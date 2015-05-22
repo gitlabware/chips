@@ -1,0 +1,1 @@
+$('#cargaForm').load(urlentrega);

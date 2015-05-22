@@ -1,0 +1,1 @@
+<h3 style="color: green;"><?php echo $message; ?></h3>

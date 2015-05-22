@@ -1,0 +1,1 @@
+[12-Jul-2013 15:18:24 America/Denver] PHP Fatal error:  Call to undefined method VentasdistribuidorController::getday() in /home1/cherrera/public_html/viva/app/Controller/VentasdistribuidorController.php on line 44
