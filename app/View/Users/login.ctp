@@ -2,7 +2,7 @@
 
     <hgroup id="login-title" class="large-margin-bottom">
         <!--<h1 class="login-title-image"></h1>-->
-        <h5>&copy; Sanchez Alvarez</h5>
+        <h5>&copy; SISTEMA SEJAS SRL.</h5>
     </hgroup>
 
     <div id="form-wrapper">
