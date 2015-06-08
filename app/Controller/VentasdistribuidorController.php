@@ -23,7 +23,7 @@ class VentasdistribuidorController extends AppController {
     'Tiposobservacione',
     'Deposito',
     'Recargado',
-    'Listacliente', 'User','Rutasusuario');
+    'Listacliente', 'User', 'Rutasusuario');
   public $layout = 'vivadistribuidor';
   public $components = array('RequestHandler', 'Session', 'Acl', 'Auth', 'DataTable');
 
@@ -344,7 +344,7 @@ class VentasdistribuidorController extends AppController {
       $dat['total'] = $total - $dat['salida'];
       $this->Movimiento->save($dat);
     }
-    $this->registra_recarga();
+    //$this->registra_recarga();
     $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
     $this->redirect(array('action' => 'clientes'));
   }
@@ -1187,12 +1187,12 @@ class VentasdistribuidorController extends AppController {
   }
 
   public function clientes() {
-    
+
     if ($this->RequestHandler->responseType() == 'json') {
       $asignar = '<button class="button blue-gradient compact icon-list" type="button" onclick="asignar(' . "',Cliente.id,'" . ')">Asignar</button>';
       $venta = '<button class="button green-gradient compact icon-list" type="button" onclick="venta(' . "',Cliente.id,'" . ')">Venta</button>';
       $acciones = "$asignar $venta";
-      $rutas_usuario = $this->Rutasusuario->find('list',array(
+      $rutas_usuario = $this->Rutasusuario->find('list', array(
         'conditions' => array('Rutasusuario.user_id' => $this->Session->read('Auth.User.id')),
         'fields' => array('Rutasusuario.ruta_id')
       ));
@@ -1278,11 +1278,11 @@ class VentasdistribuidorController extends AppController {
         $datos[$key]['precios'] = $datos_aux;
         //debug($datos);exit;
       }
-      $recargas = $this->Recargado->find('all',array(
-        'conditions' => array('Recargado.user_id' => $this->Session->read('Auth.User.id'),'DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin)
+      $recargas = $this->Recargado->find('all', array(
+        'conditions' => array('Recargado.user_id' => $this->Session->read('Auth.User.id'), 'DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin)
       ));
     }
-    $this->set(compact('datos','recargas'));
+    $this->set(compact('datos', 'recargas'));
   }
 
   public function reporte_cliente() {
@@ -1364,15 +1364,15 @@ class VentasdistribuidorController extends AppController {
       'conditions' => array('Productosprecio.tipousuario_id' => 3, 'Productosprecio.escala' => 'MAYOR'),
       'group' => array('Productosprecio.producto_id')
     ));
-    $pedidos_c = $this->Pedido->find('list', array('fields' => array('Pedido.producto_id', 'Pedido.cantidad'),'conditions' => array('Pedido.numero' => $numero)));
-    $pedidos_i = $this->Pedido->find('list', array('fields' => array('Pedido.producto_id', 'Pedido.id'),'conditions' => array('Pedido.numero' => $numero)));
+    $pedidos_c = $this->Pedido->find('list', array('fields' => array('Pedido.producto_id', 'Pedido.cantidad'), 'conditions' => array('Pedido.numero' => $numero)));
+    $pedidos_i = $this->Pedido->find('list', array('fields' => array('Pedido.producto_id', 'Pedido.id'), 'conditions' => array('Pedido.numero' => $numero)));
     $ultimo_pedido = $this->Pedido->find('first', array('conditions' => array('Pedido.numero' => $numero), 'order' => 'Pedido.id DESC'));
     if (!empty($ultimo_pedido)) {
       $this->request->data['Dato']['monto'] = $ultimo_pedido['Pedido']['monto'];
       $this->request->data['Dato']['numero'] = $ultimo_pedido['Pedido']['numero'];
     }
-    /*debug($pedidos_i);
-    exit;*/
+    /* debug($pedidos_i);
+      exit; */
     $this->set(compact('productos', 'pedidos_c', 'pedidos_i', 'ultimo_pedido'));
   }
 
@@ -1414,9 +1414,9 @@ class VentasdistribuidorController extends AppController {
     ));
     $this->set(compact('pedidos'));
   }
-  
-  public function cancela_asignado(){
-    
+
+  public function cancela_asignado() {
+
     //debug($this->request->data);
     $idDis = $this->Session->read('Auth.User.id');
     if (!empty($this->request->data['Dato'])) {
@@ -1427,10 +1427,10 @@ class VentasdistribuidorController extends AppController {
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id'),
-        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => $idDistribuidor,'Chip.fecha_entrega_d' => $fecha_d)
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_d)
       ));
-       //debug($chips);
-       // exit; 
+      //debug($chips);
+      // exit; 
       foreach ($chips as $ch) {
         $this->Chip->id = $ch['Chip']['id'];
         $dato['Chip']['fecha_entrega_d'] = date('Y-m-d');
@@ -1443,7 +1443,8 @@ class VentasdistribuidorController extends AppController {
     }
     $this->redirect($this->referer());
   }
-  
+
+
 }
 
 ?>
