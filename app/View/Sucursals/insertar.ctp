@@ -13,7 +13,7 @@
             <div class="new-row six-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Nombre <small>(requerido)</small></label>                    
-                    <?php echo $this->Form->text('nombre', array('class' => 'input full-width')); ?>
+                    <?php echo $this->Form->text('nombre', array('class' => 'input full-width input validate[required]', 'autofocus')); ?>
                 </p>
             </div>
             <div class="six-columns">                

@@ -34,8 +34,7 @@ App::uses('Controller', 'Controller');
 class AppController extends Controller {
     
     public $components = array(
-        'Acl',
-        'Auth' => array('authorize' => array('Actions' => array('actionPath' => 'controllers'))),
+        'Auth',
         'Session',
         'DebugKit.Toolbar');
         
@@ -47,14 +46,14 @@ class AppController extends Controller {
         'Ajax');
 
     
-    public function beforeFilter()
+    /*public function beforeFilter()
     {
         //Configure AuthComponent
         $this->Auth->authorize = 'actions';
         $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login');
         $this->Auth->logoutRedirect = array('controller' => 'users', 'action' => 'login');
         $this->Auth->loginRedirect = array('controller' => 'users', 'action' => 'index');
-    }
+    }*/
     public function validar($modelo) {
         $devuelve = '';
         if ($this->$modelo->validates()) {

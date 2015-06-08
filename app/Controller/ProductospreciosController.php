@@ -16,7 +16,7 @@ class ProductospreciosController extends AppController {
 
   public function beforeFilter() {
     parent::beforeFilter();
-    $this->Auth->allow();
+    //$this->Auth->allow();
   }
 
   //public
@@ -30,6 +30,7 @@ class ProductospreciosController extends AppController {
     }
     $this->render('message');
   }
+
   public function index() {
 
     $productosprecios = $this->Productosprecio->find('all');
@@ -123,9 +124,9 @@ class ProductospreciosController extends AppController {
     $this->layout = 'ajax';
     $precios = $this->Productosprecio->find('all', array(
       'conditions' => array('Productosprecio.producto_id' => $idProducto)
-      , 'fields' => array('Tipousuario.nombre', 'Producto.nombre', 'Productosprecio.precio', 'Productosprecio.escala','Productosprecio.id')
+      , 'fields' => array('Tipousuario.nombre', 'Producto.nombre', 'Productosprecio.precio', 'Productosprecio.escala', 'Productosprecio.id')
     ));
-    
+
     $escalas = $this->Escala->find('list', array('fields' => array('Escala.nombre', 'Escala.nombre')));
     $usuarios = $this->Tipousuario->find('list', array('fields' => 'Tipousuario.nombre'));
     $this->set(compact('precios', 'idProducto', 'escalas', 'usuarios'));
@@ -134,16 +135,30 @@ class ProductospreciosController extends AppController {
   public function registra_precio() {
     $array['correcto'] = '';
     if (!empty($this->request->data)) {
+      if ($this->request->data['Productosprecio']['aux_escala'] == 1) {
+        $this->request->data['Productosprecio']['tipousuario_id'] = 3;
+        $this->request->data['Productosprecio']['escala'] = 'MAYOR';
+        $this->request->data['Productosprecio']['escala_id'] = 1;
+      } elseif ($this->request->data['Productosprecio']['aux_escala'] == 2) {
+        $this->request->data['Productosprecio']['tipousuario_id'] = 2;
+        $this->request->data['Productosprecio']['escala'] = 'MAYOR';
+        $this->request->data['Productosprecio']['escala_id'] = 1;
+      } elseif ($this->request->data['Productosprecio']['aux_escala'] == 3) {
+        $this->request->data['Productosprecio']['tipousuario_id'] = 2;
+        $this->request->data['Productosprecio']['escala'] = 'TIENDA';
+        $this->request->data['Productosprecio']['escala_id'] = 3;
+      }
       $this->Productosprecio->create();
       if ($this->Productosprecio->save($this->request->data['Productosprecio'])) {
         $array['correcto'] = 'Se registro correctamente!!!';
-      } 
+      }
     }
     $this->respond($array, true);
   }
-  public function quita_precio($idPrecio = NULL,$idProducto = NULL){
+
+  public function quita_precio($idPrecio = NULL, $idProducto = NULL) {
     $array['correcto'] = '';
-    if($this->Productosprecio->delete($idPrecio)){
+    if ($this->Productosprecio->delete($idPrecio)) {
       $array['correcto'] = 'Se quito el precio correctamente!!!';
     }
     $this->respond($array, true);

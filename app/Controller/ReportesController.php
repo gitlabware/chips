@@ -1,5 +1,4 @@
 
-
 <?php
 
 class ReportesController extends Controller {
@@ -18,7 +17,7 @@ class ReportesController extends Controller {
     'Sucursal',
     'Cliente');
   public $layout = 'viva';
-  public $components = array('Fechasconvert','Session');
+  public $components = array('Fechasconvert', 'Session');
 
   public function beforeFilter() {
     parent::beforeFilter();
@@ -509,7 +508,7 @@ class ReportesController extends Controller {
         'recursive' => 0,
         'conditions' => array('Chip.fecha_entrega_d >=' => $fecha_ini, 'Chip.fecha_entrega_d <=' => $fecha_fin),
         'group' => array('Chip.distribuidor_id'),
-        'fields' => array('Chip.distribuidor', 'Chip.activados', 'COUNT(*) entregados','Chip.distribuidor_id')
+        'fields' => array('Chip.distribuidor', 'Chip.activados', 'COUNT(*) entregados', 'Chip.distribuidor_id')
       ));
 
       /* debug($datos);
@@ -523,26 +522,73 @@ class ReportesController extends Controller {
     if (!empty($this->request->data['Dato'])) {
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $activado_t = $this->request->data['Dato']['activado'];
+      $idDistribuidor = $this->request->data['Dato']['distribuidor_id'];
       $sql1 = "(SELECT users.persona_id FROM users WHERE (users.id = Chip.distribuidor_id))";
       $sql11 = "(SELECT CONCAT(personas.nombre,' ',personas.ap_paterno,' ',personas.ap_materno) FROM personas WHERE (personas.id = ($sql1)))";
       $sql2 = "(SELECT nombre FROM lugares WHERE lugares.id = (SELECT users.lugare_id FROM users WHERE (users.id = Chip.distribuidor_id)))";
+      $sql3 = "(IF(EXISTS(SELECT id FROM activados ac WHERE ac.phone_number = Chip.telefono),1,0))";
       $this->Chip->virtualFields = array(
         'distribuidor' => "CONCAT($sql11)",
-        'lugar_dis' => "CONCAT($sql2)"
+        'lugar_dis' => "CONCAT($sql2)",
+        'activado' => "CONCAT($sql3)"
       );
+      $condiciones = array();
+      $condiciones['Chip.fecha >='] = $fecha_ini;
+      $condiciones['Chip.fecha <='] = $fecha_fin;
+      $condiciones['Chip.activado'] = $activado_t;
+      $condiciones['Chip.distribuidor_id'] = $idDistribuidor;
+      //debug($condiciones);exit;
       $datos = $this->Chip->find('all', array(
-        'conditions' => array('Chip.fecha >=' => $fecha_ini,'Chip.fecha <=' => $fecha_fin,'Chip.cliente_id !=' => NULL)
+        'conditions' => $condiciones
       ));
     }
-    $this->set(compact('datos'));
+    $this->User->virtualFields = array(
+      'nombre_d' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+    $distribuidores = $this->User->find('list',array('fields' => 'User.nombre_d','recursive' => 0,'conditions' => array('User.group_id' => 2)));
+    $this->set(compact('datos','distribuidores'));
   }
-  
+  public function reporte_chips_c_total() {
+    $datos = array();
+    if (!empty($this->request->data['Dato'])) {
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $activado_t = $this->request->data['Dato']['activado'];
+      $idDistribuidor = $this->request->data['Dato']['distribuidor_id'];
+      $sql1 = "(SELECT users.persona_id FROM users WHERE (users.id = Chip.distribuidor_id))";
+      $sql11 = "(SELECT CONCAT(personas.nombre,' ',personas.ap_paterno,' ',personas.ap_materno) FROM personas WHERE (personas.id = ($sql1)))";
+      $sql2 = "(SELECT nombre FROM lugares WHERE lugares.id = (SELECT users.lugare_id FROM users WHERE (users.id = Chip.distribuidor_id)))";
+      $sql3 = "(SELECT COUNT(*) FROM chips c,activados a WHERE c.telefono = a.phone_number AND Chip.distribuidor_id = c.distribuidor_id AND c.distribuidor_id = $idDistribuidor)";
+      $this->Chip->virtualFields = array(
+        'distribuidor' => "CONCAT($sql11)",
+        'lugar_dis' => "CONCAT($sql2)",
+        'activados' => "CONCAT($sql3)"
+      );
+      $condiciones = array();
+      $condiciones['Chip.fecha >='] = $fecha_ini;
+      $condiciones['Chip.fecha <='] = $fecha_fin;
+      $condiciones['Chip.distribuidor_id'] = $idDistribuidor;
+      //debug($condiciones);exit;
+      $datos = $this->Chip->find('all', array(
+        'conditions' => $condiciones
+        ,'group' => array('Chip.cliente_id'),
+        'fields' => array('Cliente.num_registro','Cliente.nombre','Cliente.zona','Chip.distribuidor','Chip.lugar_dis','Chip.activados','COUNT(*) as total')
+      ));
+    }
+    $this->User->virtualFields = array(
+      'nombre_d' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+    $distribuidores = $this->User->find('list',array('fields' => 'User.nombre_d','recursive' => 0,'conditions' => array('User.group_id' => 2)));
+    $this->set(compact('datos','distribuidores'));
+  }
+
   public function reporte_cliente_tienda() {
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
     $fecha_fin = $this->request->data['Dato']['fecha_fin'];
     $sucursal = $this->request->data['Dato']['sucursal_id'];
     $condiciones1 = array();
-    if(!empty($sucursal)){
+    if (!empty($sucursal)) {
       $condiciones1['Movimiento.sucursal_id'] = $sucursal;
     }
     $condiciones1['Movimiento.sucursal_id !='] = NULL;
@@ -554,24 +600,24 @@ class ReportesController extends Controller {
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
         'conditions' => $condiciones1,
-        'group' => array('Movimiento.cliente_id','Movimiento.sucursal_id'),
-        'fields' => array('Cliente.nombre','Cliente.num_registro','Movimiento.cliente_id', 'SUM(Movimiento.salida) ventas', 'SUM(Movimiento.precio_uni*Movimiento.salida)','Sucursal.nombre','Movimiento.sucursal_id')
+        'group' => array('Movimiento.cliente_id', 'Movimiento.sucursal_id'),
+        'fields' => array('Cliente.nombre', 'Cliente.num_registro', 'Movimiento.cliente_id', 'SUM(Movimiento.salida) ventas', 'SUM(Movimiento.precio_uni*Movimiento.salida)', 'Sucursal.nombre', 'Movimiento.sucursal_id')
       ));
-      foreach ($datos as $key => $da){
+      foreach ($datos as $key => $da) {
         $datos_aux = $this->Movimiento->find('all', array(
           'recursive' => 0, 'order' => 'Movimiento.producto_id',
-          'conditions' => array('Movimiento.sucursal_id' => $da['Movimiento']['sucursal_id'], 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.precio_uni !=' => NULL, 'Movimiento.cliente_id' => $da['Movimiento']['cliente_id'],'Movimiento.salida !=' => 'null'),
-          'group' => array('Movimiento.producto_id','Movimiento.precio_uni'),
-          'fields' => array('Producto.nombre','SUM(Movimiento.salida) vendidos', 'Movimiento.precio_uni', '(Movimiento.precio_uni*SUM(Movimiento.salida)) precio_total')
+          'conditions' => array('Movimiento.sucursal_id' => $da['Movimiento']['sucursal_id'], 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.precio_uni !=' => NULL, 'Movimiento.cliente_id' => $da['Movimiento']['cliente_id'], 'Movimiento.salida !=' => 'null'),
+          'group' => array('Movimiento.producto_id', 'Movimiento.precio_uni'),
+          'fields' => array('Producto.nombre', 'SUM(Movimiento.salida) vendidos', 'Movimiento.precio_uni', '(Movimiento.precio_uni*SUM(Movimiento.salida)) precio_total')
         ));
         $datos[$key]['productos'] = $datos_aux;
       }
       //debug($datos);exit;
     }
-    $sucursales = $this->Sucursal->find('list',array('fields' => 'Sucursal.nombre'));
-    $this->set(compact('datos','sucursales'));
+    $sucursales = $this->Sucursal->find('list', array('fields' => 'Sucursal.nombre'));
+    $this->set(compact('datos', 'sucursales'));
   }
-  
+
   public function reporte_detallado_precio_tienda() {
 
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
@@ -579,7 +625,7 @@ class ReportesController extends Controller {
     $sucursal = $this->request->data['Dato']['sucursal_id'];
     $condiciones1 = array();
     $sucursal_sql = '';
-    if(!empty($sucursal)){
+    if (!empty($sucursal)) {
       $condiciones1['Movimiento.sucursal_id'] = $sucursal;
       $sucursal_sql = "mo.sucursal_id = $sucursal AND";
     }
@@ -597,8 +643,8 @@ class ReportesController extends Controller {
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
         'conditions' => $condiciones1,
-        'group' => array('Movimiento.producto_id','Movimiento.sucursal_id'),
-        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s','Movimiento.sucursal_id','Sucursal.nombre')
+        'group' => array('Movimiento.producto_id', 'Movimiento.sucursal_id'),
+        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s', 'Movimiento.sucursal_id', 'Sucursal.nombre')
       ));
       foreach ($datos as $key => $da) {
         $datos_aux = $this->Movimiento->find('all', array(
@@ -611,16 +657,17 @@ class ReportesController extends Controller {
         //debug($datos);exit;
       }
     }
-    $sucursales = $this->Sucursal->find('list',array('fields' => 'Sucursal.nombre'));
-    $this->set(compact('datos','sucursales'));
+    $sucursales = $this->Sucursal->find('list', array('fields' => 'Sucursal.nombre'));
+    $this->set(compact('datos', 'sucursales'));
   }
+
   public function reportes_tienda() {
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
     $fecha_fin = $this->request->data['Dato']['fecha_fin'];
     $sucursal = $this->request->data['Dato']['sucursal_id'];
     $condiciones1 = array();
     $sucursal_sql = '';
-    if(!empty($sucursal)){
+    if (!empty($sucursal)) {
       $condiciones1['Movimiento.sucursal_id'] = $sucursal;
       $sucursal_sql = "mo.sucursal_id = $sucursal AND";
     }
@@ -628,7 +675,7 @@ class ReportesController extends Controller {
     $condiciones1['Movimiento.salida !='] = NULL;
     $condiciones1['Movimiento.created >='] = $fecha_ini;
     $condiciones1['Movimiento.created <='] = $fecha_fin;
-    
+
     $datos = array();
     /* debug($fecha_ini);
       debug($fecha_fin);exit; */
@@ -648,22 +695,23 @@ class ReportesController extends Controller {
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
         'conditions' => $condiciones1,
-        'group' => array('Movimiento.producto_id','Movimiento.sucursal_id'),
-        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.ventas', 'Movimiento.ventas_mayor', 'Movimiento.precio_v_t', 'Movimiento.precio_v_mayor', 'Movimiento.total_s','Sucursal.nombre')
+        'group' => array('Movimiento.producto_id', 'Movimiento.sucursal_id'),
+        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.ventas', 'Movimiento.ventas_mayor', 'Movimiento.precio_v_t', 'Movimiento.precio_v_mayor', 'Movimiento.total_s', 'Sucursal.nombre')
       ));
       /* debug($datos);
         exit; */
     }
-    $sucursales = $this->Sucursal->find('list',array('fields' => 'Sucursal.nombre'));
-    $this->set(compact('datos','sucursales'));
+    $sucursales = $this->Sucursal->find('list', array('fields' => 'Sucursal.nombre'));
+    $this->set(compact('datos', 'sucursales'));
   }
+
   public function reporte_detallado_precio_dist() {
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
     $fecha_fin = $this->request->data['Dato']['fecha_fin'];
     $persona = $this->request->data['Dato']['persona_id'];
     $condiciones1 = array();
     $persona_sql = '';
-    if(!empty($persona)){
+    if (!empty($persona)) {
       $condiciones1['Movimiento.persona_id'] = $persona;
       $persona_sql = "mo.persona_id = $persona AND";
     }
@@ -681,12 +729,12 @@ class ReportesController extends Controller {
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
         'conditions' => $condiciones1,
         'group' => array('Movimiento.producto_id'),
-        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s','Persona.nombre','Persona.ap_paterno')
+        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s', 'Persona.nombre', 'Persona.ap_paterno')
       ));
       foreach ($datos as $key => $da) {
         $datos_aux = $this->Movimiento->find('all', array(
           'recursive' => -1, 'order' => 'Movimiento.producto_id',
-          'conditions' => array('Movimiento.persona_id' => $persona, 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.precio_uni !=' => NULL, 'Movimiento.producto_id' => $da['Producto']['id'],'Movimiento.salida !=' => NULL),
+          'conditions' => array('Movimiento.persona_id' => $persona, 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.precio_uni !=' => NULL, 'Movimiento.producto_id' => $da['Producto']['id'], 'Movimiento.salida !=' => NULL),
           'group' => array('Movimiento.precio_uni'),
           'fields' => array('SUM(Movimiento.salida) vendidos', 'Movimiento.precio_uni', '(Movimiento.precio_uni*SUM(Movimiento.salida)) precio_total', 'Movimiento.producto_id')
         ));
@@ -695,17 +743,18 @@ class ReportesController extends Controller {
       }
     }
     $this->User->virtualFields = array(
-        'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
-      );
-    $distribuidores = $this->User->find('list',array('recursive' => 0,'conditions' => array('User.group_id' => 2),'fields' => array('User.persona_id','User.nombre_completo')));
-    $this->set(compact('datos','distribuidores'));
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+    $distribuidores = $this->User->find('list', array('recursive' => 0, 'conditions' => array('User.group_id' => 2), 'fields' => array('User.persona_id', 'User.nombre_completo')));
+    $this->set(compact('datos', 'distribuidores'));
   }
+
   public function reporte_cliente_dist() {
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
     $fecha_fin = $this->request->data['Dato']['fecha_fin'];
     $persona = $this->request->data['Dato']['persona_id'];
     $condiciones1 = array();
-    if(!empty($persona)){
+    if (!empty($persona)) {
       $condiciones1['Movimiento.persona_id'] = $persona;
     }
     $condiciones1['Movimiento.persona_id !='] = NULL;
@@ -719,24 +768,24 @@ class ReportesController extends Controller {
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
         'conditions' => $condiciones1,
         'group' => array('Movimiento.cliente_id'),
-        'fields' => array('Cliente.nombre','Cliente.num_registro','Movimiento.cliente_id', 'SUM(Movimiento.salida) ventas', 'SUM(Movimiento.precio_uni*Movimiento.salida)','Persona.nombre','Persona.ap_paterno','Movimiento.persona_id')
+        'fields' => array('Cliente.nombre', 'Cliente.num_registro', 'Movimiento.cliente_id', 'SUM(Movimiento.salida) ventas', 'SUM(Movimiento.precio_uni*Movimiento.salida)', 'Persona.nombre', 'Persona.ap_paterno', 'Movimiento.persona_id','TIME(Movimiento.modified) as hora')
       ));
-      foreach ($datos as $key => $da){
+      foreach ($datos as $key => $da) {
         $datos_aux = $this->Movimiento->find('all', array(
           'recursive' => 0, 'order' => 'Movimiento.producto_id',
-          'conditions' => array('Movimiento.persona_id' => $da['Movimiento']['persona_id'], 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.precio_uni !=' => NULL, 'Movimiento.cliente_id' => $da['Movimiento']['cliente_id'],'Movimiento.salida !=' => 'null'),
-          'group' => array('Movimiento.producto_id','Movimiento.precio_uni'),
-          'fields' => array('Producto.nombre','SUM(Movimiento.salida) vendidos', 'Movimiento.precio_uni', '(Movimiento.precio_uni*SUM(Movimiento.salida)) precio_total')
+          'conditions' => array('Movimiento.persona_id' => $da['Movimiento']['persona_id'], 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.precio_uni !=' => NULL, 'Movimiento.cliente_id' => $da['Movimiento']['cliente_id'], 'Movimiento.salida !=' => 'null'),
+          'group' => array('Movimiento.producto_id', 'Movimiento.precio_uni'),
+          'fields' => array('Producto.nombre', 'SUM(Movimiento.salida) vendidos', 'Movimiento.precio_uni', '(Movimiento.precio_uni*SUM(Movimiento.salida)) precio_total')
         ));
         $datos[$key]['productos'] = $datos_aux;
       }
       //debug($datos);exit;
     }
     $this->User->virtualFields = array(
-        'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
-      );
-    $distribuidores = $this->User->find('list',array('recursive' => 0,'conditions' => array('User.group_id' => 2),'fields' => array('User.persona_id','User.nombre_completo')));
-    $this->set(compact('datos','distribuidores'));
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+    $distribuidores = $this->User->find('list', array('recursive' => 0, 'conditions' => array('User.group_id' => 2), 'fields' => array('User.persona_id', 'User.nombre_completo')));
+    $this->set(compact('datos', 'distribuidores'));
   }
 
 }

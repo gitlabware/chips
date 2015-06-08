@@ -31,7 +31,7 @@
         <link rel="stylesheet" media="only all and (min-width: 992px)" href="<?php echo $this->webroot; ?>css/992.css?v=1">
         <link rel="stylesheet" media="only all and (min-width: 1200px)" href="<?php echo $this->webroot; ?>css/1200.css?v=1">
         <!-- For Retina displays -->
-        <link rel="stylesheet" media="only all and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min-device-pixel-ratio: 1.5)" href="css/2x.css?v=1">
+        <link rel="stylesheet" media="only all and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min-device-pixel-ratio: 1.5)" href="<?php echo $this->webroot; ?>css/2x.css?v=1">
 
         <!-- Webfonts -->
         <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>-->
@@ -72,8 +72,7 @@
         <!-- Microsoft clear type rendering -->
         <meta http-equiv="cleartype" content="on">
         <!-- Scripts -->
-        <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.8.2.min.js"></script>
-        <script src="<?php echo $this->webroot; ?>js/setup.js"></script>
+        <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.10.2.min.js"></script>
 
         <?php
         echo $this->fetch('css');
@@ -109,14 +108,13 @@
         <?php if ($this->Session->read('Auth.User.group_id') == 2): ?>
           <?php echo $this->element('menu/admindistribuidor'); ?>
         <?php elseif ($this->Session->read('Auth.User.group_id') == 1): ?>
-          <?php echo $this->element('menu/admindistribuidor'); ?>
+          <?php //echo $this->element('menu/admindistribuidor'); ?>
           <?php echo $this->element('menu/admin'); ?>             
         <?php endif; ?>
 
         <!-- JavaScript at the bottom for fast page loading -->
 
         <!-- Scripts -->
-        <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.10.2.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/setup.js"></script>
 
         <!-- Template functions -->
@@ -127,12 +125,12 @@
         <script src="<?php echo $this->webroot; ?>js/developr.tooltip.js"></script>
         <script src="<?php echo $this->webroot; ?>js/developr.table.js"></script>
         <script src="<?php echo $this->webroot; ?>js/developr.modal.js"></script>
-        <?php echo $this->fetch('js_add'); ?>
+
         <?php echo $this->element('jsvalidador') ?>
         <!-- Plugins -->
         <script src="<?php echo $this->webroot; ?>js/libs/jquery.tablesorter.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.min.js"></script>
-
+        <?php echo $this->fetch('js_add'); ?>
         <script>
           // Call template init (optional, but faster if called manually)
           $.template.init();
@@ -140,6 +138,9 @@
           // Table sort - DataTables
           var table = $('#sorting-advanced');
           table.dataTable({
+              "oLanguage": {
+                  "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+              },
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
               "order": [],
@@ -149,10 +150,13 @@
                   table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
                   tableStyled = true;
               }
-          });
+          });          
 
           var table2 = $('#tabla-json');
           table2.dataTable({
+              "oLanguage": {
+                  "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+              },
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
               'bProcessing': true,
@@ -167,7 +171,7 @@
               }
           });
 
-          function cargarmodal(url,titulo) {
+          function cargarmodal(url, titulo) {
               $.modal({
                   content: '<div id="idmodal"></div>',
                   title: titulo,

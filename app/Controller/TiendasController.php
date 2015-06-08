@@ -28,7 +28,7 @@ class TiendasController extends AppController {
 
   public function beforeFilter() {
     parent::beforeFilter();
-    $this->Auth->allow();
+    //$this->Auth->allow();
   }
 
   public function ajaxpidetienda($id = null, $idProducto = null, $precio = null) {
@@ -203,8 +203,8 @@ class TiendasController extends AppController {
 
     $precios = $this->Productosprecio->find('all', array(
       'conditions' => array(
-        'Productosprecio.tipousuario_id' => 3,
-        'Producto.proveedor like' => 'VIVA',
+        'Productosprecio.tipousuario_id' => 2,
+        //'Producto.proveedor like' => 'VIVA',
         'Productosprecio.escala' => 'MAYOR',
         'Producto.estado' => '1'),
       'order' => array('Producto.tipo_producto DESC', 'Productosprecio.precio DESC',
@@ -212,8 +212,9 @@ class TiendasController extends AppController {
     //debug($precios);exit;
     $rows = $this->Productosprecio->find('all', array(
       'conditions' => array(
-        'Productosprecio.tipousuario_id' => 3,
-        'Producto.proveedor like' => 'VIVA',
+        'Productosprecio.tipousuario_id' => 2,
+        //'Producto.proveedor like' => 'VIVA',
+        'Productosprecio.escala' => 'MAYOR',
         'Producto.estado' => '1'),
       'fields' => array(
         'Count(Productosprecio.id) as cantidad',
@@ -224,6 +225,7 @@ class TiendasController extends AppController {
       $this->request->data = $this->Session->read('form_venta_mayor');
       $this->Session->delete('form_venta_mayor');
     }
+    //debug($precios);exit;
     $this->set(compact('precios', 'rows', 'idAlmacen', 'usu', 'datoscli', 'sucursal', 'recargas'));
   }
 

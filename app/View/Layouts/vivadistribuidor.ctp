@@ -46,6 +46,7 @@
 
         <!-- JavaScript at bottom except for Modernizr -->
         <script src="<?php echo $this->webroot; ?>js/libs/modernizr.custom.js"></script>
+        <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/modal.css?v=1">
 
         <!-- For Modern Browsers -->
         <link rel="shortcut icon" href="<?php echo $this->webroot; ?>img/favicons/favicon.png">
@@ -72,7 +73,7 @@
         <!-- Scripts -->
         <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.8.2.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/setup.js"></script>
-
+        
         <?php
         echo $this->fetch('css');
         echo $this->fetch('script');
@@ -109,7 +110,7 @@
         <!-- JavaScript at the bottom for fast page loading -->
 
         <!-- Scripts -->
-        <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.8.2.min.js"></script>
+        <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.10.2.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/setup.js"></script>
 
         <!-- Template functions -->
@@ -119,6 +120,7 @@
         <script src="<?php echo $this->webroot; ?>js/developr.scroll.js"></script>
         <script src="<?php echo $this->webroot; ?>js/developr.tooltip.js"></script>
         <script src="<?php echo $this->webroot; ?>js/developr.table.js"></script>
+        <script src="<?php echo $this->webroot; ?>js/developr.modal.js"></script>
         
         <?php echo $this->element('jsvalidador') ?>
         <?php echo $this->fetch('js_add'); ?>

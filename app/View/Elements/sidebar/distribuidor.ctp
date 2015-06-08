@@ -15,7 +15,7 @@
 
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
-            <li><a href="<?php echo $this->Html->url(array('controller'=>'ventasdistribuidor', 'action'=>'pidecodigo'))?>" title="INICIO"><span class="icon-gear"></span></span></a></li>
+            <li><a href="<?php echo $this->Html->url(array('controller'=>'ventasdistribuidor', 'action'=>'clientes'))?>" title="INICIO"><span class="icon-gear"></span></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller'=>'users', 'action'=>'salir'))?>" title="Cerrar Session"><span class="icon-user"></span></a></li>
         </ul>
 
@@ -53,7 +53,16 @@
 
                     </ul>
                 </li>
-                
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor','action'=>'entregados')); ?>">Chips entregados</a></li>
+                <li class="with-right-arrow">
+                    <span>Pedidos</span>
+                    <ul class="big-menu">
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'pedido')); ?>">Nuevo Pedido</a></li>
+
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'lista_pedidos')); ?>">Listado de Pedidos</a></li>                                                                        
+
+                    </ul>
+                </li>
             </ul>
         </section>
     </div>

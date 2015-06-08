@@ -9,7 +9,7 @@
         <a href="javascript:void(0)" class="button green-gradient glossy" id="btMuestraFormActivaciones">SUBIR EXCEL ACTIVACIONES</a>
         <p>&nbsp;</p>
         <div id="muestraFormAsignaciones">
-            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcel', 'enctype' => 'multipart/form-data')); ?>
+            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcel', 'id' => 'formAsig', 'enctype' => 'multipart/form-data')); ?>
             <!--        <form method="post" action="" class="columns" onsubmit="return false">                               -->
             <!--<div class="new-row-desktop four-columns six-columns-tablet twelve-columns-mobile">-->
             <div class="new-row twelve-columns">                
@@ -23,12 +23,12 @@
                         <span class="input file">
                             <span class="file-text"></span>
                             <span class="button compact orange-gradient">Seleccione</span>
-                            <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" multiple="" />
+                            <input type="file" name="data[Excel][excel]" id="special-input-1" class="file withClearFunctions" required />
                         </span>
                     </div>                                                                 
 
                     <div class="field-block button-height">
-                        <button type="submit" class="button glossy mid-margin-right">
+                        <button type="submit" id="btAsig" class="button glossy mid-margin-right">
                             <span class="button-icon orange-gradient"><span class="icon-save"></span></span>
                             Guardar Excel
                         </button>
@@ -45,21 +45,29 @@
         </div>
 
         <script>
-                            function openModal()
-                            {
-                                //console.log('hizo click');
-                                $.modal({
-                                    title: 'Formato del Archivo',
-                                    content: '<?php echo $this->Html->image('iconos/asignados.png'); ?>',
-                                    //center: true
-                                });
-                            }
-                            ;
+          $("#formAsig").on("submit", function (e) {
+             
+             $("#btAsig").replaceWith("<span class='loader big working'></span> Trabajando ;)");
+          });       
+
+          function openModal()
+          {
+              //console.log('hizo click');
+              $.modal({
+                  content: '<div id="idmodal"></div>',
+                  title: 'Formato del Archivo',
+                  content: '<?php echo $this->Html->image('iconos/asignados.png'); ?>',
+                          center: true,
+                  width: 850,
+                  height: 450,
+              });
+          }
+          ;
 
         </script>
 
         <div id="muestraFormActivaciones" style="display: none;">
-<?php echo $this->Form->create('Chips', array('action' => 'guardaexcelactivados', 'enctype' => 'multipart/form-data')); ?>
+            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcelactivados', 'id'=>'formActi', 'enctype' => 'multipart/form-data')); ?>
             <!--        <form method="post" action="" class="columns" onsubmit="return false">                               -->
             <!--<div class="new-row-desktop four-columns six-columns-tablet twelve-columns-mobile">-->
             <div class="new-row twelve-columns">                
@@ -68,17 +76,17 @@
                     <legend class="legend green-gradient">Formulario Subida Excel Activaciones</legend>
                     <div class="field-block button-height">							
                         <label for="login" class="label"><b>Seleccionar Excel :</b></label>
-<?php //echo $this->Form->text('Persona.nombre', array('class' => 'span12', 'required'));   ?>
+                        <?php //echo $this->Form->text('Persona.nombre', array('class' => 'span12', 'required'));   ?>
                         <!--<input type="text" name="login" id="login" value="" class="input">-->
                         <span class="input file">
                             <span class="file-text"></span>
                             <span class="button compact green-gradient">Seleccione</span>
-                            <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" multiple="" />
+                            <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
                         </span>
                     </div>                                                                 
 
                     <div class="field-block button-height">
-                        <button type="submit" class="button glossy mid-margin-right">
+                        <button type="submit" id="btActi" class="button glossy mid-margin-right">
                             <span class="button-icon green-gradient"><span class="icon-save"></span></span>
                             Guardar Excel
                         </button>
@@ -95,27 +103,35 @@
         </div>
 
         <script>
-            $(document).ready(function() {
-                $("#btMuestraFormAsignaciones").click(function() {
-                    $("#muestraFormAsignaciones").show('slow');
-                    $("#muestraFormActivaciones").hide('slow');
-                });
+          $("#formActi").on("submit", function (e) {
+             
+             $("#btActi").replaceWith("<span class='loader big working'></span> Trabajando ;)");
+          }); 
+          
+          $(document).ready(function () {
+              $("#btMuestraFormAsignaciones").click(function () {
+                  $("#muestraFormAsignaciones").show('slow');
+                  $("#muestraFormActivaciones").hide('slow');
+              });
 
-                $("#btMuestraFormActivaciones").click(function() {
-                    $("#muestraFormActivaciones").show('slow');
-                    $("#muestraFormAsignaciones").hide('slow');
-                });
-            });
+              $("#btMuestraFormActivaciones").click(function () {
+                  $("#muestraFormActivaciones").show('slow');
+                  $("#muestraFormAsignaciones").hide('slow');
+              });
+          });
 
-            function openModal2()
-            {
-                //console.log('hizo click');
-                $.modal({
-                    title: 'Formato del Archivo',
-                    content: '<?php echo $this->Html->image('iconos/activados.png'); ?>'
-                });
-            }
-            ;
+          function openModal2()
+          {
+              //console.log('hizo click');
+              $.modal({
+                  title: 'Formato del Archivo',
+                  content: '<?php echo $this->Html->image('iconos/activados.png'); ?>',
+                  center: true,
+                  width: 1190,
+                  height: 450,
+              });
+          }
+          ;
         </script>
 
         <p>&nbsp;</p>
@@ -131,14 +147,14 @@
             </thead>          
 
             <tbody>
-<?php foreach ($excels as $e): ?>
-                    <tr>                      
-                        <td><?php echo $e['Excel']['nombre_original']; ?></td>                        
-                        <td><?php echo $e['Excel']['created']; ?></td>
-                        <td><?php echo $e['Excel']['tipo']; ?></td>                       
-                        <td>Detalle</td>                       
-                    </tr>               
-<?php endforeach; ?>
+                <?php foreach ($excels as $e): ?>
+                  <tr>                      
+                      <td><?php echo $e['Excel']['nombre_original']; ?></td>                        
+                      <td><?php echo $e['Excel']['created']; ?></td>
+                      <td><?php echo $e['Excel']['tipo']; ?></td>                       
+                      <td>Detalle</td>                       
+                  </tr>               
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>

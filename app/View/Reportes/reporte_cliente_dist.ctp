@@ -120,6 +120,7 @@
                 <td>Por Productos</td>
                 <td>Venta Total</td>
                 <td>Precio Total (Bs)</td>
+                <td>Hora</td>
             </tr>
             <?php foreach ($datos as $da): ?>
               <?php
@@ -146,6 +147,7 @@
                   </td>
                   <td><?php echo $venta_total;?></td>
                   <td><?php echo $venta_prec_total;?></td>
+                  <td><?php echo $da[0]['hora']?></td>
               </tr>
             <?php endforeach; ?>
         </table> 

@@ -28,10 +28,7 @@
             <tbody>
                 
             </tbody>
-        </table>   
-        <div class="low-padding align-center">
-            <?php echo $this->Html->link('INSERTAR NUEVO PRODUCTO', array('action' => 'insertar'), array('class' => 'button blue-gradient')); ?>
-        </div>    
+        </table>               
     </div>
 </section>
 <script>

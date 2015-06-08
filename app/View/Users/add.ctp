@@ -15,7 +15,7 @@
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Nombre <small>(requerido)</small></label>                    
-                    <?php echo $this->Form->text('Persona.nombre', array('class' => 'input full-width', 'placeholder' => 'Ingrese el nombre', 'value' => "")); ?>
+                    <?php echo $this->Form->text('Persona.nombre', array('class' => 'input full-width input validate[required]', 'placeholder' => 'Ingrese el nombre', 'value' => "", 'autofocus')); ?>
                 </p>
             </div>
             <div class="four-columns">                
@@ -78,14 +78,14 @@
             <div class="three-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Usuario <small>(requerido)</small></label>
-                    <?php echo $this->Form->text('username', array('class' => 'input full-width', 'placeholder' => 'Nombre de Usuario')); ?>
+                    <?php echo $this->Form->text('username', array('class' => 'input full-width input validate[required]', 'placeholder' => 'Nombre de Usuario')); ?>
                 </p>
             </div>
 
             <div class="three-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Password <small>(requerido)</small></label>
-                    <?php echo $this->Form->password('password', array('class' => 'input full-width', 'placeholder' => 'Password')) ?>
+                    <?php echo $this->Form->password('password', array('class' => 'input full-width input validate[required]', 'placeholder' => 'Password')) ?>
                 </p>
             </div>
             <div class="two-columns">
@@ -117,7 +117,7 @@
             <div class=" new-row two-columns">
                 <p class="block-label button-height" id="mostrarruta" style="display: none">
                     <label for="validation-select" class="label"><b>Ruta:</b></label>
-                   <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select', 'required')); ?>
+                   <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select')); ?>
                 </p>
             </div>
             

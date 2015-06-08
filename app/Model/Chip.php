@@ -29,6 +29,13 @@ class Chip extends AppModel {
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
+		),
+    'Distribuidor' => array(
+			'className' => 'User',
+			'foreignKey' => 'distribuidor_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
 		)
 	);
 }

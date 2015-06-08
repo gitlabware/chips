@@ -4,13 +4,13 @@ class ProductosController extends AppController {
 
   public $layout = 'viva';
   public $name = 'Productos';
-  public $uses = array('Producto', 'Preciosventa', 'Tiposproducto', 'Marca');
+  public $uses = array('Producto', 'Preciosventa', 'Tiposproducto', 'Marca', 'Productosprecio', 'Almacene', 'Movimiento');
   public $helpers = array('Html', 'Form');
   public $components = array('Session', 'RequestHandler', 'DataTable');
 
   public function beforeFilter() {
     parent::beforeFilter();
-    $this->Auth->allow();
+    //$this->Auth->allow();
   }
 
   //public
@@ -61,6 +61,8 @@ class ProductosController extends AppController {
         }
       }
       if ($this->Producto->save($this->request->data['Producto'])) {
+        $idProducto = $this->Producto->getLastInsertID();
+        $this->registra_precio_cantidad($idProducto);
         $this->Session->setFlash('Producto Registrado', 'msgbueno');
       } else {
         $this->Session->setFlash('No se pudo registrar!!!', 'msgerror');
@@ -73,6 +75,43 @@ class ProductosController extends AppController {
     $marcas = $this->Marca->find('list', array('fields' => 'Marca.nombre'));
     //debug($marcas);exit;
     $this->set(compact('tiposproductos', 'marcas'));
+  }
+  public function registra_precio_cantidad($idProducto = null) {
+    if (!empty($this->request->data['Producto']['precio_venta'])) {
+      $this->request->data['Productosprecio']['producto_id'] = $idProducto;
+      if($this->request->data['Productosprecio']['escala'] == 'TIENDA'){
+        $this->request->data['Productosprecio']['tipousuario_id'] = 2;
+        $this->request->data['Productosprecio']['escala_id'] = 3;
+      }elseif ($this->request->data['Productosprecio']['escala'] == 'DISTRIBUIDOR') {
+        $this->request->data['Productosprecio']['tipousuario_id'] = 3;
+        $this->request->data['Productosprecio']['escala_id'] = 1;
+        $this->request->data['Productosprecio']['escala'] = 'MAYOR';
+      }
+      $this->request->data['Productosprecio']['precio'] = $this->request->data['Producto']['precio_venta'];
+      $this->request->data['Productosprecio']['fecha'] = date('Y-m-d');
+      $this->Productosprecio->create();
+      $this->Productosprecio->save($this->request->data['Productosprecio']);
+    }
+    if (!empty($this->request->data['Producto']['cantidad_central'])) {
+      $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
+      $ultimo = $this->Movimiento->find('first', array(
+        'order' => 'Movimiento.id DESC',
+        'conditions' => array('Movimiento.producto_id' => $idProducto, 'Movimiento.almacene_id' => $almacen['Almacene']['id'])
+      ));
+      if (!empty($ultimo)) {
+        $total = $ultimo['Movimiento']['total'] + $this->request->data['Producto']['cantidad_central'];
+      } else {
+        $total = $this->request->data['Producto']['cantidad_central'];
+      }
+      $this->request->data['Movimiento']['user_id'] = $this->Session->read('Auth.User.id');
+      $this->request->data['Movimiento']['producto_id'] = $idProducto;
+      $this->request->data['Movimiento']['ingreso'] = $this->request->data['Producto']['cantidad_central'];
+      $this->request->data['Movimiento']['total'] = $total;
+      $this->request->data['Movimiento']['almacene_id'] = $almacen['Almacene']['id'];
+      $this->request->data['Movimiento']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+      $this->Movimiento->create();
+      $this->Movimiento->save($this->request->data['Movimiento']);
+    }
   }
 
   public function guarda_imagen() {
@@ -169,7 +208,8 @@ class ProductosController extends AppController {
       $this->redirect(array('action' => 'index'), null, true);
     }
   }
-
+  
+  
 }
 
 ?>

@@ -10,13 +10,13 @@ App::uses('AppController', 'Controller');
  */
 class AlmacenesController extends AppController {
 
-  public $uses = array('Almacene', 'Tiposproducto', 'Persona', 'Producto', 'Movimiento', 'Detalle', 'User', 'Deposito', 'Movimientosrecarga', 'Sucursal', 'Banco', 'Ventascelulare');
+  public $uses = array('Almacene', 'Tiposproducto', 'Persona', 'Producto', 'Movimiento', 'Detalle', 'User', 'Deposito', 'Movimientosrecarga', 'Sucursal', 'Banco', 'Ventascelulare', 'Pedido', 'Productosprecio', 'Devuelto', 'Recargado');
   public $components = array('Session', 'Fechasconvert', 'RequestHandler', 'DataTable');
   public $layout = 'viva';
 
   public function beforeFilter() {
     parent::beforeFilter();
-    $this->Auth->allow();
+    //$this->Auth->allow();
   }
 
   /**
@@ -50,7 +50,7 @@ class AlmacenesController extends AppController {
    * @return void
    */
   public function add() {
-    
+
     if ($this->request->is('post')) {
       $this->Almacene->create();
       $this->request->data['Almacene']['central'] = 0;
@@ -133,7 +133,7 @@ class AlmacenesController extends AppController {
   }
 
   public function listaentregas($idPersona = null, $almacen = null) {
-
+    $pedidos = array();
     if ($almacen == 1) {
       $persona = $this->Almacene->find('first', array('conditions' => array('Almacene.id' => $idPersona)));
       $nombre = $persona['Almacene']['nombre'];
@@ -154,6 +154,18 @@ class AlmacenesController extends AppController {
         'group' => array('Movimiento.producto_id'),
         'order' => array('Movimiento.id DESC')
       ));
+
+      $idDistribuidor = $this->User->find('first', array('fields' => array('User.id'), 'conditions' => array('User.persona_id' => $idPersona)));
+      $ultima = $this->Pedido->find('first', array(
+        'fields' => array('Pedido.numero'),
+        'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id']),
+        'order' => 'Pedido.id DESC'
+      ));
+      if (!empty($ultima)) {
+        $pedidos = $this->Pedido->find('all', array(
+          'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id'], 'Pedido.numero' => $ultima['Pedido']['numero'])
+        ));
+      }
     }
 
     $c = 0;
@@ -180,7 +192,8 @@ class AlmacenesController extends AppController {
       )
     );
 
-    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen'));
+
+    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos'));
   }
 
   public function ajaxrepartir($idPersona = null, $almacen = null) {
@@ -400,6 +413,15 @@ class AlmacenesController extends AppController {
     $this->set(compact('productos', 'almacen'));
   }
 
+  public function ajaxproductos2($idCategoria = null, $almacen = null) {
+    $this->layout = 'ajax';
+    $productos = $this->Producto->find('all', array(
+      'conditions' => array('Producto.tiposproducto_id' => $idCategoria),
+      'recursive' => 0));
+    //debug($productos);exit;
+    $this->set(compact('productos', 'almacen'));
+  }
+
   public function ajaxcantidad($idProducto = null, $almacen = null) {
     //debug($almacen);exit;
     $this->layout = 'ajax';
@@ -584,8 +606,8 @@ class AlmacenesController extends AppController {
         'cantidad' => "$sql",
         'acciones' => "CONCAT('$acciones')"
       );
-      /*debug($id_a);
-      exit;*/
+      /* debug($id_a);
+        exit; */
       $this->paginate = array(
         'fields' => array('Producto.imagen', 'Producto.nombre', 'Marca.nombre', 'Producto.cantidad', 'Producto.acciones'),
         'recursive' => 0,
@@ -662,6 +684,276 @@ class AlmacenesController extends AppController {
       }
     }
     $this->redirect(array('action' => 'entrega_celulares', $idAlmacen, 1));
+  }
+
+  public function devuelto($idPersona = null) {
+    $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM movimientos mo WHERE mo.persona_id = $idPersona AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
+    $this->Movimiento->virtualFields = array(
+      'total_s' => "CONCAT($sql1)"
+    );
+    $distribuidor = $this->Persona->findByid($idPersona, null, null, -1);
+    $ult_movimientos = $this->Movimiento->find('all', array(
+      'conditions' => array('Movimiento.devuelto_id' => NULL, 'Movimiento.persona_id' => $idPersona, 'Movimiento.salida !=' => NULL),
+      'group' => array('Movimiento.producto_id'),
+      'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s', 'Movimiento.created'),
+      'order' => array('Movimiento.created', 'Producto.nombre')
+    ));
+    $devueltos = $this->Devuelto->find('all', array(
+      'group' => array('created'),
+      'order' => array('created DESC'),
+      'fields' => array('created')
+    ));
+
+    $datos = $this->Movimiento->find('all', array(
+      'recursive' => 0, 'order' => 'Movimiento.producto_id',
+      'conditions' => array('Movimiento.persona_id' => $idPersona, 'Movimiento.created' => date('Y-m-d'), 'Movimiento.salida !=' => NULL),
+      'group' => array('Movimiento.producto_id'),
+      'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s')
+    ));
+    foreach ($datos as $key => $da) {
+      $datos_aux = $this->Movimiento->find('all', array(
+        'recursive' => -1, 'order' => 'Movimiento.producto_id',
+        'conditions' => array('Movimiento.persona_id' => $idPersona, 'Movimiento.created' => date('Y-m-d'), 'Movimiento.precio_uni !=' => NULL, 'Movimiento.producto_id' => $da['Producto']['id'], 'Movimiento.salida !=' => NULL),
+        'group' => array('Movimiento.precio_uni'),
+        'fields' => array('SUM(Movimiento.salida) vendidos', 'Movimiento.precio_uni', '(Movimiento.precio_uni*SUM(Movimiento.salida)) precio_total', 'Movimiento.producto_id')
+      ));
+      $datos[$key]['precios'] = $datos_aux;
+      //debug($datos);exit;
+    }
+    $recargas = $this->Recargado->find('all', array(
+      'conditions' => array('Recargado.persona_id' => $idPersona, 'DATE(Recargado.created)' => date('Y-m-d'))
+    ));
+    $this->set(compact('ult_movimientos', 'distribuidor', 'devueltos', 'datos', 'recargas', 'recargas'));
+    //debug($ult_movimientos);exit;
+  }
+
+  public function registra_devuelto($idPersona = null) {
+    /* debug($this->request->data);
+      exit; */
+    $almac_cent = $this->Almacene->find('first', array('conditions' => array('central' => 1), 'fields' => array('Almacene.id')));
+    $usuario = $this->User->findBypersona_id($idPersona, null, null, -1);
+    foreach ($this->request->data['Devuelto'] as $dev) {
+      $dmov['devuelto_id'] = NULL;
+      $this->Devuelto->create();
+      $this->Devuelto->save($dev);
+      $idDevuelto = $this->Devuelto->getLastInsertID();
+      $ult_movimientos = $this->Movimiento->find('all', array(
+        'conditions' => array('Movimiento.devuelto_id' => null, 'Movimiento.persona_id' => $idPersona, 'Movimiento.salida !=' => NULL, 'Movimiento.producto_id' => $dev['producto_id']),
+        'fields' => array('Movimiento.id')
+      ));
+      $dmov['devuelto_id'] = $idDevuelto;
+      foreach ($ult_movimientos as $ul) {
+        $this->Movimiento->id = $ul['Movimiento']['id'];
+        $this->Movimiento->save($dmov);
+      }
+      $nue_mov['producto_id'] = $dev['producto_id'];
+      $nue_mov['user_id'] = $usuario['User']['id'];
+      $nue_mov['persona_id'] = $idPersona;
+      $nue_mov['salida'] = $dev['cantidad'];
+      $nue_mov['total'] = $dev['total'] - $dev['cantidad'];
+      $nue_mov['devuelto_id'] = $idDevuelto;
+      $this->Movimiento->create();
+      $this->Movimiento->save($nue_mov);
+
+      $nue_mov = null;
+      $ult_almac = $this->Movimiento->find('first', array('order' => array('Movimiento.id DESC'), 'fields' => array('Movimiento.total'), 'conditions' => array('Movimiento.producto_id' => $dev['producto_id'], 'Movimiento.almacene_id' => $almac_cent['Almacene']['id'])));
+      $nue_mov['producto_id'] = $dev['producto_id'];
+      $nue_mov['user_id'] = $this->Session->read('Auth.User.id');
+      $nue_mov['almacene_id'] = $almac_cent['Almacene']['id'];
+      $nue_mov['ingreso'] = $dev['cantidad'];
+      $nue_mov['total'] = $ult_almac['Movimiento']['total'] + $dev['cantidad'];
+      $nue_mov['devuelto_id'] = $idDevuelto;
+      $this->Movimiento->create();
+      $this->Movimiento->save($nue_mov);
+      $nue_mov = null;
+    }
+    $this->Session->setFlash('Se registro correctamente!!', 'msgbueno');
+    $this->redirect(array('action' => 'devuelto', $idPersona));
+  }
+
+  public function registra_regularizacion() {
+    /* debug($this->request->data);
+      exit; */
+    $dmov = $this->request->data['Movimiento'];
+    $total_d = 0;
+    if (!empty($dmov['persona_id'])) {
+      $d_distrib = $this->Movimiento->find('first', array(
+        'conditions' => array('Movimiento.persona_id' => $dmov['persona_id'], 'Movimiento.producto_id' => $dmov['producto_id']),
+        'order' => array('Movimiento.id DESC'),
+        'fields' => array('Movimiento.total')
+      ));
+      if (!empty($d_distrib)) {
+        $total_d = $d_distrib['Movimiento']['total'];
+      }
+    } else {
+      $d_alma = $this->Movimiento->find('first', array(
+        'conditions' => array('Movimiento.almacene_id' => $dmov['almacene_id'], 'Movimiento.producto_id' => $dmov['producto_id']),
+        'order' => array('Movimiento.id DESC'),
+        'fields' => array('Movimiento.total')
+      ));
+      if (!empty($d_alma)) {
+        $total_d = $d_alma['Movimiento']['total'];
+      }
+    }
+
+    $idProducto = $dmov['producto_id'];
+    $total_cent = $this->get_tot_cent($idProducto);
+    if ($dmov['tipo'] == 'Entrega') {
+      if ($total_cent >= $dmov['cantidad']) {
+        $dmov['ingreso'] = $dmov['cantidad'];
+        $dmov['total'] = $total_d + $dmov['ingreso'];
+        $dmov['user_id'] = $this->Session->read('Auth.User.id');
+        $this->Movimiento->create();
+        $this->Movimiento->save($dmov);
+
+        $dmov['almacene_id'] = $this->get_id_alm_cent();
+        $dmov['total'] = $total_cent - $dmov['cantidad'];
+        $dmov['salida'] = $dmov['cantidad'];
+        $dmov['ingreso'] = NULL;
+        $dmov['persona_id'] = NULL;
+        $this->Movimiento->create();
+        $this->Movimiento->save($dmov);
+        $this->Session->setFlash("Se regularizo correctamente!!", 'msgbueno');
+      } else {
+        $this->Session->setFlash("La cantidad en almacen central es de " . $total_cent, 'msgerror');
+      }
+    } else {
+      if ($total_d >= $dmov['cantidad']) {
+        $dmov['salida'] = $dmov['cantidad'];
+        $dmov['total'] = $total_d - $dmov['salida'];
+        $dmov['user_id'] = $this->Session->read('Auth.User.id');
+        $this->Movimiento->create();
+        $this->Movimiento->save($dmov);
+
+        $dmov['almacene_id'] = $this->get_id_alm_cent();
+        $dmov['total'] = $total_cent + $dmov['cantidad'];
+        $dmov['ingreso'] = $dmov['cantidad'];
+        $dmov['salida'] = NULL;
+        $dmov['persona_id'] = NULL;
+        $this->Movimiento->create();
+        $this->Movimiento->save($dmov);
+        $this->Session->setFlash("Se regularizo correctamente!!", 'msgbueno');
+      } else {
+        $this->Session->setFlash("La cantidad del distribuidor es de " . $total_d, 'msgerror');
+      }
+    }
+    $this->redirect($this->referer());
+  }
+
+  //devuelve el id del almacen central
+  public function get_id_alm_cent() {
+    $almacen = $this->Almacene->find('first', array('recursive' => -1, 'conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id')));
+    if (!empty($almacen)) {
+      return $almacen['Almacene']['id'];
+    } else {
+      return 0;
+    }
+  }
+
+  //devuelve total enalmacen central 
+  public function get_tot_cent($idProducto = null) {
+    $almacen = $this->Movimiento->find('first', array(
+      'order' => array('Movimiento.id DESC'),
+      'conditions' => array('Movimiento.almacene_id' => $this->get_id_alm_cent(), 'Movimiento.producto_id' => $idProducto),
+      'fields' => array('Movimiento.total')
+    ));
+    if (!empty($almacen)) {
+      return $almacen['Movimiento']['total'];
+    } else {
+      return 0;
+    }
+  }
+
+  public function detalle_mov($idProducto = null, $id = null, $almacen = null) {
+    $this->layout = 'ajax';
+    $condiciones = array();
+    $condiciones['Movimiento.producto_id'] = $idProducto;
+    if ($almacen == 1) {
+      $condiciones['Movimiento.almacene_id'] = $id;
+    } else {
+      $condiciones['Movimiento.persona_id'] = $id;
+    }
+    $movimientos = $this->Movimiento->find('all', array(
+      'conditions' => $condiciones,
+      'order' => array('Movimiento.id DESC'),
+      'limit' => 10,
+      'recursive' => -1
+    ));
+    $this->set(compact('movimientos'));
+  }
+
+  public function principal() {
+    $idCentral = $this->get_id_alm_cent();
+    $sql = "SELECT m.total FROM movimientos m WHERE m.almacene_id = $idCentral AND m.producto_id = Producto.id ORDER BY m.id DESC LIMIT 1";
+    $this->Producto->virtualFields = array(
+      'total_central' => "CONCAT(($sql))"
+    );
+    $productos = $this->Producto->find('all', array(
+      'recursive' => -1,
+      'fields' => array('Producto.id','Producto.nombre', 'Producto.total_central')
+    ));
+    $meses = $this->get_meses();
+    $this->set(compact('productos', 'meses'));
+  }
+
+  public function get_vent_mes($idProducto = null, $mes = null) {
+    $movimiento = $this->Movimiento->find('all',array(
+      'recursive' => -1,
+      'conditions' => array('Movimiento.producto_id' => $idProducto,'MONTH(Movimiento.created)' => $mes,'YEAR(Movimiento.created)' => date('Y'),'Movimiento.cliente_id !=' => NULL),
+      'group' => array('Movimiento.producto_id'),
+      'fields' => array('SUM(Movimiento.salida) as s_total')
+    ));
+    return $movimiento[0][0]['s_total'];
+  }
+
+  public function get_meses() {
+    $meses = $this->Movimiento->find('all', array(
+      'conditions' => array('YEAR(Movimiento.created)' => date("Y")),
+      'group' => array('MONTH(Movimiento.created)'),
+      'recursive' => -1,
+      'fields' => array('MONTH(Movimiento.created) as mes')
+    ));
+    foreach ($meses as $key => $me) {
+      switch ($me[0]['mes']) {
+        case 1:
+          $meses[$key][0]['nombre'] = "ENERO";
+          break;
+        case 2:
+          $meses[$key][0]['nombre'] = "FEBRERO";
+          break;
+        case 3:
+          $meses[$key][0]['nombre'] = "MARZO";
+          break;
+        case 4:
+          $meses[$key][0]['nombre'] = "ABRIL";
+          break;
+        case 5:
+          $meses[$key][0]['nombre'] = "MAYO";
+          break;
+        case 6:
+          $meses[$key][0]['nombre'] = "JUNIO";
+          break;
+        case 7:
+          $meses[$key][0]['nombre'] = "JULIO";
+          break;
+        case 8:
+          $meses[$key][0]['nombre'] = "AGOSTO";
+          break;
+        case 9:
+          $meses[$key][0]['nombre'] = "SEPTIEMBRE";
+          break;
+        case 10:
+          $meses[$key][0]['nombre'] = "OCTUBRE";
+          break;
+        case 11:
+          $meses[$key][0]['nombre'] = "NOVIEMBRE";
+          break;
+        case 12:
+          $meses[$key][0]['nombre'] = "DICIEMBRE";
+          break;
+      }
+    }
+    return $meses;
   }
 
 }

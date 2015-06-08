@@ -14,14 +14,14 @@
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Nombre <small>(requerido)</small></label>                    
-                    <?php echo $this->Form->text('nombre', array('class' => 'input full-width')); ?>
+                    <?php echo $this->Form->text('nombre', array('class' => 'input full-width input validate[required]', 'autofocus')); ?>
                 </p>
             </div>
             
             <div class="six-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Tienda<small>(Requerido)</small></label>
-                    <?php echo $this->Form->select('sucursal_id', $sucursals, array('class' => 'select full-width','required')); ?>
+                    <?php echo $this->Form->select('sucursal_id', $sucursals, array('class' => 'select full-width input validate[required]')); ?>
                 </p>
             </div>
             

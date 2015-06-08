@@ -16,7 +16,7 @@ class ChipsController extends AppController {
     if ($this->RequestHandler->responseType() == 'json') {
       $this->RequestHandler->setContent('json', 'application/json');
     }
-    $this->Auth->allow();
+    //$this->Auth->allow();
   }
 
   public function subirexcel() {
@@ -336,6 +336,13 @@ class ChipsController extends AppController {
         $i++;
       }
       //debug($this->request->data);die;
+      if (!empty($this->request->data[0]['Activado']['phone_number'])) {
+        $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $this->request->data[0]['Activado']['phone_number'])));
+        if (!empty($verifica_tel)) {
+          $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
+          $this->redirect(array('action' => 'subirexcel'));
+        }
+      }
 
       if ($this->Activado->saveMany($this->data)) {
         $this->Session->setFlash('se Guardo correctamente el Excel', 'msgbueno');
@@ -430,8 +437,17 @@ class ChipsController extends AppController {
         $this->request->data[$i]['Chip']['fecha'] = $d['G'];
         $i++;
       }
+      if (!empty($this->request->data[0]['Chip']['telefono'])) {
+        $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $this->request->data[0]['Chip']['telefono'])));
+        if (!empty($verifica_tel)) {
+          $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
+          $this->redirect(array('action' => 'subirexcel'));
+        }
+      }
+
       //debug($this->data);
       //exit;
+
       if ($this->Chip->saveMany($this->data)) {
         //echo 'registro corectamente';
         //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
@@ -548,8 +564,10 @@ class ChipsController extends AppController {
   }
 
   public function asigna_distrib() {
+    $sql2 = "SELECT fecha_entrega_d FROM chips WHERE distribuidor_id = User.id ORDER BY fecha_entrega_d DESC LIMIT 1";
+    $sql = "SELECT COUNT(*) FROM chips ch,activados ac WHERE ch.telefono = ac.phone_number AND ch.distribuidor_id = User.id AND ch.fecha_entrega_d = ($sql2)";
     $this->User->virtualFields = array(
-      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno,' (',($sql),')')"
     );
     $distribuidores = $this->User->find('list', array('recursive' => 0, 'fields' => 'User.nombre_completo', array('Conditions' => array('User.group_id' => 2))));
     if ($this->RequestHandler->responseType() == 'json') {
@@ -597,81 +615,152 @@ class ChipsController extends AppController {
     $this->redirect(array('action' => 'asigna_distrib'));
   }
 
-  public function guardaexcelclientes() {
+  public function asignados() {
+    $sql = "SELECT CONCAT(p.nombre,' ',p.ap_paterno,' ',p.ap_materno) FROM personas p WHERE p.id = Distribuidor.persona_id";
+    $this->Chip->virtualFields = array(
+      'nombre_dist' => "CONCAT(($sql))"
+    );
+    $entregados = $this->Chip->find('all', array(
+      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist')
+      , 'recursive' => 0
+      , 'conditions' => array('Chip.distribuidor_id !=' => NULL)
+      , 'group' => array('Chip.fecha_entrega_d', 'distribuidor_id')
+      , 'order' => 'fecha_entrega_d DESC'
+      , 'LIMIT' => 50
+    ));
+    //debug($entregados);exit;
+    $this->set(compact('entregados'));
+  }
 
-    $objLector = new PHPExcel_Reader_Excel2007();
-    //debug($objLector);die;
-    $objPHPExcel = $objLector->load("../webroot/files/clientesMod.xlsx");
-    //debug($objPHPExcel);die;
+  public function detalle_entrega($fecha = null, $idDistribuidor = null) {
+    $distribuidor = $this->User->findByid($idDistribuidor, null, null, 0);
+    $entregados = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.fecha_entrega_d' => $fecha, 'Chip.distribuidor_id' => $idDistribuidor)
+    ));
+    $this->set(compact('entregados', 'fecha', 'distribuidor', 'idDistribuidor'));
+  }
 
-    $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
+  public function cancela_entrega_id($idChip = null) {
+    $this->Chip->id = $idChip;
+    $dchip['distribuidor_id'] = null;
+    $this->Chip->save($dchip);
+    $this->Session->setFlash('Se cancelo correctamente!!!', 'msgbueno');
+    $this->redirect($this->referer());
+  }
 
-    $array_data = array();
+  public function cancela_entrega($fecha = null, $idDistribuidor = null) {
+    $entregas = $this->Chip->find('all', array(
+      'fields' => array('Chip.id'),
+      'conditions' => array('Chip.fecha_entrega_d' => $fecha, 'Chip.distribuidor_id' => $idDistribuidor)
+    ));
+    foreach ($entregas as $en) {
+      $this->Chip->id = $en['Chip']['id'];
+      $dchip['distribuidor_id'] = NULL;
+      $this->Chip->save($dchip);
+    }
+    $this->Session->setFlash('Se cancelo correctamente!!!', 'msgbueno');
+    $this->redirect($this->referer());
+  }
 
-    foreach ($rowIterator as $row) {
-      $cellIterator = $row->getCellIterator();
+  public function cancela_asignado() {
+    if (!empty($this->request->data['Dato'])) {
+      $rango_ini = $this->request->data['Dato']['rango_ini'];
+      $cantidad = $this->request->data['Dato']['cantidad'];
+      $idDistribuidor = $this->request->data['Dato']['distribuidor_id'];
+      $fecha_d = $this->request->data['Dato']['fecha'];
+      $chips = $this->Chip->find('all', array(
+        'recursive' => -1,
+        'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id'),
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_d)
+      ));
+      /* debug($chips);
+        exit; */
+      foreach ($chips as $ch) {
+        $this->Chip->id = $ch['Chip']['id'];
+        $dato['Chip']['fecha_entrega_d'] = date('Y-m-d');
+        $dato['Chip']['distribuidor_id'] = NULL;
+        $dato['Chip']['cliente_id'] = NULL;
+        $this->Chip->save($dato['Chip']);
+      }
+      $this->Session->setFlash('Se cancela correctamente', 'msgbueno');
+    } else {
+      $this->Session->setFlash('No se pudo cancelar!!', 'msgerror');
+    }
+    $this->redirect($this->referer());
+  }
+  
+  public function guardaexcelmigra() {    
+    
+      $excelSubido = $nombreExcel;
+      $objLector = new PHPExcel_Reader_Excel2007();
+      //debug($objLector);die;
+      $objPHPExcel = $objLector->load("../webroot/files/cliCrt.xlsx");
+      //debug($objPHPExcel);die;
 
-      $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
+      $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
 
-      if ($row->getRowIndex() >= 2) { //a partir de la 1
-        $rowIndex = $row->getRowIndex();
+      $array_data = array();
 
-        $array_data[$rowIndex] = array(
-          'A' => '',
-          'B' => '',
-          'C' => '',
-          'D' => '',
-          'E' => '',
-          'F' => '',
-          'G' => '',
-          );
+      foreach ($rowIterator as $row) {
+        $cellIterator = $row->getCellIterator();
 
-        foreach ($cellIterator as $cell) {
-          if ('A' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('B' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('C' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('D' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('E' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('F' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('G' == $cell->getColumn()) {
-            $fechaExcel = $cell->getCalculatedValue();
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+        $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
+
+        if ($row->getRowIndex() >= 2) { //a partir de la 1
+          $rowIndex = $row->getRowIndex();
+
+          $array_data[$rowIndex] = array(
+            'A' => '',
+            'B' => '',
+            'C' => '',
+            'D' => '',
+            'E' => '',
+            'F' => '');
+
+          foreach ($cellIterator as $cell) {
+            if ('A' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('B' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('C' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('D' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('E' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('F' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            }
           }
         }
       }
-    }
-    $i = 0;
-    $this->request->data = "";
-    foreach ($array_data as $d) {      
-      $this->request->data[$i]['Cliente']['num_registro'] = $d['A'];
-      $this->request->data[$i]['Cliente']['nombre'] = $d['B'];
-      $this->request->data[$i]['Cliente']['direccion'] = $d['C'];
-      $this->request->data[$i]['Cliente']['celular'] = $d['D'];
-      $this->request->data[$i]['Cliente']['zona'] = $d['E'];
-      $this->request->data[$i]['Cliente']['mercado'] = $d['F'];
-      $this->request->data[$i]['Cliente']['dist'] = $d['G'];
-      $i++;
-    }
-    //debug($this->data);
-    //exit;
-    if ($this->Cliente->saveMany($this->request->data)) {
-      //echo 'registro corectamente';
-      //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
-      debug($this->request->data);
-      //$this->Session->setFlash('se Guardo correctamente el EXCEL', 'msgbueno');
-      //$this->redirect(array('action' => 'subirexcel'));
-    } else {
-      echo 'no se pudo guardar';
-    }
-    //fin funciones del excel
+           
+      $i = 0;
+      $this->request->data = "";
+      foreach ($array_data as $d) {
+        $this->request->data[$i]['Cliente']['num_registro'] = $d['A'];
+        $this->request->data[$i]['Cliente']['cod_dealer'] = $d['B'];
+        $this->request->data[$i]['Cliente']['nombre'] = $d['C'];
+        $this->request->data[$i]['Cliente']['direccion'] = $d['F'];
+        $this->request->data[$i]['Cliente']['celular'] = $d['E'];
+        $this->request->data[$i]['Cliente']['zona'] = $d['D'];
+        $i++;
+      }      
+
+      //debug($this->request->data);
+      //exit;
+
+      if ($this->Cliente->saveMany($this->data)) {
+        //echo 'registro corectamente';
+        //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
+        $this->Session->setFlash('se Guardo correctamente el EXCEL', 'msgbueno');
+        $this->redirect(array('controller'=>'Clientes', 'action' => 'index'));
+      } else {
+        echo 'no se pudo guardar';
+      }
+      //fin funciones del excel
+   
   }
 
 }
-
-?>

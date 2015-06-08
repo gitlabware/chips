@@ -9,13 +9,26 @@ App::uses('AppController', 'Controller');
  */
 class UsersController extends AppController {
 
-  public $uses = array('User', 'Migralmacen', 'Group', 'Persona', 'Sucursal','Lugare','Ruta');
+  public $uses = array('User', 'Migralmacen', 'Group', 'Persona', 'Sucursal','Lugare','Ruta', 'Rutasusuario');
   public $layout = 'viva';
-  public $components = array('Acl', 'Auth');
+  public $components = array('Acl', 'Auth', 'RequestHandler');  
 
   public function beforeFilter() {
     parent::beforeFilter();
-    $this->Auth->allow();
+    //$this->Auth->allow();
+  }
+  
+  function respond($message = null, $json = false) {
+    
+    if ($message != null) {
+      if ($json == true) {
+        $this->RequestHandler->setContent('json', 'application/json');
+        $message = json_encode($message);
+      }
+      $this->set('message', $message);
+    }
+    $this->render('message');
+    //$this->render = false;
   }
 
   public function login2() {
@@ -36,7 +49,7 @@ class UsersController extends AppController {
         //$this->redirect($this->Auth->redirect());
         $rol = $this->Session->read('Auth.User.group_id');
         switch ($rol) {
-          case '1':$this->redirect(array('controller' => 'Users', 'action' => 'index'));
+          case '1':$this->redirect(array('controller' => 'Almacenes', 'action' => 'principal'));
             break;
           case '2':$this->redirect(array('controller' => 'Ventasdistribuidor', 'action' => 'clientes'));
             break;
@@ -105,10 +118,10 @@ class UsersController extends AppController {
    */
   public function add() {
     if ($this->request->is('post')) {
-
+      //debug($this->request->data);die;
+      $ruta = $this->request->data['User']['ruta_id'];
       $this->User->create();
-
-      $this->Persona->create();
+      $this->Persona->create();      
 
       if ($this->Persona->save($this->request->data['Persona'])) {
         //debug($this->request->data);
@@ -121,6 +134,19 @@ class UsersController extends AppController {
           } */
 
         if ($this->User->save($this->request->data['User'])) {
+                    
+          if($this->request->data['User']['group_id']==2){
+            
+            $idUser = $this->User->getLastInsertID();
+            $this->Rutasusuario->create();
+            $this->request->data['Rutasusuario']['user_id']=$idUser;
+            $this->request->data['Rutasusuario']['ruta_id']=$ruta;
+            if($this->Rutasusuario->save($this->request->data['Rutasusuario'])){
+              $this->Session->setFlash(__('The user has been saved'));
+              $this->redirect(array('action' => 'index'));
+            }
+          }
+          
           $this->Session->setFlash(__('The user has been saved'));
           $this->redirect(array('action' => 'index'));
         } else {
@@ -278,13 +304,20 @@ class UsersController extends AppController {
   }
 
   public function delete($id = null) {
+    
+    $idUsuario = $this->User->findById($id, null, null, -1);
+    $Persona = $this->Persona->findById($idUsuario['User']['persona_id'], null, null, -1);
+    $idPersona = $Persona['Persona']['id'];
+    //debug($idPersona);die;
     $this->User->id = $id;
     if (!$this->User->exists()) {
       throw new NotFoundException(__('Usuario invalido'));
     }
     if ($this->User->delete()) {
-      $this->Session->setFlash(__('Usuario eliminado'), 'msgbueno');
-      $this->redirect(array('action' => 'index'));
+      if($this->Persona->delete($idPersona)){
+        $this->Session->setFlash(__('Usuario eliminado'), 'msgbueno');
+        $this->redirect(array('action' => 'index'));
+      }
     }
     $this->Session->setFlash(__('El usuario no se elemino'), 'msgalert');
     $this->redirect(array('action' => 'index'));
@@ -328,5 +361,41 @@ class UsersController extends AppController {
 
       } */
   }
+  
+  public function ajaxrutas($idUsuario = null){
+    $this->layout = 'ajax';
+    $rutasUsuario = $this->Rutasusuario->find('all', array(
+      'recursive'=>0,
+      'conditions'=>array('Rutasusuario.user_id'=>$idUsuario)
+    ));
+    $csr = $this->Ruta->find('list', array(
+      'fields'=>array('Ruta.id', 'Ruta.nombre')
+    ));
+    //debug($rutas);
+    $this->set(compact('rutasUsuario', 'csr', 'idUsuario'));
+  }
+  
+  public function registraruta(){
+    //debug($this->request->data);
+    $array['correcto'] = '';
+    if (!empty($this->request->data)) {
+      $this->Rutasusuario->create();
+      if ($this->Rutasusuario->save($this->request->data['User'])) {
+        $array['correcto'] = 'Se registro correctamente!!!';
+      } 
+    }
+    $this->respond($array, true);
+  }
+  
+  public function quita_ruta($idRuta = null){
+    //debug($idRuta);
+    $array['correcto'] = '';
+    if($this->Rutasusuario->delete($idRuta)){
+      $array['correcto'] = 'Se quito el precio correctamente!!!';
+    }
+    $this->respond($array, true);
+    //$this->redirect(array('action' => 'ajax_precios',$idProducto));
+  }
+    
 
 }

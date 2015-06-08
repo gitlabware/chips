@@ -4,15 +4,16 @@
 
         <div class="new-row four-columns">
             <p class="block-label button-height">
-                <label for="block-label-1" class="label">Para <small>(requerido)</small></label> 
+                <label for="block-label-1" class="label">Escala <small>(requerido)</small></label> 
+                <?php
+                $op_excalas = array();
+                $op_excalas[1] = 'DISTRIBUIDOR (MAYOR)';
+                $op_excalas[2] = 'TIENDA (MAYOR)';
+                $op_excalas[3] = 'TIENDA (TIENDA)';
+                ?>
                 <?php echo $this->Form->hidden('producto_id', array('value' => $idProducto)) ?>
-                <?php echo $this->Form->select('tipousuario_id', $usuarios, array('class' => 'select full-width')); ?>
-            </p>
-        </div>
-        <div class="four-columns">
-            <p class="block-label button-height">
-                <label for="block-label-1" class="label">Escala <small>(requerido)</small></label>                    
-                <?php echo $this->Form->select('escala', $escalas, array('class' => 'select full-width')); ?>
+                <?php echo $this->Form->select('aux_escala', $op_excalas, array('class' => 'select full-width')); ?>
+                <?php //echo $this->Form->select('tipousuario_id', $usuarios, array('class' => 'select full-width')); ?>
             </p>
         </div>
         <div class="four-columns">
@@ -21,8 +22,9 @@
                 <?php echo $this->Form->text('precio', array('class' => 'input full-width', 'placeholder' => 'Ingrese el precio', 'value' => "")); ?>
             </p>
         </div>
-        <div class="twelve-columns">
+        <div class="four-columns">
             <p class="block-label button-height">
+                <label class="label">&nbsp;</label>  
                 <a href="javascript:" class="button green-gradient full-width" onclick="registra_precio();">REGISTRAR</a>
             </p>
         </div>

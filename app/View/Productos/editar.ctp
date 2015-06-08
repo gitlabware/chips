@@ -116,17 +116,4 @@
   });
 </script>
 
-<!-- CKEditor -->
-<script src="<?php echo $this->webroot; ?>js/libs/ckeditor/ckeditor.js"></script>
-
-<script>
-
-// Call template init (optional, but faster if called manually)
-  $.template.init();
-
-// CKEditor
-  CKEDITOR.replace('ckeditor', {
-      height: 300
-  });
-
-</script>
+<?php echo $this->Html->script(array('libs/ckeditor/ckeditor','inickeditor'), array('block' => 'js_add'));?>

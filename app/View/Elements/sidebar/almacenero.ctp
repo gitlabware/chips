@@ -38,7 +38,7 @@
                     <span>Recargas</span>
                     <ul class="big-menu">
                         <li>
-                            <a href="<?php echo $this->Html->url(array('controller' => 'Recargas', 'action' => 'nuevo')); ?>">Registrar recarga</a></li>
+                            <a href="<?php echo $this->Html->url(array('controller' => 'Recargados', 'action' => 'nuevo')); ?>">Registrar recarga</a></li>
                         <li>
                             <a href="<?php echo $this->Html->url(array('controller' => 'Recargas', 'action' => 'estadorecargas2')); ?>">Reporte Recargas</a>
 

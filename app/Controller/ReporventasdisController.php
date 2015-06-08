@@ -24,7 +24,7 @@ class ReporventasdisController extends AppController {
     public function beforeFilter()
     {
         parent::beforeFilter();
-        $this->Auth->allow();
+        //$this->Auth->allow();
     }
     
     function index() {

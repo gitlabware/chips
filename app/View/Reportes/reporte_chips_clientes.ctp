@@ -26,7 +26,20 @@
                     </span>
                 </p>
             </div>
-            <div class="three-columns">
+            <div class="two-columns">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Estado</label>
+                    <?php echo $this->Form->select("Dato.activado", array(1 => 'Activado', 0 => 'No activado'), array('class' => 'select full-width full-width')) ?>
+                </p>
+            </div>
+            <div class="two-columns">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Distribuidor</label>
+                    <?php echo $this->Form->select("Dato.distribuidor_id", $distribuidores, array('class' => 'select full-width full-width')) ?>
+                </p>
+            </div>
+            
+            <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <button class="button green-gradient full-width" type="submit">GENERAR</button>
