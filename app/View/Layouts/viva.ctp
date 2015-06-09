@@ -41,7 +41,6 @@
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/switches.css?v=1">
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/table.css?v=1">
 
-
         <!-- DataTables -->
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.css?v=1">
 
@@ -82,7 +81,8 @@
     </head>
 
     <body class="clearfix with-menu with-shortcuts">
-        <script>var urljsontabla = '';</script>
+        <script>var urljsontabla = '';
+        var datos_tabla2 = null;</script>
         <!-- Prompt IE 6 users to install Chrome Frame -->
         <!--[if lt IE 7]><p class="message red-gradient simpler">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
@@ -153,23 +153,26 @@
           });          
 
           var table2 = $('#tabla-json');
-          table2.dataTable({
-              "oLanguage": {
-                  "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-              },
-              'sPaginationType': 'full_numbers',
-              'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
-              'bProcessing': true,
-              'sAjaxSource': urljsontabla,
-              'sServerMethod': 'POST',
-              "order": [],
-              'fnInitComplete': function (oSettings)
-              {
-                  // Style length select
-                  table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
-                  tableStyled = true;
-              }
-          });
+          if (datos_tabla2 == null) {
+              datos_tabla2 = {
+                  "oLanguage": {
+                      "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+                  },
+                  'sPaginationType': 'full_numbers',
+                  'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
+                  'bProcessing': true,
+                  'sAjaxSource': urljsontabla,
+                  'sServerMethod': 'POST',
+                  "order": [],
+                  'fnInitComplete': function (oSettings)
+                  {
+                      // Style length select
+                      table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+                      tableStyled = true;
+                  }
+              };
+          }
+          table2.dataTable(datos_tabla2);
 
           function cargarmodal(url, titulo) {
               $.modal({

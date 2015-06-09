@@ -12,16 +12,16 @@
 
             <thead>
                 <tr>
-                    <th style="width: 10%;">numero de registro</th>
+                    <th style="width: 8%;">num de registro</th>
                     <th >nombre</th>
                     <th style="width: 30%;" class="hide-on-mobile">direccion</th>  
                     <th class="hide-on-mobile">celular</th>
-                    <th >zona</th>
+                    <th class="hide-on-mobile">zona</th>
                     <th >Acciones</th>
                 </tr>
             </thead>          
             <tbody>
-                
+
             </tbody>
         </table>  
     </div>
@@ -39,6 +39,9 @@
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'clientes.json')); ?>';
   datos_tabla2 = {};
   datos_tabla2 = {
+      "oLanguage": {
+          "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+      },
       'sPaginationType': 'full_numbers',
       'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
       'bProcessing': true,
@@ -53,6 +56,7 @@
       }, "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
           $('td:eq(2)', nRow).addClass('hide-on-mobile');
           $('td:eq(3)', nRow).addClass('hide-on-mobile');
+          $('td:eq(4)', nRow).addClass('hide-on-mobile');
       }
   };
 </script>

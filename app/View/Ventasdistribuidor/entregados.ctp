@@ -9,7 +9,7 @@
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
                 <tr>
-                    <th>Fecha</th>
+                    <th class="hide-on-mobile">Fecha</th>
                     <th>Cliente</th>
                     <th>Codigo CLiente</th>
                     <th>Nro Chips</th>
@@ -19,7 +19,7 @@
             <tbody>
                 <?php foreach ($entregados as $ent): ?>
                   <tr>
-                      <td><?php echo $ent['Chip']['fecha_entrega_d'] ?></td>
+                      <td class="hide-on-mobile"><?php echo $ent['Chip']['fecha_entrega_d'] ?></td>
                       <td><?php echo $ent['Cliente']['nombre'] ?></td>
                       <td><?php echo $ent['Cliente']['num_tegistro'] ?></td>
                       <td><?php echo $ent[0]['num_chips'] ?></td>

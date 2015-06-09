@@ -10,7 +10,7 @@
         <?php echo $this->Form->create('Cliente', array('id' => 'formID')) ?>
         <div class="columns">
             <?php if ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
-                <div class="new-row six-columns">
+                <div class="new-row six-columns new-row-mobile twelve-columns">
 
                     <p class="block-label button-height">
                         <label for="block-label-1" class="label">Codigo 149 <small>(requerido)</small></label>                    
@@ -18,20 +18,20 @@
                     </p>
                 </div>
             <?php endif; ?>
-            <div class="new-row six-columns">
+            <div class="new-row six-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Nombre <small>(requerido)</small></label>                    
                     <?php echo $this->Form->text('nombre', array('class' => 'input full-width')); ?>
                 </p>
             </div>
-            <div class="six-columns">                
+            <div class="six-columns new-row-mobile twelve-columns">                
                 <p class="block-label button-height">
                     <label for="block-label-2" class="label">Direccion<small>(requerido)</small></label>
                     <?php echo $this->Form->text('direccion', array('class' => 'input full-width')); ?>
                 </p>  
             </div>
 
-            <div class="three-columns">
+            <div class="three-columns new-row-mobile twelve-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Celular<small>(requerido)</small></label>
@@ -39,7 +39,7 @@
                 </p>
             </div>
 
-            <div class="three-columns">
+            <div class="three-columns new-row-mobile twelve-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Zona<small>(requerido)</small></label>
@@ -47,21 +47,21 @@
                 </p>
             </div>
             
-            <div class="three-columns">
+            <div class="three-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Mercado<small>(requerido)</small></label>
                     <?php echo $this->Form->text('mercado', array('class' => 'input full-width')); ?>
                 </p>
             </div>
             
-            <div class="three-columns">
+            <div class="three-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Ruta<small>(Requerido)</small></label>
                     <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select', 'style' => 'width: 222px', 'required')); ?>
                 </p>
             </div>
 
-            <div class="new-row three-columns">
+            <div class="new-row three-columns new-row-mobile twelve-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Inspector<small>(requerido)</small></label>
@@ -71,7 +71,7 @@
             </div>
 
 
-            <div class="three-columns">
+            <div class="three-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Lugar<small>(Requerido)</small></label>
                     <select id="validation-select" name="data[Cliente][lugare_id]" class="select validate[required]" class="input full-width" style="width: 223px">
@@ -90,14 +90,14 @@
                 </p>
             </div>
 
-            <div class="six-columns">
+            <div class="six-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Observaciones<small>(Requerido)</small></label>
                     <?php echo $this->Form->text('observaciones', array('class' => 'input full-width')); ?>
                 </p>
             </div>
             
-            <div class="new-row six-columns">
+            <div class="new-row six-columns new-row-mobile twelve-columns">
 
                 <button type="submit" class="button glossy mid-margin-right" onClick="javascript:verificar()">
                     <span class="button-icon"><span class="icon-tick"></span></span>

@@ -14,7 +14,7 @@
         ?>
         <div class="columns">
             <?php if ($this->Session->read('Auth.User.Group.name') == 'Administradores'):?>
-            <div class="new-row six-columns">
+            <div class="new-row six-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label"> Quien entrega <small>(requerido)</small></label>
                     <select id="validation-select1" name="data[Deposito][persona_id]" class="select" style="width: 200px">
@@ -31,14 +31,14 @@
             </div>
             
             <?php endif; ?>
-            <div class="new-row three-columns">
+            <div class="new-row three-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Banco<small>(Requerido)</small></label>
                     <?php echo $this->Form->select('Deposito.banco_id', $bancos, array('class' => 'select', 'required')); ?>
                 </p>
             </div>
 
-            <div class="three-columns">
+            <div class="three-columns new-row-mobile twelve-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Deposito<small>(requerido)</small></label>                    
@@ -47,14 +47,14 @@
             </div>
 
 
-            <div class="three-columns">
+            <div class="three-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Monto en Efectivo<small>(Requerido)</small></label>
                     <?php echo $this->Form->text('Deposito.efectivo', array('value' => '0.0', 'class' => 'validate[custom[number]] input')) ?>
                 </p>
             </div>
 
-            <div class="threee-columns">
+            <div class="threee-columns new-row-mobile twelve-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Comprobante<small>(requerido)</small></label>
@@ -62,14 +62,14 @@
                 </p>
             </div>
 
-            <div class="new-row six-columns">
+            <div class="new-row six-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Recibo <small>(Requerido)</small></label>
                     <?php echo $this->Form->text('Deposito.recibo', array('class' => 'input full-width')) ?>
                 </p>
             </div>
 
-            <div class="new-row six-columns">
+            <div class="new-row six-columns new-row-mobile twelve-columns">
 
                 <button type="submit" class="button glossy mid-margin-right" onClick="javascript:verificar()">
                     <span class="button-icon"><span class="icon-tick"></span></span>

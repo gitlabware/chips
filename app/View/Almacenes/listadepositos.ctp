@@ -12,7 +12,7 @@
             <thead>
                 <tr>                     
                     <th scope="col" width="15%" class="align-center">Distribuidor</th> 
-                    <th scope="col" width="15%" class="align-center">Banco</th>
+                    <th scope="col" width="15%" class="align-center hide-on-mobile">Banco</th>
                     <th scope="col" width="15%" class="align-center">Deposito</th>
                     <th scope="col" width="5%" class="align-center hide-on-mobile">Comprobante</th>
                     <th scope="col" width="15%" class="align-center">Efectivo</th>
@@ -29,13 +29,13 @@
                 ?>
                     <tr>    
                         <td><?php echo $d['Persona']['nombre'].' '.$d['Persona']['ap_paterno']; ?></td>
-                        <td><?php echo $d['Banco']['nombre'];?></td>
+                        <td class="hide-on-mobile"><?php echo $d['Banco']['nombre'];?></td>
                         <td><?php echo $d['Deposito']['banco']; ?></td>               
-                        <td><?php echo $d['Deposito']['comprobante']; ?></td>                   
+                        <td class="hide-on-mobile"><?php echo $d['Deposito']['comprobante']; ?></td>                   
                         <td><?php echo $d['Deposito']['efectivo'] ?></td>
-                        <td><?php echo $d['Deposito']['recibo'] ?></td>
+                        <td class="hide-on-mobile"><?php echo $d['Deposito']['recibo'] ?></td>
                         <td><?php echo $total ?></td>
-                        <td class="low-padding align-center">
+                        <td class="low-padding align-center hide-on-mobile">
                            <?php echo $d['Deposito']['created']?>
                         </td>
                     </tr>               
