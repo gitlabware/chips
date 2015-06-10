@@ -6,13 +6,13 @@
         <h1>Entregas a <?php echo $cliente['Cliente']['nombre'] ?> de <?php echo $fecha; ?></h1>
     </hgroup>
     <div class="with-padding"> 
-        <?php echo $this->Form->create('Ventasdistribuidor', array('url'=>'Ventasdistribuidor', 'action' => 'cancela_asignado')); ?>
+        <?php echo $this->Form->create('Ventasdistribuidor', array('url' => array('controller' => 'Ventasdistribuidor', 'action' => 'cancela_asignado'))); ?>
         <div class="columns">
             <div class="four-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Inicial</label>
-                    <?php echo $this->Form->hidden("Dato.fecha",array('value' => $fecha));?>
-                    <?php echo $this->Form->hidden("Dato.distribuidor_id",array('value' => $idDistribuidor));?>
+                    <?php echo $this->Form->hidden("Dato.fecha", array('value' => $fecha)); ?>
+                    <?php echo $this->Form->hidden("Dato.distribuidor_id", array('value' => $idDistribuidor)); ?>
                     <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'full-width input')); ?>
                 </p>
             </div>
@@ -63,10 +63,10 @@
 </section>	
 
 <script>
-  function cancelar(url){
-    if(confirm("Esta seguro de cancelar la entrega??")){
-      window.location = url;
-    }
+  function cancelar(url) {
+      if (confirm("Esta seguro de cancelar la entrega??")) {
+          window.location = url;
+      }
   }
 </script>
 <!-- Sidebar/drop-down menu -->

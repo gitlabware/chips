@@ -1416,7 +1416,6 @@ class VentasdistribuidorController extends AppController {
   }
 
   public function cancela_asignado() {
-
     //debug($this->request->data);
     $idDis = $this->Session->read('Auth.User.id');
     if (!empty($this->request->data['Dato'])) {
@@ -1427,14 +1426,14 @@ class VentasdistribuidorController extends AppController {
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id'),
-        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_d)
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => $idDistribuidor,'Chip.cliente_id !=' => NULL, 'Chip.fecha_entrega_d' => $fecha_d)
       ));
       //debug($chips);
       // exit; 
       foreach ($chips as $ch) {
         $this->Chip->id = $ch['Chip']['id'];
         $dato['Chip']['fecha_entrega_d'] = date('Y-m-d');
-        $dato['Chip']['distribuidor_id'] = NULL;
+        $dato['Chip']['cliente_id'] = NULL;
         $this->Chip->save($dato['Chip']);
       }
       $this->Session->setFlash('Se cancela correctamente', 'msgbueno');
@@ -1443,7 +1442,6 @@ class VentasdistribuidorController extends AppController {
     }
     $this->redirect($this->referer());
   }
-
 
 }
 
