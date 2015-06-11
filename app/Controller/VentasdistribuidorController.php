@@ -339,9 +339,11 @@ class VentasdistribuidorController extends AppController {
       }
     }
     foreach ($this->request->data['Movimiento'] as $dat) {
+      $num_transaccion = $this->get_num_trans();
       $total = $this->get_total_dis($dat['producto_id']);
       $this->Movimiento->create();
       $dat['total'] = $total - $dat['salida'];
+      $dat['transaccion'] = $num_transaccion;
       $this->Movimiento->save($dat);
     }
     //$this->registra_recarga();
@@ -1426,7 +1428,7 @@ class VentasdistribuidorController extends AppController {
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id'),
-        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => $idDistribuidor,'Chip.cliente_id !=' => NULL, 'Chip.fecha_entrega_d' => $fecha_d)
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => $idDistribuidor, 'Chip.cliente_id !=' => NULL, 'Chip.fecha_entrega_d' => $fecha_d)
       ));
       //debug($chips);
       // exit; 
@@ -1441,6 +1443,19 @@ class VentasdistribuidorController extends AppController {
       $this->Session->setFlash('No se pudo cancelar!!', 'msgerror');
     }
     $this->redirect($this->referer());
+  }
+
+  public function get_num_trans() {
+    $ultimo = $this->Movimiento->find('first', array(
+      'order' => 'Movimiento.id DESC',
+      'recursive' => -1,
+      'fields' => array('Movimiento.transaccion')
+    ));
+    if (!empty($ultimo)) {
+      return $ultimo['Movimiento']['transaccion'] + 1;
+    } else {
+      return 1;
+    }
   }
 
 }

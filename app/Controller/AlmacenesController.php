@@ -747,12 +747,14 @@ class AlmacenesController extends AppController {
         $this->Movimiento->id = $ul['Movimiento']['id'];
         $this->Movimiento->save($dmov);
       }
+      $num_trans = $this->get_num_trans();
       $nue_mov['producto_id'] = $dev['producto_id'];
       $nue_mov['user_id'] = $usuario['User']['id'];
       $nue_mov['persona_id'] = $idPersona;
       $nue_mov['salida'] = $dev['cantidad'];
       $nue_mov['total'] = $dev['total'] - $dev['cantidad'];
       $nue_mov['devuelto_id'] = $idDevuelto;
+      $nue_mov['transaccion'] = $num_trans;
       $this->Movimiento->create();
       $this->Movimiento->save($nue_mov);
 
@@ -764,6 +766,7 @@ class AlmacenesController extends AppController {
       $nue_mov['ingreso'] = $dev['cantidad'];
       $nue_mov['total'] = $ult_almac['Movimiento']['total'] + $dev['cantidad'];
       $nue_mov['devuelto_id'] = $idDevuelto;
+      $nue_mov['transaccion'] = $num_trans;
       $this->Movimiento->create();
       $this->Movimiento->save($nue_mov);
       $nue_mov = null;

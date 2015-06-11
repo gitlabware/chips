@@ -84,6 +84,7 @@ class TiendasController extends AppController {
       $this->request->data['Movimiento']['precio_uni'] = $ped['precio'];
       $this->request->data['Movimiento']['ingreso'] = 0;
       $this->request->data['Movimiento']['total'] = $total - $ped['cantidad'];
+      $this->request->data['Movimiento']['transaccion'] = $this->get_num_trans();
       $this->Movimiento->save($this->request->data['Movimiento']);
     }
     $this->Session->setFlash('Venta registrada', 'msgbueno');
@@ -242,10 +243,13 @@ class TiendasController extends AppController {
         }
       }
     }
+
     foreach ($this->request->data['Movimiento'] as $dat) {
+      $num_transaccion = $this->get_num_trans();
       $total = $this->get_total_almacen($dat['producto_id']);
       $this->Movimiento->create();
       $dat['total'] = $total - $dat['salida'];
+      $dat['transaccion'] = $num_transaccion;
       $this->Movimiento->save($dat);
     }
     $this->registra_recarga();
@@ -870,18 +874,31 @@ class TiendasController extends AppController {
       );
       $datos = $this->Ventascelulare->find('all', array(
         'recursive' => 0, 'order' => 'Ventascelulare.producto_id',
-        'conditions' => array('Ventascelulare.sucursal_id' => $sucursal, 'DATE(Ventascelulare.created) >=' => $fecha_ini, 'DATE(Ventascelulare.created) <=' => $fecha_fin,'Ventascelulare.salida !=' => 0),
+        'conditions' => array('Ventascelulare.sucursal_id' => $sucursal, 'DATE(Ventascelulare.created) >=' => $fecha_ini, 'DATE(Ventascelulare.created) <=' => $fecha_fin, 'Ventascelulare.salida !=' => 0),
         'fields' => array('Producto.nombre', 'Producto.id', 'Ventascelulare.created', 'Ventascelulare.precio', 'Ventascelulare.id', 'Ventascelulare.cliente')
       ));
       foreach ($datos as $key => $da) {
-        $datos[$key]['pagos'] = $this->Pago->find('all',array(
+        $datos[$key]['pagos'] = $this->Pago->find('all', array(
           'recursive' => -1,
           'conditions' => array('Pago.ventascelulare_id' => $da['Ventascelulare']['id']),
-          'fields' => array('Pago.tipo','Pago.monto')
+          'fields' => array('Pago.tipo', 'Pago.monto')
         ));
       }
     }
     $this->set(compact('datos'));
+  }
+
+  public function get_num_trans() {
+    $ultimo = $this->Movimiento->find('first', array(
+      'order' => 'Movimiento.id DESC',
+      'recursive' => -1,
+      'fields' => array('Movimiento.transaccion')
+    ));
+    if (!empty($ultimo)) {
+      return $ultimo['Movimiento']['transaccion'] + 1;
+    } else {
+      return 1;
+    }
   }
 
 }
