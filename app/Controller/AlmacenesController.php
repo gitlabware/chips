@@ -344,7 +344,8 @@ class AlmacenesController extends AppController {
         $this->Session->setFlash("Error en el registro de entrega'!!!...No existen suficientes $productoNombre en almacen central le quedan $totalProducto", 'msgerror');
         $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
       }
-
+      $num_transac = $this->get_num_trans();
+      $this->request->data['Movimiento']['transaccion'] = $num_transac;
       $this->Movimiento->create();
       //debug($this->request->data);exit;//prueba para el registro de la entrega
       if ($this->Movimiento->save($this->request->data)) {
@@ -379,7 +380,7 @@ class AlmacenesController extends AppController {
           $this->request->data['Movimiento']['total'] = $totala;
           $this->request->data['Movimiento']['salida'] = $cantidad;
           $this->request->data['Movimiento']['ingreso'] = 0;
-
+          $this->request->data['Movimiento']['transaccion'] = $num_transac;
 
           $this->Movimiento->create();
           if ($this->Movimiento->save($this->request->data)) {
@@ -879,7 +880,12 @@ class AlmacenesController extends AppController {
       'limit' => 10,
       'recursive' => -1
     ));
-    $this->set(compact('movimientos'));
+    $ultimo = $this->Movimiento->find('first',array(
+      'order' => 'Movimiento.id DESC',
+      'conditions' => array('Movimiento.producto_id' => $idProducto),
+      'fields' => array('Movimiento.transaccion')
+      ));
+    $this->set(compact('movimientos','ultimo'));
   }
 
   public function principal() {
@@ -890,16 +896,16 @@ class AlmacenesController extends AppController {
     );
     $productos = $this->Producto->find('all', array(
       'recursive' => -1,
-      'fields' => array('Producto.id','Producto.nombre', 'Producto.total_central')
+      'fields' => array('Producto.id', 'Producto.nombre', 'Producto.total_central')
     ));
     $meses = $this->get_meses();
     $this->set(compact('productos', 'meses'));
   }
 
   public function get_vent_mes($idProducto = null, $mes = null) {
-    $movimiento = $this->Movimiento->find('all',array(
+    $movimiento = $this->Movimiento->find('all', array(
       'recursive' => -1,
-      'conditions' => array('Movimiento.producto_id' => $idProducto,'MONTH(Movimiento.created)' => $mes,'YEAR(Movimiento.created)' => date('Y'),'Movimiento.cliente_id !=' => NULL),
+      'conditions' => array('Movimiento.producto_id' => $idProducto, 'MONTH(Movimiento.created)' => $mes, 'YEAR(Movimiento.created)' => date('Y'), 'Movimiento.cliente_id !=' => NULL),
       'group' => array('Movimiento.producto_id'),
       'fields' => array('SUM(Movimiento.salida) as s_total')
     ));
@@ -954,6 +960,24 @@ class AlmacenesController extends AppController {
       }
     }
     return $meses;
+  }
+
+  public function get_num_trans() {
+    $ultimo = $this->Movimiento->find('first', array(
+      'order' => 'Movimiento.id DESC',
+      'recursive' => -1,
+      'fields' => array('Movimiento.transaccion')
+    ));
+    if (!empty($ultimo)) {
+      return $ultimo['Movimiento']['transaccion'] + 1;
+    }  else {
+      return 1;
+    }
+  }
+  public function elimina_movimiento($numTransaccion = NULL){
+    $this->Movimiento->deleteAll(array('Movimiento.transaccion' => $numTransaccion));
+    $this->Session->setFlash("Se elimino correctamente el movimiento!!",'msgbueno');
+    $this->redirect($this->referer());
   }
 
 }
