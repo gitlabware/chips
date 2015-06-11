@@ -78,10 +78,31 @@
                     <?php echo $this->Form->text('cantidad_central', array('class' => 'input full-width input validate[required]', 'type' => 'number', 'min' => 0)); ?>
                 </p>
             </div>
+            
+            
+            <div id="divpluscelulares-color" style="display: none;" class="new-row four-columns">
+                <p class="block-label button-height">
+                    <label class="label">Color</label>
+                    <?php echo $this->Form->select('colore_id', $colores, array('class' => 'select full-width')); ?>
+                </p>
+            </div>
+            <div id="divpluscelulares-precio" style="display: none;" class="four-columns">
+                <p class="block-label button-height">
+                    <label class="label">Precio de venta ($u$)</label>
+                    <?php echo $this->Form->text('precio_ven', array('class' => 'input full-width', 'type' => 'number', 'step' => 'any')); ?>
+                </p>
+            </div>
+            <div id="divpluscelulares-cantidad" style="display: none;" class="four-columns">
+                <p class="block-label button-height">
+                    <label class="label">Cantidad en Almacen central</label>
+                    <?php echo $this->Form->text('cantidad_cen', array('class' => 'input full-width', 'type' => 'number', 'min' => 0)); ?>
+                </p>
+            </div>
+            
             <div class="new-row twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-2" class="label">Observaciones<small>(Requerido)</small></label>
-                    <textarea name="data[Producto][observaciones]" class="input full-width"></textarea>
+                    <textarea name="data[Producto][observaciones]" class="input full-width" id="ckeditor"></textarea>
                     <?php //echo $this->Form->text('observaciones', array('class' => 'input full-width', 'id' => 'ckeditor')); ?>
                 </p>
             </div>
@@ -114,23 +135,45 @@
 <?php endforeach; ?>
   $(document).ready(function () {
       $('#validation-select').change(function () {
-          if (categoria[$('#validation-select').val()] == 'TARJETAS' || categoria[$('#validation-select').val()] == 'CHIPS') {
+          if (categoria[$('#validation-select').val()] == 'CELULARES') {
               $('#iddivimagen').removeClass('eight-columns');
               $('#iddivimagen').addClass('four-columns');
               $('#iddivmarca').show(200);
-              $('#divplus-escala').show(200);
-              $('#divplus-precio').show(200);
-              $('#divplus-cantidad').show(200);
-          } else {
-              $('#iddivimagen').removeClass('four-columns');
-              $('#iddivimagen').addClass('eight-columns');
-              $('#iddivmarca').hide(200);
+              $('#divpluscelulares-color').show(200);
+              $('#divpluscelulares-precio').show(200);
+              $('#divpluscelulares-cantidad').show(200);
+
               $('#divplus-escala').hide(200);
               $('#divplus-precio').hide(200);
               $('#divplus-cantidad').hide(200);
+          } else {
+              if (categoria[$('#validation-select').val()] == 'TARJETAS' || categoria[$('#validation-select').val()] == 'CHIPS') {
+                  $('#iddivimagen').removeClass('eight-columns');
+                  $('#iddivimagen').addClass('four-columns');
+                  $('#iddivmarca').show(200);
+                  $('#divplus-escala').show(200);
+                  $('#divplus-precio').show(200);
+                  $('#divplus-cantidad').show(200);
+                  
+                  $('#divpluscelulares-color').hide(200);
+                  $('#divpluscelulares-precio').hide(200);
+                  $('#divpluscelulares-cantidad').hide(200);
+              } else {
+                  $('#iddivimagen').removeClass('four-columns');
+                  $('#iddivimagen').addClass('eight-columns');
+                  $('#iddivmarca').hide(200);
+                  $('#divplus-escala').hide(200);
+                  $('#divplus-precio').hide(200);
+                  $('#divplus-cantidad').hide(200);
+
+                  $('#divpluscelulares-color').hide(200);
+                  $('#divpluscelulares-precio').hide(200);
+                  $('#divpluscelulares-cantidad').hide(200);
+              }
           }
+
       });
       $("#formID").validationEngine();
   });
 </script>
-<?php echo $this->Html->script(array('libs/ckeditor/ckeditor','inickeditor'), array('block' => 'js_add'));?>
+<?php echo $this->Html->script(array('libs/ckeditor/ckeditor', 'inickeditor'), array('block' => 'js_add')); ?>

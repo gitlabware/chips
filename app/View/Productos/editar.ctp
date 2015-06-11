@@ -63,6 +63,15 @@
                     <?php echo $this->Form->select('marca_id', $marcas, array('class' => 'select full-width')); ?>
                 </p>
             </div>
+            
+            
+            <div id="divpluscelulares-color" style="display: none;" class="new-row four-columns">
+                <p class="block-label button-height">
+                    <label class="label">Color</label>
+                    <?php echo $this->Form->select('colore_id', $colores, array('class' => 'select full-width')); ?>
+                </p>
+            </div>
+            
             <div class="new-row twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-2" class="label">Observaciones<small>(Requerido)</small></label>
@@ -70,6 +79,8 @@
                     <?php //echo $this->Form->text('observaciones', array('class' => 'input full-width', 'id' => 'ckeditor')); ?>
                 </p>
             </div>
+            
+            
 
             <div class="new-row twelve-columns">
 
@@ -105,10 +116,31 @@
               $('#iddivimagen').removeClass('eight-columns');
               $('#iddivimagen').addClass('four-columns');
               $('#iddivmarca').show(200);
+              $('#divpluscelulares-color').show(200);
+
+              $('#divplus-escala').hide(200);
+              $('#divplus-precio').hide(200);
+              $('#divplus-cantidad').hide(200);
           } else {
-              $('#iddivimagen').removeClass('four-columns');
-              $('#iddivimagen').addClass('eight-columns');
-              $('#iddivmarca').hide(200);
+              if (categoria[$('#validation-select').val()] == 'TARJETAS' || categoria[$('#validation-select').val()] == 'CHIPS') {
+                  $('#iddivimagen').removeClass('eight-columns');
+                  $('#iddivimagen').addClass('four-columns');
+                  $('#iddivmarca').show(200);
+                  $('#divplus-escala').show(200);
+                  $('#divplus-precio').show(200);
+                  $('#divplus-cantidad').show(200);
+                  
+                  $('#divpluscelulares-color').hide(200);
+              } else {
+                  $('#iddivimagen').removeClass('four-columns');
+                  $('#iddivimagen').addClass('eight-columns');
+                  $('#iddivmarca').hide(200);
+                  $('#divplus-escala').hide(200);
+                  $('#divplus-precio').hide(200);
+                  $('#divplus-cantidad').hide(200);
+
+                  $('#divpluscelulares-color').hide(200);
+              }
           }
       }
       $("#formID").validationEngine();

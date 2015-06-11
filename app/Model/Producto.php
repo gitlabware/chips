@@ -28,6 +28,12 @@ class Producto extends AppModel {
       'foreignKey' => 'marca_id',
       'conditions' => '',
       'fields' => '',
+      'order' => ''),
+    'Colore' => array(
+      'className' => 'Colore',
+      'foreignKey' => 'colore_id',
+      'conditions' => '',
+      'fields' => '',
       'order' => '')
   );
 

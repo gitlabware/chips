@@ -4,7 +4,7 @@ class ProductosController extends AppController {
 
   public $layout = 'viva';
   public $name = 'Productos';
-  public $uses = array('Producto', 'Preciosventa', 'Tiposproducto', 'Marca', 'Productosprecio', 'Almacene', 'Movimiento');
+  public $uses = array('Producto', 'Preciosventa', 'Tiposproducto', 'Marca', 'Productosprecio', 'Almacene', 'Movimiento', 'Colore', 'Ventascelulare');
   public $helpers = array('Html', 'Form');
   public $components = array('Session', 'RequestHandler', 'DataTable');
 
@@ -63,6 +63,7 @@ class ProductosController extends AppController {
       if ($this->Producto->save($this->request->data['Producto'])) {
         $idProducto = $this->Producto->getLastInsertID();
         $this->registra_precio_cantidad($idProducto);
+        $this->registra_precio_cantidad2($idProducto);
         $this->Session->setFlash('Producto Registrado', 'msgbueno');
       } else {
         $this->Session->setFlash('No se pudo registrar!!!', 'msgerror');
@@ -73,16 +74,18 @@ class ProductosController extends AppController {
     //exit;
     $tiposproductos = $this->Producto->Tiposproducto->find('all', array('recursive' => -1));
     $marcas = $this->Marca->find('list', array('fields' => 'Marca.nombre'));
+    $colores = $this->Colore->find('list', array('fields' => 'Colore.nombre'));
     //debug($marcas);exit;
-    $this->set(compact('tiposproductos', 'marcas'));
+    $this->set(compact('tiposproductos', 'marcas', 'colores'));
   }
+
   public function registra_precio_cantidad($idProducto = null) {
     if (!empty($this->request->data['Producto']['precio_venta'])) {
       $this->request->data['Productosprecio']['producto_id'] = $idProducto;
-      if($this->request->data['Productosprecio']['escala'] == 'TIENDA'){
+      if ($this->request->data['Productosprecio']['escala'] == 'TIENDA') {
         $this->request->data['Productosprecio']['tipousuario_id'] = 2;
         $this->request->data['Productosprecio']['escala_id'] = 3;
-      }elseif ($this->request->data['Productosprecio']['escala'] == 'DISTRIBUIDOR') {
+      } elseif ($this->request->data['Productosprecio']['escala'] == 'DISTRIBUIDOR') {
         $this->request->data['Productosprecio']['tipousuario_id'] = 3;
         $this->request->data['Productosprecio']['escala_id'] = 1;
         $this->request->data['Productosprecio']['escala'] = 'MAYOR';
@@ -109,8 +112,43 @@ class ProductosController extends AppController {
       $this->request->data['Movimiento']['total'] = $total;
       $this->request->data['Movimiento']['almacene_id'] = $almacen['Almacene']['id'];
       $this->request->data['Movimiento']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+      $this->request->data['Movimiento']['transaccion'] = $this->get_num_trans();
       $this->Movimiento->create();
       $this->Movimiento->save($this->request->data['Movimiento']);
+    }
+  }
+
+  public function registra_precio_cantidad2($idProducto = null) {
+    if (!empty($this->request->data['Producto']['precio_ven'])) {
+      $this->request->data['Productosprecio']['producto_id'] = $idProducto;
+      $this->request->data['Productosprecio']['escala_id'] = 3;
+      $this->request->data['Productosprecio']['escala'] = 'TIENDA';
+      $this->request->data['Productosprecio']['tipousuario_id'] = 2;
+      $this->request->data['Productosprecio']['precio'] = $this->request->data['Producto']['precio_ven'];
+      $this->request->data['Productosprecio']['fecha'] = date('Y-m-d');
+      $this->Productosprecio->create();
+      $this->Productosprecio->save($this->request->data['Productosprecio']);
+    }
+    if (!empty($this->request->data['Producto']['cantidad_cen'])) {
+      $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
+      $ultimo = $this->Ventascelulare->find('first', array(
+        'order' => 'Ventascelulare.id DESC',
+        'conditions' => array('Ventascelulare.producto_id' => $idProducto, 'Ventascelulare.almacene_id' => $almacen['Almacene']['id'])
+      ));
+      if (!empty($ultimo)) {
+        $total = $ultimo['Ventascelulare']['total'] + $this->request->data['Producto']['cantidad_cen'];
+      } else {
+        $total = $this->request->data['Producto']['cantidad_cen'];
+      }
+      $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
+      $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
+      $this->request->data['Ventascelulare']['entrada'] = $this->request->data['Producto']['cantidad_cen'];
+      $this->request->data['Ventascelulare']['total'] = $total;
+      $this->request->data['Ventascelulare']['almacene_id'] = $almacen['Almacene']['id'];
+      $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+      $this->request->data['Ventascelulare']['transaccion'] = $this->get_num_trans();
+      $this->Ventascelulare->create();
+      $this->Ventascelulare->save($this->request->data['Ventascelulare']);
     }
   }
 
@@ -185,7 +223,8 @@ class ProductosController extends AppController {
     }
     $marcas = $this->Marca->find('list', array('fields' => 'Marca.nombre'));
     $tiposproductos = $this->Producto->Tiposproducto->find('all', array('recursive' => -1));
-    $this->set(compact('tiposproductos', 'marcas'));
+    $colores = $this->Colore->find('list', array('fields' => 'Colore.nombre'));
+    $this->set(compact('tiposproductos', 'marcas','colores'));
   }
 
   function buscar() {
@@ -208,8 +247,19 @@ class ProductosController extends AppController {
       $this->redirect(array('action' => 'index'), null, true);
     }
   }
-  
-  
+  public function get_num_trans() {
+    $ultimo = $this->Movimiento->find('first', array(
+      'order' => 'Movimiento.id DESC',
+      'recursive' => -1,
+      'fields' => array('Movimiento.transaccion')
+    ));
+    if (!empty($ultimo)) {
+      return $ultimo['Movimiento']['transaccion'] + 1;
+    } else {
+      return 1;
+    }
+  }
+
 }
 
 ?>
