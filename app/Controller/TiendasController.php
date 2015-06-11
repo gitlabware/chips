@@ -22,7 +22,7 @@ class TiendasController extends AppController {
     'Chip',
     'Almacene',
     'Recarga', 'Ventascelulare',
-    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago'
+    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago', 'Rutasusuario'
   );
   public $components = array('RequestHandler', 'DataTable');
 
@@ -578,11 +578,15 @@ class TiendasController extends AppController {
       $this->Cliente->virtualFields = array(
         'acciones' => "CONCAT('$acciones')"
       );
+      $rutas_usuario = $this->Rutasusuario->find('list', array(
+        'conditions' => array('Rutasusuario.user_id' => $this->Session->read('Auth.User.id')),
+        'fields' => array('Rutasusuario.ruta_id')
+      ));
       $this->paginate = array(
         'fields' => array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Cliente.zona', 'Cliente.acciones'),
         'recursive' => -1,
         'order' => 'Cliente.id DESC',
-        'conditions' => array('Cliente.ruta_id' => $this->Session->read('Auth.User.ruta_id'))
+        'conditions' => array('Cliente.ruta_id' => $rutas_usuario)
       );
       $this->DataTable->fields = array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Cliente.zona', 'Cliente.acciones');
       //$this->DataTable->emptyEleget_usuarios_adminments = 1;
