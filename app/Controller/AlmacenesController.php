@@ -10,7 +10,16 @@ App::uses('AppController', 'Controller');
  */
 class AlmacenesController extends AppController {
 
-  public $uses = array('Almacene', 'Tiposproducto', 'Persona', 'Producto', 'Movimiento', 'Detalle', 'User', 'Deposito', 'Movimientosrecarga', 'Sucursal', 'Banco', 'Ventascelulare', 'Pedido', 'Productosprecio', 'Devuelto', 'Recargado');
+  public $uses = array(
+    'Almacene',
+    'Tiposproducto',
+    'Persona',
+    'Producto', 'Movimiento',
+    'Detalle', 'User', 'Deposito', 'Movimientosrecarga', 'Sucursal',
+    'Banco', 'Ventascelulare', 'Pedido', 'Productosprecio',
+    'Devuelto', 'Recargado',
+    'Totale'
+  );
   public $components = array('Session', 'Fechasconvert', 'RequestHandler', 'DataTable');
   public $layout = 'viva';
 
@@ -134,64 +143,18 @@ class AlmacenesController extends AppController {
 
   public function listaentregas($idPersona = null, $almacen = null) {
     $pedidos = array();
+
+    $condiciones = array();
     if ($almacen == 1) {
-      $persona = $this->Almacene->find('first', array('conditions' => array('Almacene.id' => $idPersona)));
-      $nombre = $persona['Almacene']['nombre'];
-      $ultimosId = $this->Movimiento->find(
-        'all', array(
-        'fields' => array('MAX(Movimiento.id) as ultimo'),
-        'conditions' => array('Movimiento.almacene_id' => $persona['Almacene']['id']),
-        'group' => array('Movimiento.producto_id'),
-        'order' => array('Movimiento.id DESC')
-      ));
+      $condiciones['Totale.almacene_id'] = $idPersona;
     } else {
-      $persona = $this->Persona->find('first', array('conditions' => array('Persona.id' => $idPersona)));
-      $nombre = $persona['Persona']['ap_paterno'] . ' ' . $persona['Persona']['ap_materno'] . ' ' . $persona['Persona']['nombre'];
-      $ultimosId = $this->Movimiento->find(
-        'all', array(
-        'fields' => array('MAX(Movimiento.id) as ultimo'),
-        'conditions' => array('Movimiento.persona_id' => $idPersona),
-        'group' => array('Movimiento.producto_id'),
-        'order' => array('Movimiento.id DESC')
-      ));
-
-      $idDistribuidor = $this->User->find('first', array('fields' => array('User.id'), 'conditions' => array('User.persona_id' => $idPersona)));
-      $ultima = $this->Pedido->find('first', array(
-        'fields' => array('Pedido.numero'),
-        'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id']),
-        'order' => 'Pedido.id DESC'
-      ));
-      if (!empty($ultima)) {
-        $pedidos = $this->Pedido->find('all', array(
-          'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id'], 'Pedido.numero' => $ultima['Pedido']['numero'])
-        ));
-      }
+      $condiciones['Totale.persona_id'] = $idPersona;
     }
-
-    $c = 0;
-    $ides = array();
-    foreach ($ultimosId as $ids) {
-      $ides[$c] = $ids[0]['ultimo'];
-      $c++;
-    }
-
-    $entregas = $this->Movimiento->find(
-      'all', array(
-      'fields' => array(
-        'Movimiento.id',
-        'Movimiento.saldo',
-        'Movimiento.total',
-        'Movimiento.producto_id',
-        'Producto.nombre',
-        'Producto.proveedor',
-        'Producto.tiposproducto_id'),
-      'conditions' => array(
-        'Movimiento.id' => $ides
-      ),
-      'group' => array('Movimiento.producto_id')
-      )
-    );
-
+    $entregas = $this->Totale->find('all', array(
+      'recursive' => 0,
+      'conditions' => $condiciones,
+      'fields' => array('Producto.nombre', 'Producto.proveedor', 'Totale.total', 'Totale.producto_id')
+    ));
 
     $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos'));
   }
@@ -216,191 +179,81 @@ class AlmacenesController extends AppController {
 
       $idAlmacenCentral = $this->Almacene->find('first', array(
         'conditions' => array('Almacene.central' => true)));
-
       $idAlmacenCentral = $idAlmacenCentral['Almacene']['id'];
       /* corresponde al ultimo movimiento del producto en almacen central */
-      $movimiento = $this->Movimiento->find('first', array(
-        'conditions' => array('Movimiento.almacene_id' => $idAlmacenCentral,
-          'Movimiento.producto_id' => $idProducto),
-        'order' => array('Movimiento.id DESC'),
-        'recursive' => -1
-      ));
-      $fecha = date('Y-m-d');
-      /* fin movimiento almacen central */
-      if (!empty($movimiento)) {
-        $totalProducto = $movimiento['Movimiento']['total'];
-      } else {
-        $totalProducto = 0;
-      }
 
-      if ($almacen) {
+      $totalProducto = $this->get_total($idProducto, 1, $idAlmacenCentral);
+      $num_transaccion = $this->get_num_trans();
+      if ($almacen == 1) {
         if ($idAlmacenCentral == $idPersona) {
-          $almacenCentral = true;
-        } else {
-          $almacenCentral = false;
-        }
-
-        /* movimiento del almacen */
-        $ultimoMovimiento = $this->Movimiento->find('first', array(
-          'conditions' => array(
-            'Movimiento.almacene_id' => $idPersona,
-            'Movimiento.producto_id' => $idProducto),
-          'order' => array('Movimiento.id DESC')
-        ));
-        /* fin del movimiento del almacen */
-
-        if (!empty($ultimoMovimiento)) {
-
-          if ($almacenCentral) {
-            $total = $cantidad + $ultimoMovimiento['Movimiento']['total'];
-            $ingreso = $cantidad;
-          } else {//para otro almacenes de las tiendas
-            //movimiento es la consulta de datos desde almacen central
-            if (!empty($movimiento)) {
-              if ($movimiento['Movimiento']['total'] == 0) {
-                $this->Session->setFlash("Error en el registro de entrega'!!!...No existe $productoNombre en almacen central", 'msgerror');
-                $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
-              }
-            } else {
-              $this->Session->setFlash("Error en el registro de entrega'!!!...No existe $productoNombre en almacen central", 'msgerror');
-              $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
-            }
-            $total = $cantidad + $ultimoMovimiento['Movimiento']['total'];
-            $ingreso = $cantidad;
-          }
-        } else {//en caso de ser el primer registro de entrega para el almacen
-          if ($almacenCentral) {
-
-            $total = $cantidad;
-            $saldo = 0;
-            $ingreso = $cantidad;
-          } else {
-            if (!empty($movimiento)) {
-
-              if ($totalProducto == 0) {
-                $this->Session->setFlash("Error en el registro de entrega'!!!...No existe $productoNombre en almacen central", 'msgerror');
-                $this->redirect(array('action' => 'listaentregas', $idPersona));
-              }
-            } else {
-              $this->Session->setFlash("Error en el registro de entrega'!!!...No existe $productoNombre en almacen central", 'msgerror');
-              $this->redirect(array('action' => 'listaentregas', $idPersona));
-            }
-            $total = $total + $cantidad;
-            $saldo = 0;
-            $ingreso = $cantidad;
-          }
-        }
-      } else {//caso de no ser almacen
-        $almacenCentral = false;
-
-        $ultimoMovimiento = $this->Movimiento->find('first', array(
-          'conditions' => array(
-            'Movimiento.persona_id' => $idPersona,
-            'Movimiento.producto_id' => $idProducto),
-          'order' => array('Movimiento.id DESC')
-        ));
-
-        if (!empty($movimiento)) {
-
-          if ($totalProducto == 0) {
-            $this->Session->setFlash("Error en el registro de entrega'!!!...No existe $productoNombre en almacen central", 'msgerror');
-            $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
-          }
-        } else {
-          $this->Session->setFlash("Error en el registro de entrega'!!!...No existe $productoNombre en almacen central", 'msgerror');
-          $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
-        }
-
-        if (!empty($ultimoMovimiento)) {
-          $total = $ultimoMovimiento['Movimiento']['total'] + $cantidad;
-          $ingreso = $cantidad;
-        } else {
-          $total = $cantidad;
-          $ingreso = $cantidad;
-        }
-      }
-      if ($almacen) {
-        $almacen_d = $this->Almacene->findByid($idPersona, null, null, -1);
-        $id_sucursal = $almacen_d['Almacene']['sucursal_id'];
-        $this->request->data['Movimiento']['sucursal_id'] = $id_sucursal;
-      }
-
-      $this->request->data['Movimiento']['total'] = $total;
-      $this->request->data['Movimiento']['ingreso'] = $ingreso;
-      $this->request->data['Movimiento']['user_id'] = $this->Session->read("Auth.User.id");
-
-      if ($this->request->data['Movimiento']['categoria'] == 1) {
-        $this->request->data['Detalle']['producto_id'] = $idProducto;
-        $this->request->data['Detalle']['cantient'] = $cantidad;
-        if ($almacen) {
-          $this->request->data['Detalle']['almacene_id'] = $idPersona;
-        } else {
-          $this->request->data['Detalle']['persona_id'] = $idPersona;
-        }
-      }
-
-      if (!$almacenCentral && $cantidad > $totalProducto) {
-
-        $this->Session->setFlash("Error en el registro de entrega'!!!...No existen suficientes $productoNombre en almacen central le quedan $totalProducto", 'msgerror');
-        $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
-      }
-      $num_transac = $this->get_num_trans();
-      $this->request->data['Movimiento']['transaccion'] = $num_transac;
-      $this->Movimiento->create();
-      //debug($this->request->data);exit;//prueba para el registro de la entrega
-      if ($this->Movimiento->save($this->request->data)) {
-
-        $a = 0;
-        $IdMovimiento = $this->Movimiento->getLastInsertID();
-
-        if ($this->request->data['Movimiento']['categoria'] == 1) {
-          $this->request->data['Detalle']['movimiento_id'] = $IdMovimiento;
-
-          $this->Detalle->create();
-
-          if ($this->Detalle->save($this->request->data['Detalle'])) {
-            $a = 1;
-          }
-
-          if ($a == 0) {
-            $this->Movimiento->delete($IdMovimiento);
-            $this->Session->setFlash("Error en el registro de entrega'!!!", 'msgerror');
-            $this->redirect(array('action' => 'listaentregas', $idPersona));
-          }
-        }
-
-        if (!$almacenCentral) {
-          $this->request->data = "";
-          $totala = $totalProducto - $cantidad;
-          $almacen_d = $this->Almacene->findByid($idAlmacenCentral, null, null, -1);
-          $id_sucursal = $almacen_d['Almacene']['sucursal_id'];
-          $this->request->data['Movimiento']['sucursal_id'] = $id_sucursal;
-          $this->request->data['Movimiento']['almacene_id'] = $idAlmacenCentral;
-          $this->request->data['Movimiento']['producto_id'] = $idProducto;
-          $this->request->data['Movimiento']['total'] = $totala;
-          $this->request->data['Movimiento']['salida'] = $cantidad;
-          $this->request->data['Movimiento']['ingreso'] = 0;
-          $this->request->data['Movimiento']['transaccion'] = $num_transac;
-
+          $datos = array();
+          $datos['producto_id'] = $idProducto;
+          $datos['user_id'] = $this->Session->read('Auth.User.id');
+          $datos['almacene_id'] = $idPersona;
+          $datos['ingreso'] = $cantidad;
+          $datos['salida'] = 0;
+          $datos['transaccion'] = $num_transaccion;
           $this->Movimiento->create();
-          if ($this->Movimiento->save($this->request->data)) {
-            $this->Session->setFlash("se registro la entrega'!!!", 'msgbueno');
-            $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
-          } else {
-
-            $this->Movimiento->delete($IdMovimiento);
-            $this->Detalle->deleteAll(array('Detalle.movimiento_id' => $IdMovimiento));
-            $this->Session->setFlash("Error en el registro de entrega'!!!", 'msgerror');
-            $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
-          }
+          $this->Movimiento->save($datos);
+          $this->set_total($idProducto, 1, $idPersona, ($totalProducto + $cantidad));
+          $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
         } else {
-          $this->Session->setFlash("se registro el ingreso en almacen'!!!", 'msgbueno');
-          $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
+          if ($totalProducto >= $cantidad) {
+            $datos = array();
+            $datos['producto_id'] = $idProducto;
+            $datos['user_id'] = $this->Session->read('Auth.User.id');
+            $datos['almacene_id'] = $idPersona;
+            $datos['ingreso'] = $cantidad;
+            $datos['salida'] = 0;
+            $datos['transaccion'] = $num_transaccion;
+            $this->Movimiento->create();
+            $this->Movimiento->save($datos);
+            $this->set_total($idProducto, 1, $idPersona, ($this->get_total($idProducto, 1, $idPersona) + $cantidad));
+
+            $datos = array();
+            $datos['producto_id'] = $idProducto;
+            $datos['user_id'] = $this->Session->read('Auth.User.id');
+            $datos['almacene_id'] = $idAlmacenCentral;
+            $datos['ingreso'] = 0;
+            $datos['salida'] = $cantidad;
+            $datos['transaccion'] = $num_transaccion;
+            $this->Movimiento->create();
+            $this->Movimiento->save($datos);
+            $this->set_total($idProducto, 1, $idAlmacenCentral, ($totalProducto - $cantidad));
+            $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
+          } else {
+            $this->Session->setFlash("No se pudo registrar en almacen hay " . $totalProducto, 'msgerror');
+          }
         }
       } else {
-        $this->Session->setFlash("Error en el registro de entrega'!!!", 'msgerror');
-        $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
+        if ($totalProducto >= $cantidad) {
+          $datos = array();
+          $datos['producto_id'] = $idProducto;
+          $datos['user_id'] = $this->Session->read('Auth.User.id');
+          $datos['persona_id'] = $idPersona;
+          $datos['ingreso'] = $cantidad;
+          $datos['salida'] = 0;
+          $datos['transaccion'] = $num_transaccion;
+          $this->Movimiento->create();
+          $this->Movimiento->save($datos);
+          $this->set_total($idProducto, 0, $idPersona, ($this->get_total($idProducto, 0, $idPersona) + $cantidad));
+
+          $datos = array();
+          $datos['producto_id'] = $idProducto;
+          $datos['user_id'] = $this->Session->read('Auth.User.id');
+          $datos['almacene_id'] = $idAlmacenCentral;
+          $datos['ingreso'] = 0;
+          $datos['salida'] = $cantidad;
+          $datos['transaccion'] = $num_transaccion;
+          $this->Movimiento->create();
+          $this->Movimiento->save($datos);
+          $this->set_total($idProducto, 1, $idAlmacenCentral, ($totalProducto - $cantidad));
+          $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
+        } else {
+          $this->Session->setFlash("No se pudo registrar en almacen hay " . $totalProducto, 'msgerror');
+        }
       }
+      $this->redirect(array('action' => 'listaentregas', $idPersona, $almacen));
     }
     $this->set(compact('distribuidores', 'categorias', 'productos', 'idPersona', 'almacen', 'cent'));
   }
@@ -699,6 +552,7 @@ class AlmacenesController extends AppController {
           $this->request->data['Ventascelulare']['almacene_id'] = $ultimo_central['Ventascelulare']['almacene_id'];
           $this->request->data['Ventascelulare']['sucursal_id'] = $ultimo_central['Ventascelulare']['sucursal_id'];
           $this->request->data['Ventascelulare']['transaccion'] = $num_transaccion;
+          $this->request->data['Ventascelulare']['entrada'] = 0;
           $this->Ventascelulare->create();
           $this->Ventascelulare->save($this->request->data['Ventascelulare']);
           $this->Session->setFlash('Se registro correctamente!!!' . 'msgbueno');
@@ -918,7 +772,7 @@ class AlmacenesController extends AppController {
 
   public function principal() {
     $idCentral = $this->get_id_alm_cent();
-    $sql = "SELECT m.total FROM movimientos m WHERE m.almacene_id = $idCentral AND m.producto_id = Producto.id ORDER BY m.id DESC LIMIT 1";
+    $sql = "SELECT t.total FROM totales t WHERE t.almacene_id = $idCentral AND t.producto_id = Producto.id LIMIT 1";
     $this->Producto->virtualFields = array(
       'total_central' => "CONCAT(($sql))"
     );
@@ -1002,6 +856,7 @@ class AlmacenesController extends AppController {
       return 1;
     }
   }
+
   public function get_num_trans_cel() {
     $ultimo = $this->Ventascelulare->find('first', array(
       'order' => 'Ventascelulare.id DESC',
@@ -1019,6 +874,51 @@ class AlmacenesController extends AppController {
     $this->Movimiento->deleteAll(array('Movimiento.transaccion' => $numTransaccion));
     $this->Session->setFlash("Se elimino correctamente el movimiento!!", 'msgbueno');
     $this->redirect($this->referer());
+  }
+
+  public function set_total($idProducto = null, $es_almacen = null, $id = null, $total = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+      $datos_t['almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+      $datos_t['persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.id')
+    ));
+    if (!empty($dato_total)) {
+      $this->Totale->id = $dato_total['Totale']['id'];
+    } else {
+      $this->Totale->create();
+    }
+    $datos_t['producto_id'] = $idProducto;
+    $datos_t['total'] = $total;
+    $this->Totale->save($datos_t);
+  }
+
+  public function get_total($idProducto = null, $es_almacen = null, $id = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.total')
+    ));
+    if (!empty($dato_total)) {
+      return $dato_total['Totale']['total'];
+    } else {
+      return 0;
+    }
   }
 
 }

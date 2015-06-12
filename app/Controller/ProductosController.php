@@ -4,7 +4,9 @@ class ProductosController extends AppController {
 
   public $layout = 'viva';
   public $name = 'Productos';
-  public $uses = array('Producto', 'Preciosventa', 'Tiposproducto', 'Marca', 'Productosprecio', 'Almacene', 'Movimiento', 'Colore', 'Ventascelulare');
+  public $uses = array('Producto', 'Preciosventa', 'Tiposproducto', 'Marca',
+    'Productosprecio', 'Almacene', 'Movimiento', 'Colore',
+    'Ventascelulare', 'Totale');
   public $helpers = array('Html', 'Form');
   public $components = array('Session', 'RequestHandler', 'DataTable');
 
@@ -97,19 +99,11 @@ class ProductosController extends AppController {
     }
     if (!empty($this->request->data['Producto']['cantidad_central'])) {
       $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
-      $ultimo = $this->Movimiento->find('first', array(
-        'order' => 'Movimiento.id DESC',
-        'conditions' => array('Movimiento.producto_id' => $idProducto, 'Movimiento.almacene_id' => $almacen['Almacene']['id'])
-      ));
-      if (!empty($ultimo)) {
-        $total = $ultimo['Movimiento']['total'] + $this->request->data['Producto']['cantidad_central'];
-      } else {
-        $total = $this->request->data['Producto']['cantidad_central'];
-      }
+      $this->set_total($idProducto, 1, $almacen['Almacene']['id'], $this->request->data['Producto']['cantidad_central']);
       $this->request->data['Movimiento']['user_id'] = $this->Session->read('Auth.User.id');
       $this->request->data['Movimiento']['producto_id'] = $idProducto;
       $this->request->data['Movimiento']['ingreso'] = $this->request->data['Producto']['cantidad_central'];
-      $this->request->data['Movimiento']['total'] = $total;
+      //$this->request->data['Movimiento']['total'] = $total;
       $this->request->data['Movimiento']['almacene_id'] = $almacen['Almacene']['id'];
       $this->request->data['Movimiento']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
       $this->request->data['Movimiento']['transaccion'] = $this->get_num_trans();
@@ -131,22 +125,14 @@ class ProductosController extends AppController {
     }
     if (!empty($this->request->data['Producto']['cantidad_cen'])) {
       $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
-      $ultimo = $this->Ventascelulare->find('first', array(
-        'order' => 'Ventascelulare.id DESC',
-        'conditions' => array('Ventascelulare.producto_id' => $idProducto, 'Ventascelulare.almacene_id' => $almacen['Almacene']['id'])
-      ));
-      if (!empty($ultimo)) {
-        $total = $ultimo['Ventascelulare']['total'] + $this->request->data['Producto']['cantidad_cen'];
-      } else {
-        $total = $this->request->data['Producto']['cantidad_cen'];
-      }
+      $this->set_total($idProducto, 1, $almacen['Almacene']['id'], $this->request->data['Producto']['cantidad_cen']);
       $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
       $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
       $this->request->data['Ventascelulare']['entrada'] = $this->request->data['Producto']['cantidad_cen'];
       $this->request->data['Ventascelulare']['total'] = $total;
       $this->request->data['Ventascelulare']['almacene_id'] = $almacen['Almacene']['id'];
       $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
-      $this->request->data['Ventascelulare']['transaccion'] = $this->get_num_trans();
+      $this->request->data['Ventascelulare']['transaccion'] = $this->get_num_trans_cel();
       $this->Ventascelulare->create();
       $this->Ventascelulare->save($this->request->data['Ventascelulare']);
     }
@@ -224,7 +210,7 @@ class ProductosController extends AppController {
     $marcas = $this->Marca->find('list', array('fields' => 'Marca.nombre'));
     $tiposproductos = $this->Producto->Tiposproducto->find('all', array('recursive' => -1));
     $colores = $this->Colore->find('list', array('fields' => 'Colore.nombre'));
-    $this->set(compact('tiposproductos', 'marcas','colores'));
+    $this->set(compact('tiposproductos', 'marcas', 'colores'));
   }
 
   function buscar() {
@@ -247,6 +233,7 @@ class ProductosController extends AppController {
       $this->redirect(array('action' => 'index'), null, true);
     }
   }
+
   public function get_num_trans() {
     $ultimo = $this->Movimiento->find('first', array(
       'order' => 'Movimiento.id DESC',
@@ -257,6 +244,64 @@ class ProductosController extends AppController {
       return $ultimo['Movimiento']['transaccion'] + 1;
     } else {
       return 1;
+    }
+  }
+
+  public function get_num_trans_cel() {
+    $ultimo = $this->Ventascelulare->find('first', array(
+      'order' => 'Ventascelulare.id DESC',
+      'recursive' => -1,
+      'fields' => array('Ventascelulare.transaccion')
+    ));
+    if (!empty($ultimo)) {
+      return $ultimo['Ventascelulare']['transaccion'] + 1;
+    } else {
+      return 1;
+    }
+  }
+
+  public function set_total($idProducto = null, $es_almacen = null, $id = null, $total = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+      $datos_t['almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+      $datos_t['persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.id')
+    ));
+    if (!empty($dato_total)) {
+      $this->Totale->id = $dato_total['Totale']['id'];
+    } else {
+      $this->Totale->create();
+    }
+    $datos_t['producto_id'] = $idProducto;
+    $datos_t['total'] = $total;
+    $this->Totale->save($datos_t);
+  }
+
+  public function get_total($idProducto = null, $es_almacen = null, $id = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.total')
+    ));
+    if (!empty($dato_total)) {
+      return $dato_total['Totale']['total'];
+    } else {
+      return 0;
     }
   }
 

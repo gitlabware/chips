@@ -64,15 +64,15 @@
                                   <?php echo $entrega['Producto']['proveedor']; ?>
                               </td>
                               <td>
-                                  <?php echo $entrega['Movimiento']['total']; ?>
+                                  <?php echo $entrega['Totale']['total']; ?>
                               </td>
                               <td>
                                   <?php
-                                  $idProducto = $entrega['Movimiento']['producto_id'];
-                                  if ($entrega['Producto']['tiposproducto_id'] == 1):
+                                  $idProducto = $entrega['Totale']['producto_id'];
+                                  /*if ($entrega['Producto']['tiposproducto_id'] == 1):
                                     echo
                                     $this->Html->link('Rango&lote', array('action' => 'verdetalle', $idPersona, $almacen, $idProducto));
-                                  endif;
+                                  endif;*/
                                   ?>
                                   <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'detalle_mov',$idProducto,$idPersona,$almacen));?>','Detalle de <?php echo $entrega['Producto']['nombre']; ?>')">Detalle</a>
                                   <?php //echo $this->Html->link('Entregas', array('action' => 'verentregas', $idPersona, $almacen, $idProducto));?>

@@ -802,6 +802,7 @@ class TiendasController extends AppController {
       $datos['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
       $datos['Ventascelulare']['almacene_id'] = $this->get_id_almacen();
       $datos['Ventascelulare']['sucursal_id'] = $this->Session->read('Auth.User.sucursal_id');
+      $datos['Ventascelulare']['transaccion'] = $this->get_num_trans_cel();
       $this->Ventascelulare->create();
       $this->Ventascelulare->save($datos['Ventascelulare']);
       $idVenta = $this->Ventascelulare->getLastInsertID();
@@ -900,6 +901,19 @@ class TiendasController extends AppController {
     ));
     if (!empty($ultimo)) {
       return $ultimo['Movimiento']['transaccion'] + 1;
+    } else {
+      return 1;
+    }
+  }
+
+  public function get_num_trans_cel() {
+    $ultimo = $this->Ventascelulare->find('first', array(
+      'order' => 'Ventascelulare.id DESC',
+      'recursive' => -1,
+      'fields' => array('Ventascelulare.transaccion')
+    ));
+    if (!empty($ultimo)) {
+      return $ultimo['Ventascelulare']['transaccion'] + 1;
     } else {
       return 1;
     }
