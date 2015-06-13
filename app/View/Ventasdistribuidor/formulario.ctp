@@ -52,7 +52,7 @@
                                       </tr>
                                       <tr>
                                           <td align="center" style="color: teal; font-weight: bold;">
-                                              <?php echo $this->requestAction(array('action' => 'get_total_dis',$r['Producto']['id']))?>
+                                              <?php echo $this->requestAction(array('action' => 'get_total',$r['Producto']['id'],0,$this->Session->read('Auth.User.persona_id')))?>
                                           </td>
                                       </tr>
                                   </table>

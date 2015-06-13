@@ -7,12 +7,7 @@
         <div class="four-columns">
             <?php if ($almacen['Almacene']['central'] != 1): ?>
               <span class="tag red-bg">
-                  <?php
-                  if (!empty($ultimo)) {
-                    echo 'Hay ' . $ultimo['Ventascelulare']['total'] . ' en almacen central';
-                  } else {
-                    echo 'Hay 0 en almacen central';
-                  }
+                  <?php echo 'Hay ' . $ultimo_total . ' en almacen central';
                   ?>
               </span>
             <?php endif; ?>

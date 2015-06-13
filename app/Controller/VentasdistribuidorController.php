@@ -23,7 +23,7 @@ class VentasdistribuidorController extends AppController {
     'Tiposobservacione',
     'Deposito',
     'Recargado',
-    'Listacliente', 'User', 'Rutasusuario');
+    'Listacliente', 'User', 'Rutasusuario', 'Totale');
   public $layout = 'vivadistribuidor';
   public $components = array('RequestHandler', 'Session', 'Acl', 'Auth', 'DataTable');
 
@@ -293,7 +293,7 @@ class VentasdistribuidorController extends AppController {
     }
   }
 
-  function formulario($id_cli = null) {
+  function formulario($id_cli = null,$num_trans = null) {
     $usu = $this->Session->read('Auth.User.id');
     $usuario = $this->Session->read('Auth.User.persona_id');
     $datoscli = $this->Cliente->findById($id_cli);
@@ -317,7 +317,10 @@ class VentasdistribuidorController extends AppController {
         'Producto.nombre',
         'Producto.id'),
       'group' => array('Productosprecio.producto_id')));
-
+    
+    if(!empty($num_trans)){
+      
+    }
     if ($this->Session->check('form_venta_mayor')) {
       $this->request->data = $this->Session->read('form_venta_mayor');
       $this->Session->delete('form_venta_mayor');
@@ -329,7 +332,7 @@ class VentasdistribuidorController extends AppController {
     /* debug($this->request->data);
       exit; */
     foreach ($this->request->data['Movimiento'] as $dat) {
-      $total = $this->get_total_dis($dat['producto_id']);
+      $total = $this->get_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'));
       if ($dat['salida'] > 0) {
         if ($dat['salida'] > $total) {
           $this->Session->write('form_venta_mayor', $this->request->data);
@@ -338,13 +341,15 @@ class VentasdistribuidorController extends AppController {
         }
       }
     }
+    $num_transaccion = $this->get_num_trans();
     foreach ($this->request->data['Movimiento'] as $dat) {
       $num_transaccion = $this->get_num_trans();
-      $total = $this->get_total_dis($dat['producto_id']);
+      $total = $this->get_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'));
       $this->Movimiento->create();
-      $dat['total'] = $total - $dat['salida'];
+      //$dat['total'] = $total - $dat['salida'];
       $dat['transaccion'] = $num_transaccion;
       $this->Movimiento->save($dat);
+      $this->set_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'), ($total - $dat['salida']));
     }
     //$this->registra_recarga();
     $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
@@ -1456,6 +1461,59 @@ class VentasdistribuidorController extends AppController {
     } else {
       return 1;
     }
+  }
+
+  public function set_total($idProducto = null, $es_almacen = null, $id = null, $total = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+      $datos_t['almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+      $datos_t['persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.id')
+    ));
+    if (!empty($dato_total)) {
+      $this->Totale->id = $dato_total['Totale']['id'];
+    } else {
+      $this->Totale->create();
+    }
+    $datos_t['producto_id'] = $idProducto;
+    $datos_t['total'] = $total;
+    $this->Totale->save($datos_t);
+  }
+
+  public function get_total($idProducto = null, $es_almacen = null, $id = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.total')
+    ));
+    if (!empty($dato_total)) {
+      return $dato_total['Totale']['total'];
+    } else {
+      return 0;
+    }
+  }
+
+  public function ventas() {
+    $ventas = $this->Movimiento->find('all', array(
+      'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.persona_id' => $this->Session->read('Auth.User.persona_id')),
+      'group' => array('Movimiento.transaccion')
+    ));
+    $this->set(compact('ventas'));
   }
 
 }
