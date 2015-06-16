@@ -18,6 +18,11 @@
                 <div id="imprimir">
                     <?php $id = $precios['0']['Producto']['id']; ?>
                     <?php echo $this->Form->create(null, array('url' => array('controller' => 'Ventasdistribuidor', 'action' => 'registra_venta_mayor'), 'id' => 'formID')); ?>
+                    <?php
+                    if (!empty($num_trans)) {
+                      echo $this->Form->hidden('Aux.edita', array('value'));
+                    }
+                    ?>
                     <table class="simple-table responsive-table" style=" font-size: 16px;">
                         <tr>
                             <th class="txt">149:</th>
@@ -52,7 +57,7 @@
                                       </tr>
                                       <tr>
                                           <td align="center" style="color: teal; font-weight: bold;">
-                                              <?php echo $this->requestAction(array('action' => 'get_total',$r['Producto']['id'],0,$this->Session->read('Auth.User.persona_id')))?>
+                                              <?php echo $this->requestAction(array('action' => 'get_total', $r['Producto']['id'], 0, $this->Session->read('Auth.User.persona_id'))) ?>
                                           </td>
                                       </tr>
                                   </table>
@@ -66,20 +71,26 @@
                                       </tr>
 
                                       <?php foreach ($precios as $p): ?>
-
                                         <?php
                                         if ($p['Productosprecio']['producto_id'] ==
                                           $r['Producto']['id']):
                                           ?>
                                           <tr>
                                               <?php
-                                              echo $this->Form->
-                                                hidden("Movimiento.$n.user_id", array('value' => $usu));
+                                              if (!empty($num_trans)) {
+                                                $datos_edit = $this->requestAction(array('action' => 'get_d_edit_v', $num_trans, $p['Productosprecio']['producto_id'], $p['Productosprecio']['precio']));
+
+                                                if (empty($this->request->data['Movimiento'][$n]['salida']) && !empty($datos_edit)) {
+                                                  echo $this->Form->hidden("Movimiento.$n.id", array('value' => $datos_edit['id']));
+                                                  echo $this->Form->hidden("Movimiento.$n.salida_ant", array('value' => $datos_edit['salida']));
+                                                  $this->request->data['Movimiento'][$n]['salida'] = $datos_edit['salida'];
+                                                }
+                                              }
                                               ?>
-                                              <?php
-                                              echo $this->Form->
-                                                hidden("Movimiento.$n.producto_id", array('value' => $p['Productosprecio']['producto_id']));
-                                              ?>
+
+
+                                              <?php echo $this->Form->hidden("Movimiento.$n.user_id", array('value' => $usu)); ?>
+                                              <?php echo $this->Form->hidden("Movimiento.$n.producto_id", array('value' => $p['Productosprecio']['producto_id'])); ?>
                                               <?php echo $this->Form->hidden("Movimiento.$n.cliente_id", array('value' => $datoscli['Cliente']['id'])); ?>
                                               <?php echo $this->Form->hidden("Movimiento.$n.persona_id", array('value' => $this->Session->read('Auth.User.persona_id'))); ?>
                                               <?php echo $this->Form->hidden("Movimiento.$n.nombre_prod", array('value' => $r['Producto']['nombre'])) ?>
@@ -95,7 +106,8 @@
                                                     //'value' => '0',
                                                     "id" => "qty_item_$n",
                                                     'class' => 'input full-width validate[custom[integer], min[0]]',
-                                                    'size' => '6'));
+                                                    'size' => '6'
+                                                  ));
                                                   ?>
                                               </td>
                                               <td align="center" id="total2_item_<?php echo $n; ?>">

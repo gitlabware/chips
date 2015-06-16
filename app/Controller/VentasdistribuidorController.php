@@ -293,7 +293,7 @@ class VentasdistribuidorController extends AppController {
     }
   }
 
-  function formulario($id_cli = null,$num_trans = null) {
+  function formulario($id_cli = null, $num_trans = null) {
     $usu = $this->Session->read('Auth.User.id');
     $usuario = $this->Session->read('Auth.User.persona_id');
     $datoscli = $this->Cliente->findById($id_cli);
@@ -317,19 +317,16 @@ class VentasdistribuidorController extends AppController {
         'Producto.nombre',
         'Producto.id'),
       'group' => array('Productosprecio.producto_id')));
-    
-    if(!empty($num_trans)){
-      
-    }
+
     if ($this->Session->check('form_venta_mayor')) {
       $this->request->data = $this->Session->read('form_venta_mayor');
       $this->Session->delete('form_venta_mayor');
     }
-    $this->set(compact('precios', 'rows', 'usuario', 'usu', 'datoscli', 'recargas'));
+    $this->set(compact('precios', 'rows', 'usuario', 'usu', 'datoscli', 'recargas', 'num_trans'));
   }
 
   public function registra_venta_mayor() {
-    /* debug($this->request->data);
+    /*debug($this->request->data);
       exit; */
     foreach ($this->request->data['Movimiento'] as $dat) {
       $total = $this->get_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'));
@@ -343,12 +340,14 @@ class VentasdistribuidorController extends AppController {
     }
     $num_transaccion = $this->get_num_trans();
     foreach ($this->request->data['Movimiento'] as $dat) {
-      $num_transaccion = $this->get_num_trans();
       $total = $this->get_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'));
       $this->Movimiento->create();
       //$dat['total'] = $total - $dat['salida'];
       $dat['transaccion'] = $num_transaccion;
       $this->Movimiento->save($dat);
+      if(!empty($dat['id'])){
+        $total = $total + $dat['salida_ant'];
+      }
       $this->set_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'), ($total - $dat['salida']));
     }
     //$this->registra_recarga();
@@ -1510,9 +1509,34 @@ class VentasdistribuidorController extends AppController {
 
   public function ventas() {
     $ventas = $this->Movimiento->find('all', array(
-      'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.persona_id' => $this->Session->read('Auth.User.persona_id')),
-      'group' => array('Movimiento.transaccion')
+      'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.persona_id' => $this->Session->read('Auth.User.persona_id'), 'Movimiento.salida !=' => 0),
+      'group' => array('Movimiento.transaccion'),
+      'fields' => array('Cliente.nombre', 'SUM(Movimiento.precio_uni*Movimiento.salida) as monto_total', 'Movimiento.transaccion', 'Movimiento.cliente_id')
     ));
+    //debug($ventas);exit;
+    $this->set(compact('ventas'));
+  }
+
+  public function get_d_edit_v($num_trans = null, $idProducto = null, $precio = null) {
+    $movimiento = $this->Movimiento->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Movimiento.transaccion' => $num_trans, 'Movimiento.producto_id' => $idProducto, 'Movimiento.precio_uni' => $precio,'Movimiento.created' => date("Y-m-d")),
+      'fields' => array('Movimiento.id','Movimiento.salida')
+    ));
+    if(!empty($movimiento)){
+      return $movimiento['Movimiento'];
+    }else{
+      return NULL;
+    }
+    
+  }
+  public function ventas() {
+    $ventas = $this->Movimiento->find('all', array(
+      'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.persona_id' => $this->Session->read('Auth.User.persona_id'), 'Movimiento.escala' => 'MAYOR'),
+      'group' => array('Movimiento.transaccion'),
+      'fields' => array('Cliente.nombre', 'SUM(Movimiento.precio_uni*Movimiento.salida) as monto_total', 'Movimiento.transaccion', 'Movimiento.cliente_id')
+    ));
+    //debug($ventas);exit;
     $this->set(compact('ventas'));
   }
 

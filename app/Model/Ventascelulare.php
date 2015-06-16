@@ -30,6 +30,13 @@ class Ventascelulare extends AppModel {
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
+		),
+		'Almacene' => array(
+			'className' => 'Almacene',
+			'foreignKey' => 'almacene_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
 		)
 	);
 }

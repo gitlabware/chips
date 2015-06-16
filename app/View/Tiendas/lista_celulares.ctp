@@ -22,7 +22,8 @@
                 </table>
             </div>
             <div class="four-columns">
-                <?php echo $this->Form->create('Tienda', array('action' => 'registra_venta_celu', 'id' => 'idformventa')); ?>
+                <?php //debug($idAlmacen);exit;?>
+                <?php echo $this->Form->create('Tienda', array('action' => 'registra_venta_celu/'.$idAlmacen, 'id' => 'idformventa')); ?>
                 <p class="block-label button-height">
                     <label class="label">Cliente</label>
                     <?php echo $this->Form->text('cliente', array('class' => 'input full-width', 'placeholder' => 'Ingrese el nombre del cliente', 'required')); ?>

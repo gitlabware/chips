@@ -60,6 +60,7 @@
 
                     </ul>
                 </li>
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'ventas')); ?>">Ventas Hoy</a></li>
             </ul>
         </section>
     </div>

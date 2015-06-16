@@ -446,8 +446,8 @@ class AlmacenesController extends AppController {
     }
     if ($this->RequestHandler->responseType() == 'json') {
       $add = '<button class="button green-gradient compact icon-plus" type="button" onclick="add(' . "',Producto.id,'" . ')">Add</button>';
-      $detalle = '<button class="button blue-gradient compact" type="button" onclick="detalle(' . "',Producto.id,'" . ')">Detalle</button>';
-      $acciones = "$add $detalle";
+      //$detalle = '<button class="button blue-gradient compact" type="button" onclick="detalle(' . "',Producto.id,'" . ')">Detalle</button>';
+      $acciones = "$add";
       $sql = "SELECT t.total FROM totales t WHERE t.producto_id = Producto.id $cond_sql LIMIT 1";
       $this->Producto->virtualFields = array(
         'imagen' => "CONCAT(IF(ISNULL(Producto.url_imagen),'',CONCAT('" . '<img src="../../../' . "',Producto.url_imagen,'" . '" height="51" width="51">' . "')))",
@@ -529,6 +529,7 @@ class AlmacenesController extends AppController {
       $total_ultimo_c = $this->get_total($idProducto, 1, $Almacen_central['Almacene']['id']);
       if ($total_ultimo_c >= $this->request->data['Ventascelulare']['entrega']) {
         //$this->request->data['Ventascelulare']['total'] = $total;
+        $this->request->data['Ventascelulare']['transaccion'] = $num_transaccion;
         $this->Ventascelulare->create();
         $this->Ventascelulare->save($this->request->data['Ventascelulare']);
         $this->set_total($idProducto, 1, $idAlmacen, $total);
@@ -734,6 +735,7 @@ class AlmacenesController extends AppController {
     $this->layout = 'ajax';
     $condiciones = array();
     $condiciones['Movimiento.producto_id'] = $idProducto;
+    $condiciones['Movimiento.salida'] = 0;
     if ($almacen == 1) {
       $condiciones['Movimiento.almacene_id'] = $id;
     } else {
@@ -745,12 +747,7 @@ class AlmacenesController extends AppController {
       'limit' => 10,
       'recursive' => -1
     ));
-    $ultimo = $this->Movimiento->find('first', array(
-      'order' => 'Movimiento.id DESC',
-      'conditions' => array('Movimiento.producto_id' => $idProducto),
-      'fields' => array('Movimiento.transaccion')
-    ));
-    $this->set(compact('movimientos', 'ultimo'));
+    $this->set(compact('movimientos', 'almacen'));
   }
 
   public function principal() {
@@ -853,9 +850,44 @@ class AlmacenesController extends AppController {
     }
   }
 
-  public function elimina_movimiento($numTransaccion = NULL) {
+  public function elimina_movimiento($numTransaccion = NULL, $almacen = null) {
+    $movimiento = $this->Movimiento->find('first', array(
+      'recursive' => 0,
+      'conditions' => array('Movimiento.transaccion' => $numTransaccion, 'Movimiento.salida' => 0),
+      'fields' => array('Movimiento.ingreso', 'Almacene.id', 'Almacene.central', 'Movimiento.producto_id', 'Movimiento.persona_id')
+    ));
+    if ($almacen == 1) {
+      $total = $this->get_total($movimiento['Movimiento']['producto_id'], 1, $movimiento['Almacene']['id']);
+      if ($movimiento['Almacene']['central'] != 1) {
+        $total_c = $this->get_total($movimiento['Movimiento']['producto_id'], 1, 1);
+        $this->set_total($movimiento['Movimiento']['producto_id'], 1, 1, ($total_c + $movimiento['Movimiento']['ingreso']));
+      }
+      $this->set_total($movimiento['Movimiento']['producto_id'], 1, $movimiento['Almacene']['id'], ($total - $movimiento['Movimiento']['ingreso']));
+    } else {
+      $total = $this->get_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id']);
+      $total_c = $this->get_total($movimiento['Movimiento']['producto_id'], 1, 1);
+      $this->set_total($movimiento['Movimiento']['producto_id'], 1, 1, ($total_c + $movimiento['Movimiento']['ingreso']));
+      $this->set_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id'], ($total - $movimiento['Movimiento']['ingreso']));
+    }
     $this->Movimiento->deleteAll(array('Movimiento.transaccion' => $numTransaccion));
     $this->Session->setFlash("Se elimino correctamente el movimiento!!", 'msgbueno');
+    $this->redirect($this->referer());
+  }
+
+  public function quita_ent_cel($numTransaccion = NULL) {
+    $movimiento = $this->Ventascelulare->find('first', array(
+      'recursive' => 0,
+      'conditions' => array('Ventascelulare.transaccion' => $numTransaccion, 'Ventascelulare.salida' => 0),
+      'fields' => array('Ventascelulare.entrada', 'Almacene.id', 'Almacene.central', 'Ventascelulare.producto_id', 'Ventascelulare.persona_id')
+    ));
+    $total = $this->get_total($movimiento['Ventascelulare']['producto_id'], 1, $movimiento['Almacene']['id']);
+    if ($movimiento['Almacene']['central'] != 1) {
+      $total_c = $this->get_total($movimiento['Ventascelulare']['producto_id'], 1, 1);
+      $this->set_total($movimiento['Ventascelulare']['producto_id'], 1, 1, ($total_c + $movimiento['Ventascelulare']['entrada']));
+    }
+    $this->set_total($movimiento['Ventascelulare']['producto_id'], 1, $movimiento['Almacene']['id'], ($total - $movimiento['Ventascelulare']['entrada']));
+    $this->Ventascelulare->deleteAll(array('Ventascelulare.transaccion' => $numTransaccion));
+    $this->Session->setFlash("Se elimino correctamente el registro!!", 'msgbueno');
     $this->redirect($this->referer());
   }
 

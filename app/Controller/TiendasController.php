@@ -22,7 +22,7 @@ class TiendasController extends AppController {
     'Chip',
     'Almacene',
     'Recarga', 'Ventascelulare',
-    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago', 'Rutasusuario'
+    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago', 'Rutasusuario', 'Totale'
   );
   public $components = array('RequestHandler', 'DataTable');
 
@@ -191,7 +191,7 @@ class TiendasController extends AppController {
     }
   }
 
-  function formulario($id_cli = null) {
+  function formulario($id_cli = null, $num_trans = null) {
 
     $usu = $this->Session->read('Auth.User.id');
     $sucursal = $this->Session->read('Auth.User.sucursal_id');
@@ -227,14 +227,14 @@ class TiendasController extends AppController {
       $this->Session->delete('form_venta_mayor');
     }
     //debug($precios);exit;
-    $this->set(compact('precios', 'rows', 'idAlmacen', 'usu', 'datoscli', 'sucursal', 'recargas'));
+    $this->set(compact('precios', 'rows', 'idAlmacen', 'usu', 'datoscli', 'sucursal', 'recargas', 'num_trans'));
   }
 
-  public function registra_venta_mayor() {
+  public function registra_venta_mayor($idAlmacen = null) {
     /* debug($this->request->data);
       exit; */
     foreach ($this->request->data['Movimiento'] as $dat) {
-      $total = $this->get_total_almacen($dat['producto_id']);
+      $total = $this->get_total($dat['producto_id'], 1, $idAlmacen);
       if ($dat['salida'] > 0) {
         if ($dat['salida'] > $total) {
           $this->Session->write('form_venta_mayor', $this->request->data);
@@ -243,16 +243,20 @@ class TiendasController extends AppController {
         }
       }
     }
-
+    $num_transaccion = $this->get_num_trans();
     foreach ($this->request->data['Movimiento'] as $dat) {
-      $num_transaccion = $this->get_num_trans();
-      $total = $this->get_total_almacen($dat['producto_id']);
+
+      $total = $this->get_total($dat['producto_id'], 1, $idAlmacen);
       $this->Movimiento->create();
-      $dat['total'] = $total - $dat['salida'];
+      //$dat['total'] = $total - $dat['salida'];
       $dat['transaccion'] = $num_transaccion;
       $this->Movimiento->save($dat);
+      if (!empty($dat['id'])) {
+        $total = $total + $dat['salida_ant'];
+      }
+      $this->set_total($dat['producto_id'], 1, $idAlmacen, ($total - $dat['salida']));
     }
-    $this->registra_recarga();
+    //$this->registra_recarga();
     $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
     $this->redirect(array('action' => 'clientes'));
   }
@@ -724,13 +728,19 @@ class TiendasController extends AppController {
 
   public function lista_celulares() {
     $idSucursal = $this->Session->read('Auth.User.sucursal_id');
-    //debug($idSucursal);exit;
+    $Almacen = $this->Almacene->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Almacene.sucursal_id' => $idSucursal),
+      'fields' => array('Almacene.id')
+    ));
+    $idAlmacen = $Almacen['Almacene']['id'];
+    //debug($idAlmacen);exit;
     if ($this->RequestHandler->responseType() == 'json') {
       $tipo_pro_cel = $this->Tiposproducto->findBynombre('CELULARES', null, null, -1);
       $comillas = '"' . "'" . '"';
       $add = '<button class="button green-gradient compact icon-plus" type="button" onclick="add_venta(' . "',Producto.id,',',$comillas ,Producto.nombre,$comillas ,' " . ",',Productosprecio.precio,'" . ')">Add Compra</button>';
       $acciones = "$add";
-      $sql = "SELECT v.total FROM ventascelulares v WHERE v.producto_id = Producto.id AND v.sucursal_id = $idSucursal ORDER BY v.id DESC LIMIT 1";
+      $sql = "SELECT t.total FROM totales t WHERE t.producto_id = Producto.id AND t.almacene_id = $idAlmacen LIMIT 1";
       $sql1 = "SELECT nombre FROM marcas WHERE id = Producto.marca_id";
       $this->Productosprecio->virtualFields = array(
         'imagen' => "CONCAT(IF(ISNULL(Producto.url_imagen),'',CONCAT('" . '<img src="../' . "',Producto.url_imagen,'" . '" height="51" width="51">' . "')))",
@@ -746,16 +756,19 @@ class TiendasController extends AppController {
         'order' => 'Producto.nombre DESC',
         'conditions' => array('Productosprecio.escala' => 'TIENDA', 'Producto.tiposproducto_id' => $tipo_pro_cel['Tiposproducto']['id'])
       );
+      //debug($idAlmacen);exit;
       $this->set('productosprecio', $this->DataTable->getResponse('Tiendas', 'Productosprecio'));
       $this->set('_serialize', 'productosprecio');
     }
+    $this->set(compact('idAlmacen'));
   }
 
-  public function registra_venta_celu() {
-    /* debug($this->request->data);
-      exit; */
+  public function registra_venta_celu($idAlmacen = null) {
+    /*debug($idAlmacen);
+    exit;*/
     foreach ($this->request->data['productos'] as $key => $ped) {
-      $total = $this->get_total_cel_almacen($key);
+      //$total = $this->get_total_cel_almacen($key);
+      $total = $this->get_total($key, 1, $idAlmacen);
       if ($ped['cantidad'] > $total) {
         $this->Session->setFlash('No se pudo registrar verifique las cantidades antes!!!', 'msgerror');
         $this->redirect(array('action' => 'lista_celulares'));
@@ -792,19 +805,26 @@ class TiendasController extends AppController {
   }
 
   public function registra_venta_celu_2() {
-    /* debug($this->request->data);
+    /*debug($this->request->data);
       exit; */
+    $this->Sucursal->id = $this->Session->read('Auth.User.sucursal_id');
+    $this->Sucursal->save($this->request->data['Sucursal']);
+    $idAlmacen = $this->get_id_almacen();
+    $num_trans = $this->get_num_trans_cel();
     foreach ($this->request->data['Ventascelulare'] as $da) {
-      $total_u = $this->get_total_cel_almacen($da['producto_id']);
+      //$total_u = $this->get_total_cel_almacen($da['producto_id']);
+      $total_u = $this->get_total($da['producto_id'], 1, $idAlmacen);
       $datos['Ventascelulare'] = $da;
-      $datos['Ventascelulare']['total'] = $total_u - 1;
+      //$datos['Ventascelulare']['total'] = $total_u - 1;
       $datos['Ventascelulare']['salida'] = 1;
       $datos['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
-      $datos['Ventascelulare']['almacene_id'] = $this->get_id_almacen();
+      $datos['Ventascelulare']['almacene_id'] = $idAlmacen;
       $datos['Ventascelulare']['sucursal_id'] = $this->Session->read('Auth.User.sucursal_id');
-      $datos['Ventascelulare']['transaccion'] = $this->get_num_trans_cel();
+      $datos['Ventascelulare']['tipo_cambio'] = $this->request->data['Sucursal']['tipo_cambio'];
+      $datos['Ventascelulare']['transaccion'] = $num_trans;
       $this->Ventascelulare->create();
       $this->Ventascelulare->save($datos['Ventascelulare']);
+      $this->set_total($da['producto_id'], 1, $idAlmacen, $total_u-1);
       $idVenta = $this->Ventascelulare->getLastInsertID();
       foreach ($da['Pago'] as $pa) {
         $this->request->data['Pago'] = $pa;
@@ -917,6 +937,74 @@ class TiendasController extends AppController {
     } else {
       return 1;
     }
+  }
+
+  public function get_total($idProducto = null, $es_almacen = null, $id = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.total')
+    ));
+    if (!empty($dato_total)) {
+      return $dato_total['Totale']['total'];
+    } else {
+      return 0;
+    }
+  }
+
+  public function get_d_edit_v($num_trans = null, $idProducto = null, $precio = null) {
+    $movimiento = $this->Movimiento->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Movimiento.transaccion' => $num_trans, 'Movimiento.producto_id' => $idProducto, 'Movimiento.precio_uni' => $precio, 'Movimiento.created' => date("Y-m-d")),
+      'fields' => array('Movimiento.id', 'Movimiento.salida')
+    ));
+    if (!empty($movimiento)) {
+      return $movimiento['Movimiento'];
+    } else {
+      return NULL;
+    }
+  }
+
+  public function set_total($idProducto = null, $es_almacen = null, $id = null, $total = null) {
+    $condiciones = array();
+    $condiciones['Totale.producto_id'] = $idProducto;
+    if ($es_almacen == 1) {
+      $condiciones['Totale.almacene_id'] = $id;
+      $datos_t['almacene_id'] = $id;
+    } else {
+      $condiciones['Totale.persona_id'] = $id;
+      $datos_t['persona_id'] = $id;
+    }
+    $dato_total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => $condiciones,
+      'fields' => array('Totale.id')
+    ));
+    if (!empty($dato_total)) {
+      $this->Totale->id = $dato_total['Totale']['id'];
+    } else {
+      $this->Totale->create();
+    }
+    $datos_t['producto_id'] = $idProducto;
+    $datos_t['total'] = $total;
+    $this->Totale->save($datos_t);
+  }
+
+  public function ventas() {
+    $ventas = $this->Movimiento->find('all', array(
+      'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.sucursal_id' => $this->Session->read('Auth.User.sucursal_id'), 'Movimiento.escala' => 'MAYOR'),
+      'group' => array('Movimiento.transaccion'),
+      'fields' => array('Cliente.nombre', 'SUM(Movimiento.precio_uni*Movimiento.salida) as monto_total', 'Movimiento.transaccion', 'Movimiento.cliente_id')
+    ));
+    //debug($ventas);exit;
+    $this->set(compact('ventas'));
   }
 
 }

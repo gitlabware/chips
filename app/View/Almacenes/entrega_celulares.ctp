@@ -30,9 +30,6 @@
   function add(id_celular) {
       cargarmodal('<?php echo $this->Html->url(array('action' => 'ajax_entrega_cel',$id_a));?>/1/'+id_celular,'ENTREGA DE PRODUCTO');
   }
-  function detalle(id_celular){
-    cargarmodal('<?php echo $this->Html->url(array('action' => 'ajax_detalle_cel',$id_a));?>/1/'+id_celular,'DETALLE DE MOVIMIENTOS');
-  }
 </script>
 <!-- Sidebar/drop-down menu -->
 <?php echo $this->element('sidebar/administrador'); ?>

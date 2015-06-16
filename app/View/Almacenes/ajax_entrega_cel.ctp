@@ -45,7 +45,7 @@
                   <td><?php echo $mo['Ventascelulare']['created'] ?></td>
                   <td><?php echo $mo['Ventascelulare']['entrada'] ?></td>
                   <td>
-                      <a class="button red-gradient compact icon-cross-round" href="javascript:" onclick="quita_precio(<?php echo $mo['Ventascelulare']['id']; ?>)">Quitar</a>
+                      <?php echo $this->Html->link("Eliminar",array('action' => 'quita_ent_cel',$mo['Ventascelulare']['transaccion']),array('class' => 'button red-gradient compact icon-cross-round','confirm' => 'Esta sefuro de eliminar el registro??'))?>
                   </td>
               </tr>
             <?php endforeach; ?>

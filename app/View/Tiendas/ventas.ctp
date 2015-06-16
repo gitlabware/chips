@@ -33,6 +33,6 @@
 </section>	
 
 <!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/distribuidor'); ?>
+<?php echo $this->element('sidebar/tienda'); ?>
 <!-- End sidebar/drop-down menu --> 
 
