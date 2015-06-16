@@ -551,7 +551,7 @@ class AlmacenesController extends AppController {
   }
 
   public function devuelto($idPersona = null) {
-    $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM movimientos mo WHERE mo.persona_id = $idPersona AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
+    $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.persona_id = $idPersona AND Producto.id = mo.producto_id LIMIT 1)";
     $this->Movimiento->virtualFields = array(
       'total_s' => "CONCAT($sql1)"
     );
@@ -615,23 +615,25 @@ class AlmacenesController extends AppController {
       $nue_mov['user_id'] = $usuario['User']['id'];
       $nue_mov['persona_id'] = $idPersona;
       $nue_mov['salida'] = $dev['cantidad'];
-      $nue_mov['total'] = $dev['total'] - $dev['cantidad'];
+      //$nue_mov['total'] = $dev['total'] - $dev['cantidad'];
       $nue_mov['devuelto_id'] = $idDevuelto;
       $nue_mov['transaccion'] = $num_trans;
       $this->Movimiento->create();
       $this->Movimiento->save($nue_mov);
+      $this->set_total($dev['producto_id'], 0, $idPersona, ($dev['total'] - $dev['cantidad']));
 
       $nue_mov = null;
-      $ult_almac = $this->Movimiento->find('first', array('order' => array('Movimiento.id DESC'), 'fields' => array('Movimiento.total'), 'conditions' => array('Movimiento.producto_id' => $dev['producto_id'], 'Movimiento.almacene_id' => $almac_cent['Almacene']['id'])));
+      $total_central = $this->get_total($dev['producto_id'], 1, $almac_cent['Almacene']['id']);
       $nue_mov['producto_id'] = $dev['producto_id'];
       $nue_mov['user_id'] = $this->Session->read('Auth.User.id');
       $nue_mov['almacene_id'] = $almac_cent['Almacene']['id'];
       $nue_mov['ingreso'] = $dev['cantidad'];
-      $nue_mov['total'] = $ult_almac['Movimiento']['total'] + $dev['cantidad'];
+      //$nue_mov['total'] = $ult_almac['Movimiento']['total'] + $dev['cantidad'];
       $nue_mov['devuelto_id'] = $idDevuelto;
       $nue_mov['transaccion'] = $num_trans;
       $this->Movimiento->create();
       $this->Movimiento->save($nue_mov);
+      $this->set_total($dev['producto_id'], 1, $almac_cent['Almacene']['id'], ($total_central+$dev['cantidad']));
       $nue_mov = null;
     }
     $this->Session->setFlash('Se registro correctamente!!', 'msgbueno');
