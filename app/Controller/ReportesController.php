@@ -721,7 +721,7 @@ class ReportesController extends Controller {
     $condiciones1['Movimiento.created <='] = $fecha_fin;
     $datos = array();
     if (!empty($this->request->data['Dato'])) {
-      $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM movimientos mo WHERE $persona_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
+      $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE $persona_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
       $this->Movimiento->virtualFields = array(
         'total_s' => "CONCAT($sql1)"
       );
