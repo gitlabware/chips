@@ -1530,15 +1530,6 @@ class VentasdistribuidorController extends AppController {
     }
     
   }
-  public function ventas() {
-    $ventas = $this->Movimiento->find('all', array(
-      'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.persona_id' => $this->Session->read('Auth.User.persona_id'), 'Movimiento.escala' => 'MAYOR'),
-      'group' => array('Movimiento.transaccion'),
-      'fields' => array('Cliente.nombre', 'SUM(Movimiento.precio_uni*Movimiento.salida) as monto_total', 'Movimiento.transaccion', 'Movimiento.cliente_id')
-    ));
-    //debug($ventas);exit;
-    $this->set(compact('ventas'));
-  }
 
 }
 

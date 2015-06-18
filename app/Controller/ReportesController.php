@@ -619,7 +619,6 @@ class ReportesController extends Controller {
   }
 
   public function reporte_detallado_precio_tienda() {
-
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
     $fecha_fin = $this->request->data['Dato']['fecha_fin'];
     $sucursal = $this->request->data['Dato']['sucursal_id'];
@@ -665,17 +664,26 @@ class ReportesController extends Controller {
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
     $fecha_fin = $this->request->data['Dato']['fecha_fin'];
     $sucursal = $this->request->data['Dato']['sucursal_id'];
+    $almacen = $this->Almacene->find('first',array(
+      'recursives'=> -1,
+      'conditions' => array('Almacene.sucursal_id' => $sucursal),
+      'fields' => array('Almacene.id')
+    ));
+    $idAlmacen = $almacen['Almacene']['id'];
     $condiciones1 = array();
     $sucursal_sql = '';
+    $sucursal_sql2 = '';
+    $alamacen_sql = '';
     if (!empty($sucursal)) {
-      $condiciones1['Movimiento.sucursal_id'] = $sucursal;
-      $sucursal_sql = "mo.sucursal_id = $sucursal AND";
+      $condiciones1['Movimiento.almacene_id'] = $idAlmacen;
+      $sucursal_sql = "mo.almacene_id = $idAlmacen AND";
+      $sucursal_sql2 = "mov.almacene_id = $idAlmacen AND";
+      $alamacen_sql = "mo.almacene_id = $idAlmacen AND";
     }
-    $condiciones1['Movimiento.sucursal_id !='] = NULL;
+    //$condiciones1['Movimiento.sucursal_id !='] = NULL;
     $condiciones1['Movimiento.salida !='] = NULL;
     $condiciones1['Movimiento.created >='] = $fecha_ini;
     $condiciones1['Movimiento.created <='] = $fecha_fin;
-
     $datos = array();
     /* debug($fecha_ini);
       debug($fecha_fin);exit; */
@@ -684,13 +692,17 @@ class ReportesController extends Controller {
       $sql2 = "(SELECT IF(ISNULL(SUM(mo.salida)),0,SUM(mo.salida)) FROM movimientos mo WHERE $sucursal_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'MAYOR' AND Producto.id = mo.producto_id)";
       $sql3 = "(SELECT IF(ISNULL(SUM(mo.precio_uni*mo.salida)),0,SUM(mo.precio_uni*mo.salida)) FROM movimientos mo WHERE $sucursal_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id)";
       $sql4 = "(SELECT IF(ISNULL(SUM(mo.precio_uni*mo.salida)),0,SUM(mo.precio_uni*mo.salida)) FROM movimientos mo WHERE $sucursal_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'MAYOR' AND Producto.id = mo.producto_id)";
-      $sql5 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM movimientos mo WHERE $sucursal_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
+      
+      $sql6 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE $alamacen_sql Producto.id = mo.producto_id LIMIT 1)";
+      $sql5 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE $sucursal_sql2 mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+      
+      //$sql5 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM movimientos mo WHERE $sucursal_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
       $this->Movimiento->virtualFields = array(
         'ventas' => "CONCAT($sql1)",
         'ventas_mayor' => "CONCAT($sql2)",
         'precio_v_t' => "CONCAT($sql3)",
         'precio_v_mayor' => "CONCAT($sql4)",
-        'total_s' => "CONCAT($sql5)"
+        'total_s' => "CONCAT($sql6-(IF(ISNULL($sql5),0,$sql5)))"
       );
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
@@ -711,9 +723,11 @@ class ReportesController extends Controller {
     $persona = $this->request->data['Dato']['persona_id'];
     $condiciones1 = array();
     $persona_sql = '';
+    $persona_sql2 = '';
     if (!empty($persona)) {
       $condiciones1['Movimiento.persona_id'] = $persona;
       $persona_sql = "mo.persona_id = $persona AND";
+      $persona_sql2 = "mov.persona_id = $persona AND";
     }
     $condiciones1['Movimiento.persona_id !='] = NULL;
     $condiciones1['Movimiento.salida !='] = NULL;
@@ -721,9 +735,11 @@ class ReportesController extends Controller {
     $condiciones1['Movimiento.created <='] = $fecha_fin;
     $datos = array();
     if (!empty($this->request->data['Dato'])) {
-      $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE $persona_sql mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
+      $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE $persona_sql Producto.id = mo.producto_id LIMIT 1)";
+      $sql2 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE $persona_sql2 mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+      
       $this->Movimiento->virtualFields = array(
-        'total_s' => "CONCAT($sql1)"
+        'total_s' => "CONCAT($sql1-(IF(ISNULL($sql2),0,$sql2)))"
       );
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
