@@ -130,7 +130,7 @@
             <tr>
               
             </tr>
-              <td><?php echo $da['Sucursal']['nombre'] ?></td>
+              <td><?php echo $da['Movimiento']['nombre_sucursal'] ?></td>
               <td><?php echo $da['Producto']['nombre'] ?></td>
               <td><?php echo $da['Movimiento']['total_s'] - $da[0]['entregado'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
               <td><?php echo $da[0]['entregado'] ?></td>

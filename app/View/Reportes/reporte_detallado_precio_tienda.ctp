@@ -128,7 +128,7 @@
             $venta_prec_total = 0;
             ?>
               <tr>
-                  <td><?php echo $da['Sucursal']['nombre']?></td>
+                  <td><?php echo $da['Movimiento']['nombre_sucursal']?></td>
                   <td><?php echo $da['Producto']['nombre'] ?></td>
                   <td><?php echo $da[0]['entregado']?></td>
                   <td>

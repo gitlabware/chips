@@ -1264,9 +1264,11 @@ class VentasdistribuidorController extends AppController {
     $datos = array();
     $recargas = array();
     if (!empty($this->request->data['Dato'])) {
-      $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM movimientos mo WHERE mo.persona_id = $persona AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
+      $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.persona_id = $persona AND Producto.id = mo.producto_id LIMIT 1)";
+      $sql2 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE mov.persona_id = $persona AND mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+      //$sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM movimientos mo WHERE mo.persona_id = $persona AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id ORDER BY mo.id DESC LIMIT 1)";
       $this->Movimiento->virtualFields = array(
-        'total_s' => "CONCAT($sql1)"
+        'total_s' => "CONCAT($sql1-(IF(ISNULL($sql2),0,$sql2)))"
       );
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
@@ -1528,7 +1530,6 @@ class VentasdistribuidorController extends AppController {
     }else{
       return NULL;
     }
-    
   }
 
 }
