@@ -4,7 +4,7 @@ App::uses('AppController', 'Controller');
 
 class ImpulsadoresController extends AppController {
 
-  var $uses = array('User', 'Minievento', 'Ventasimpulsadore', 'Premio', 'Movimientospremio');
+  var $uses = array('User', 'Minievento', 'Ventasimpulsadore', 'Premio', 'Movimientospremio','Precio');
   public $layout = 'viva';
 
   public function minievento($idMini = null) {
@@ -40,11 +40,34 @@ class ImpulsadoresController extends AppController {
       'conditions' => array('Ventasimpulsadore.minievento_id' => $idMini),
       'recursive' => -1
     ));
+    $this->Premio->virtualFields = array(
+      'nombre_total' => "CONCAT(Premio.nombre,' (',Premio.total,')')"
+    );
+    $premios = $this->Premio->find('list',array('fields' => 'Premio.nombre_total','conditions' => array('Premio.total >' => 0))); 
+    $precios = $this->Precio->find('list',array('fields' => array('Precio.monto','Precio.monto')));
     //debug($minievento);exit;
-    $this->set(compact('minievento', 'ventas'));
+    $this->set(compact('minievento', 'ventas','premios','precios'));
   }
 
   public function registra_venta() {
+    
+    if(!empty($this->request->data['Ventasimpulsadore']['premio_id'])){
+      $premio = $this->Premio->findByid($this->request->data['Ventasimpulsadore']['premio_id'],null,null,-1);
+      if($premio['Premio']['total'] >= 1){
+        $this->Premio->id = $premio['Premio']['id'];
+        $dpre['total'] = $premio['Premio']['total']-1;
+        $this->Premio->save($dpre);
+        $this->Movimientospremio->create();
+        $dmov['premio_id'] = $premio['Premio']['id'];
+        $dmov['user_id'] = $this->Session->read('Auth.User.id');
+        $dmov['salida'] = 1;
+        $dmov['persona_id'] = $this->Session->read('Auth.User.persona_id');
+        $this->Movimientospremio->save($dmov);
+      }else{
+        $this->Session->setFlash("No se pudo registrar no hay premio!!",'msgerror');
+        $this->redirect($this->referer());
+      }
+    }
     $this->Ventasimpulsadore->create();
     $this->Ventasimpulsadore->save($this->request->data['Ventasimpulsadore']);
     $this->Session->setFlash("Se registro correctamente la venta!!", 'msgbueno');
@@ -52,6 +75,19 @@ class ImpulsadoresController extends AppController {
   }
 
   public function quita_venta($idVenta = null) {
+    $venta = $this->Ventasimpulsadore->findByid($idVenta,null,null,-1);
+    if(!empty($venta['Ventasimpulsadore']['premio_id'])){
+      $premio = $this->Premio->findByid($venta['Ventasimpulsadore']['premio_id']);
+      $this->Premio->id = $premio['Premio']['id'];
+      $dpre['total'] = $premio['Premio']['total'] + 1;
+      $this->Premio->save($dpre);
+      $this->Movimientospremio->create();
+      $dmov['premio_id'] = $premio['Premio']['id'];
+      $dmov['user_id'] = $this->Session->read('Auth.User.id');
+      $dmov['persona_id'] = $this->Session->read('Auth.User.persona_id');
+      $dmov['ingreso'] = 1;
+      $this->Movimientospremio->save($dmov);
+    }
     $this->Ventasimpulsadore->delete($idVenta);
     $this->Session->setFlash("Se elimino correctamente la venta!!", 'msgbueno');
     $this->redirect($this->referer());
@@ -84,6 +120,30 @@ class ImpulsadoresController extends AppController {
       'order' => array('Movimientospremio.id DESC')
     ));
     $this->set(compact('premio','movimientos'));
+  }
+  public function registra_entrega_pre(){
+    $this->Movimientospremio->create();
+    $this->Movimientospremio->save($this->request->data['Movimientospremio']);
+    $premio = $this->Premio->findByid($this->request->data['Movimientospremio']['premio_id']);
+    $this->Premio->id = $premio['Premio']['id'];
+    $datp['total'] = $premio['Premio']['total'] + $this->request->data['Movimientospremio']['ingreso'];
+    $this->Premio->save($datp);
+    $this->Session->setFlash("Se registro correctamente!!",'msgbueno');
+    $this->redirect($this->referer());
+  }
+  public function cancela_ent_pre($idMov = null){
+    $movimiento = $this->Movimientospremio->findByid($idMov,null,null,-1);
+    $premio = $this->Premio->findByid($movimiento['Movimientospremio']['premio_id'],null,null,-1);
+    if($premio['Premio']['total'] >= $movimiento['Movimientospremio']['ingreso']){
+      $this->Premio->id = $premio['Premio']['id'];
+      $dmov['total'] = $premio['Premio']['total'] - $movimiento['Movimientospremio']['ingreso'];
+      $this->Premio->save($dmov);
+      $this->Movimientospremio->delete($idMov);
+      $this->Session->setFlash("Se cancelo correctamente la entrega!!",'msgbueno');
+    }else{
+      $this->Session->setFlash("No se pudo tegistrar debido a que el total es inferior al monto!!",'msgerror');
+    }
+    $this->redirect($this->referer());
   }
 
 }

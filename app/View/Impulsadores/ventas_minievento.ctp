@@ -31,13 +31,13 @@
             <div class="four-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Monto</label>
-                    <?php echo $this->Form->text('Ventasimpulsadore.monto', array('class' => 'input full-width', 'required', 'type' => 'number', 'step' => 'any')); ?>
+                    <?php echo $this->Form->select('Ventasimpulsadore.monto', $precios,array('class' => 'select full-width', 'required')); ?>
                 </p>
             </div>
             <div class="new-row four-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Premio</label>
-                    <?php echo $this->Form->text('Ventasimpulsadore.premio', array('class' => 'input full-width')); ?>
+                    <?php echo $this->Form->select('Ventasimpulsadore.premio_id',$premios, array('class' => 'select full-width')); ?>
                 </p>
             </div>
             <div class="four-columns new-row-mobile twelve-columns-mobile">

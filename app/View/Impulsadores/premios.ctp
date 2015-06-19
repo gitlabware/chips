@@ -40,7 +40,7 @@
                     <td><?php echo $pre['Premio']['nombre'];?></td>
                     <td><?php echo $pre['Premio']['total'];?></td>
                     <td>
-                      <?php echo $this->Html->link("Entregas",array('action' => 'movimientospremios',$pre['Premio']['id']));?>
+                      <?php echo $this->Html->link("Entregas",array('action' => 'movimientospremios',$pre['Premio']['id']),array('class' => 'button blue-gradient glossy'));?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

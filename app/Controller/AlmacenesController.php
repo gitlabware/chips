@@ -155,7 +155,17 @@ class AlmacenesController extends AppController {
       'conditions' => $condiciones,
       'fields' => array('Producto.nombre', 'Producto.proveedor', 'Totale.total', 'Totale.producto_id')
     ));
-
+    $idDistribuidor = $this->User->find('first', array('fields' => array('User.id'), 'conditions' => array('User.persona_id' => $idPersona)));
+    $ultima = $this->Pedido->find('first', array(
+      'fields' => array('Pedido.numero'),
+      'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id']),
+      'order' => 'Pedido.id DESC'
+    ));
+    if (!empty($ultima)) {
+      $pedidos = $this->Pedido->find('all', array(
+        'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id'], 'Pedido.numero' => $ultima['Pedido']['numero'])
+      ));
+    }
     $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos'));
   }
 
@@ -633,7 +643,7 @@ class AlmacenesController extends AppController {
       $nue_mov['transaccion'] = $num_trans;
       $this->Movimiento->create();
       $this->Movimiento->save($nue_mov);
-      $this->set_total($dev['producto_id'], 1, $almac_cent['Almacene']['id'], ($total_central+$dev['cantidad']));
+      $this->set_total($dev['producto_id'], 1, $almac_cent['Almacene']['id'], ($total_central + $dev['cantidad']));
       $nue_mov = null;
     }
     $this->Session->setFlash('Se registro correctamente!!', 'msgbueno');
