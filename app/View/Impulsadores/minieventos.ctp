@@ -30,4 +30,4 @@
     </div>
 </section>	
 
-<?php echo $this->element('sidebar/impulsador'); ?>
+<?php echo $this->element('sidebar/distribuidor'); ?>

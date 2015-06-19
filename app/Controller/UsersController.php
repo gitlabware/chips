@@ -59,8 +59,6 @@ class UsersController extends AppController {
             break;
           case '5': $this->redirect(array('controller' => 'Tiendas', 'action' => 'index'));
             break;
-          case '6': $this->redirect(array('controller' => 'Impulsadores', 'action' => 'minieventos'));
-            break;
           default :$this->redirect(array('controller' => 'Tiendas', 'action' => 'index'));
             break;
         }
