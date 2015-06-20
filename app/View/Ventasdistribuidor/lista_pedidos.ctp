@@ -23,7 +23,7 @@
                       <td><?php echo $ped['Pedido']['numero'] ?></td>
                       <td><?php echo $ped['Pedido']['monto'] ?></td>
                       <td>
-                          <?php echo $this->Html->link("pedido", array('action' => 'pedido',$ped['Pedido']['numero']), array()); ?>
+                          <?php echo $this->Html->link("pedido", array('action' => 'pedido',$ped['Pedido']['numero']), array('class' => 'button blue-gradient glossy')); ?>
                       </td>
                   </tr>
                 <?php endforeach; ?>

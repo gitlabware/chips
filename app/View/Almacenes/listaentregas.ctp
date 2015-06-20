@@ -74,7 +74,7 @@
                                     $this->Html->link('Rango&lote', array('action' => 'verdetalle', $idPersona, $almacen, $idProducto));
                                   endif;*/
                                   ?>
-                                  <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'detalle_mov',$idProducto,$idPersona,$almacen));?>','Detalle de <?php echo $entrega['Producto']['nombre']; ?>')">Detalle</a>
+                                  <a href="javascript:" class="button anthracite-gradient" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'detalle_mov',$idProducto,$idPersona,$almacen));?>','Detalle de <?php echo $entrega['Producto']['nombre']; ?>')">Detalle</a>
                                   <?php //echo $this->Html->link('Entregas', array('action' => 'verentregas', $idPersona, $almacen, $idProducto));?>
                               </td>
                           </tr>

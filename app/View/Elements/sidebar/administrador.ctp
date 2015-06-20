@@ -89,6 +89,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'index')); ?>">Listado de Almacenes</a></li>                                                                        
                             </ul>
                         </li>
+                        <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Users','action'=>'ajaxprecios'))?>','Precios chip/4g');">Precios Chip/4g</a></li>
 
                     </ul>
                 </li>                                                                

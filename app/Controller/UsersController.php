@@ -9,7 +9,7 @@ App::uses('AppController', 'Controller');
  */
 class UsersController extends AppController {
 
-  public $uses = array('User', 'Migralmacen', 'Group', 'Persona', 'Sucursal','Lugare','Ruta', 'Rutasusuario');
+  public $uses = array('User', 'Migralmacen', 'Group', 'Persona', 'Sucursal','Lugare','Ruta', 'Rutasusuario','Precio');
   public $layout = 'viva';
   public $components = array('Acl', 'Auth', 'RequestHandler');  
 
@@ -276,8 +276,9 @@ class UsersController extends AppController {
       $this->redirect(array('action' => 'index'), null, true);
     }
     if (empty($this->request->data)) {
-      $this->data = $this->User->read();
+      
       $this->data = $this->Persona->read();
+      $this->data = $this->User->read();
     } else {
       //debug($this->request->data);die;
       if ($this->Persona->save($this->request->data['Persona'])) {
@@ -296,10 +297,11 @@ class UsersController extends AppController {
         $this->Session->setFlash('no se pudo modificar!!', 'msgerror');
       }
     }
-    $groups = $this->User->Group->find('all', array('recursive' => -1));
+    $groups = $this->User->Group->find('list', array('recursive' => -1,'fields' => 'name'));
     $tiendas = $this->Sucursal->find('all', array('recursive' => -1));
-    $lugares =  $this->Lugare->find('all', array('recursive'=> -1));
+    $lugares =  $this->Lugare->find('list', array('recursive'=> -1,'fields' => 'Lugare.nombre'));
     $rutas = $this->Ruta->find('list', array('fields' => 'Ruta.nombre'));
+    //debug($this->request->data);exit;
     $this->set(compact('groups', 'tiendas', 'lugares','rutas','idPersona'));
   }
 
@@ -396,6 +398,15 @@ class UsersController extends AppController {
     $this->respond($array, true);
     //$this->redirect(array('action' => 'ajax_precios',$idProducto));
   }
-    
-
+  public function ajaxprecios(){
+    $precios = $this->Precio->find('all');
+    $this->set(compact('precios'));
+  }
+  public function registra_precios(){
+    $dat = $this->request->data['Precio'];
+    $this->Precio->saveAll($dat);
+    $this->Session->setFlash("Se registro correctamente!!",'msgbueno');
+    $this->redirect($this->referer());
+  }
+  
 }
