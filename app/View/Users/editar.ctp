@@ -98,14 +98,7 @@
             <div class="two-columns">
                 <p class="block-label button-height" id="mostrartienda" style="display: none">
                     <label for="validation-select" class="label"><b>Tienda de trabajo:</b></label>
-                    <select id="validation-select1" name="data[User][sucursal_id]" class="select"  style="width: 145px"  >
-
-                        <?php foreach ($tiendas as $g): ?>                            
-                          <option value="<?php echo $g['Sucursal']['id'] ?>">
-                              <?php echo $g['Sucursal']['nombre'] ?>
-                          </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <?php echo $this->Form->select("User.sucursal_id", $tiendas, array('class' => 'select', 'id' => 'validation-select1')); ?>
                 </p>
             </div>
             <div class=" new-row two-columns">

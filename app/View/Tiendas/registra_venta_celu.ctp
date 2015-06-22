@@ -82,7 +82,7 @@
                                   <?php echo $this->Form->text("Ventascelulare.$key.precio_bol", array('class' => 'input', 'id' => "precio-$key-bol", 'onkeyup' => "calcula_dol($key);")); ?>
                               </p>
                               <script>
-                                calcula_tipo_cambio_bol(<?php echo $key; ?>);
+                                //calcula_tipo_cambio_bol(<?php echo $key; ?>);
                               </script>
                               <p class="button-height inline-label">
                                   <label class="label">Numero Serie</label>
@@ -224,5 +224,5 @@
       var precio_dolar = precio_bolivianos / tipo_cambio;
       $('#precio-' + key + '-dol').val(precio_dolar);
   }
-
+  calcula_tipo_cambio();
 </script>

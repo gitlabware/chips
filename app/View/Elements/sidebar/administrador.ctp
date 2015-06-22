@@ -176,7 +176,15 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_chips_c_total')); ?>">Totales</a></li>
                             </ul>
                         </li>  
-
+                        
+                        <li class="with-right-arrow">
+                            <span>Celulares</span>
+                            <ul class="big-menu">
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_celular')); ?>">General</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_celular_cliente')); ?>">Clientes</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_pagos')); ?>">Pagos</a></li>
+                            </ul>
+                        </li>
                     </ul>
                 </li>               
 

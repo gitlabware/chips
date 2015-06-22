@@ -607,6 +607,7 @@ class AlmacenesController extends AppController {
     if (!empty($this->request->data['Devuelto'])) {
       $almac_cent = $this->Almacene->find('first', array('conditions' => array('central' => 1), 'fields' => array('Almacene.id')));
       $usuario = $this->User->findBypersona_id($idPersona, null, null, -1);
+      $num_trans = $this->get_num_trans();
       foreach ($this->request->data['Devuelto'] as $dev) {
         $dmov['devuelto_id'] = NULL;
         $this->Devuelto->create();
@@ -621,7 +622,6 @@ class AlmacenesController extends AppController {
           $this->Movimiento->id = $ul['Movimiento']['id'];
           $this->Movimiento->save($dmov);
         }
-        $num_trans = $this->get_num_trans();
         $nue_mov['producto_id'] = $dev['producto_id'];
         $nue_mov['user_id'] = $usuario['User']['id'];
         $nue_mov['persona_id'] = $idPersona;

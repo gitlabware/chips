@@ -298,7 +298,7 @@ class UsersController extends AppController {
       }
     }
     $groups = $this->User->Group->find('list', array('recursive' => -1,'fields' => 'name'));
-    $tiendas = $this->Sucursal->find('all', array('recursive' => -1));
+    $tiendas = $this->Sucursal->find('list', array('recursive' => -1,'fields' => 'nombre'));
     $lugares =  $this->Lugare->find('list', array('recursive'=> -1,'fields' => 'Lugare.nombre'));
     $rutas = $this->Ruta->find('list', array('fields' => 'Ruta.nombre'));
     //debug($this->request->data);exit;

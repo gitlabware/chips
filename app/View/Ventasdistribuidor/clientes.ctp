@@ -39,9 +39,9 @@
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'clientes.json')); ?>';
   datos_tabla2 = {};
   datos_tabla2 = {
-      "oLanguage": {
+      /*"oLanguage": {
           "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-      },
+      },*/
       'sPaginationType': 'full_numbers',
       'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
       'bProcessing': true,

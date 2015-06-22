@@ -138,9 +138,9 @@
           // Table sort - DataTables
           var table = $('#sorting-advanced');
           table.dataTable({
-              "oLanguage": {
+              /*"oLanguage": {
                   "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-              },
+              },*/
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
               "order": [],
@@ -155,9 +155,9 @@
           var table2 = $('#tabla-json');
           if (datos_tabla2 == null) {
               datos_tabla2 = {
-                  "oLanguage": {
+                  /*"oLanguage": {
                       "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-                  },
+                  },*/
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,
