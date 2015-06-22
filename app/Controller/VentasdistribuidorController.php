@@ -1531,7 +1531,11 @@ class VentasdistribuidorController extends AppController {
       return NULL;
     }
   }
-
+  public function eliminar_pedido($NumPedido = null){
+    $this->Pedido->deleteAll(array('Pedido.numero' => $NumPedido));
+    $this->Session->setFlash("Se elimino correctamente el pedido!!",'msgbueno');
+    $this->redirect($this->referer());
+  }
 }
 
 ?>

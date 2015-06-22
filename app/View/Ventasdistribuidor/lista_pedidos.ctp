@@ -23,7 +23,8 @@
                       <td><?php echo $ped['Pedido']['numero'] ?></td>
                       <td><?php echo $ped['Pedido']['monto'] ?></td>
                       <td>
-                          <?php echo $this->Html->link("pedido", array('action' => 'pedido',$ped['Pedido']['numero']), array('class' => 'button blue-gradient glossy')); ?>
+                          <?php echo $this->Html->link("pedido", array('action' => 'pedido',$ped['Pedido']['numero']), array('class' => 'button blue-gradient glossy')); ?> 
+                          <?php echo $this->Html->link("",array('action' => 'eliminar_pedido',$ped['Pedido']['numero']),array('class' => 'button icon-trash red-gradient','title' => 'Eliminar el pedido','confirm' => 'Esta seguro de eliminar el pedido?'))?>
                       </td>
                   </tr>
                 <?php endforeach; ?>

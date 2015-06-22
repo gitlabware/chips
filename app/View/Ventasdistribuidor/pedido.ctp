@@ -48,7 +48,7 @@
                 <?php echo $this->Form->end(); ?>
             </div>
             <div class="three-columns hidden-phone">
-
+                
             </div>
         </div>
     </div>
