@@ -1,5 +1,4 @@
 <section role="main" id="main">
-
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
 
     <hgroup id="main-title" class="thin">
@@ -23,6 +22,7 @@
                       <td><?php echo $ent[0]['num_chips'] ?></td>
                       <td>
                           <?php echo $this->Html->link('Detalle', array('action' => 'detalle_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id'])); ?>
+                          <?php echo $this->Html->link('Excel', array('action' => 'genera_excel_1', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id'])); ?>
                           <a href="javascript:" class="" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'cancela_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id'])); ?>');">Cancelar</a>
                       </td>
                   </tr>

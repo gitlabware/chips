@@ -46,9 +46,9 @@
 
         <script>
           $("#formAsig").on("submit", function (e) {
-             
-             $("#btAsig").replaceWith("<span class='loader big working'></span> Trabajando ;)");
-          });       
+
+              $("#btAsig").replaceWith("<span class='loader big working'></span> Trabajando ;)");
+          });
 
           function openModal()
           {
@@ -67,7 +67,7 @@
         </script>
 
         <div id="muestraFormActivaciones" style="display: none;">
-            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcelactivados', 'id'=>'formActi', 'enctype' => 'multipart/form-data')); ?>
+            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcelactivados', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
             <!--        <form method="post" action="" class="columns" onsubmit="return false">                               -->
             <!--<div class="new-row-desktop four-columns six-columns-tablet twelve-columns-mobile">-->
             <div class="new-row twelve-columns">                
@@ -104,10 +104,10 @@
 
         <script>
           $("#formActi").on("submit", function (e) {
-             
-             $("#btActi").replaceWith("<span class='loader big working'></span> Trabajando ;)");
-          }); 
-          
+
+              $("#btActi").replaceWith("<span class='loader big working'></span> Trabajando ;)");
+          });
+
           $(document).ready(function () {
               $("#btMuestraFormAsignaciones").click(function () {
                   $("#muestraFormAsignaciones").show('slow');
@@ -152,7 +152,9 @@
                       <td><?php echo $e['Excel']['nombre_original']; ?></td>                        
                       <td><?php echo $e['Excel']['created']; ?></td>
                       <td><?php echo $e['Excel']['tipo']; ?></td>                       
-                      <td>Detalle</td>                       
+                      <td>
+                          <?php echo $this->Html->link("Detalle",array('action' => 'verexcel',$e['Excel']['id']),array('class' => 'button blue-gradient glossy'))?>
+                      </td>                       
                   </tr>               
                 <?php endforeach; ?>
             </tbody>
