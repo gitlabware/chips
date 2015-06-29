@@ -837,6 +837,22 @@ class ChipsController extends AppController {
     }
   }
 
+  public function excel($fecha_entrega = null, $idDistribuidor = null) {
+    $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
+    $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
+    $this->Chip->virtualFields = array(
+      'nom_distribuidor' => "CONCAT(($sql))",
+      'ciudad_dist' => "CONCAT(($sql2))"
+    );
+    $chips = $this->Chip->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega),
+      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id'
+        , 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre')
+    ));
+    $this->set(compact('chips', 'fecha_entrega', 'idDistribuidor'));
+  }
+
   public function genera_excel_1($fecha_entrega = null, $idDistribuidor = null) {
 
     $nombre_excel = "$fecha_entrega-$idDistribuidor.xlsx";
@@ -880,11 +896,10 @@ class ChipsController extends AppController {
     $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(15);
     $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(10);
     $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(11);
-    
-    
+
     $prueba->getActiveSheet()->getStyle('A1:k1')->applyFromArray($borders);
     $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
-    
+
     $prueba->setActiveSheetIndex(0)->setCellValue("A1", "CANTIDAD");
     $prueba->setActiveSheetIndex(0)->setCellValue("B1", "SIM");
     $prueba->setActiveSheetIndex(0)->setCellValue("C1", "NUM-TELEFONO");
@@ -908,12 +923,11 @@ class ChipsController extends AppController {
     $chips = $this->Chip->find('all', array(
       'recursive' => 0,
       'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega),
-      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f","DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist')
+      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist')
     ));
     //debug($chips);exit;
     $cont = 1;
     foreach ($chips as $ch) {
-      
       $cont++;
       $prueba->getActiveSheet()->getStyle("A$cont:k$cont")->applyFromArray($borders2);
       //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
@@ -932,6 +946,164 @@ class ChipsController extends AppController {
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
     $objWriter->save('php://output');
     exit;
+  }
+
+  public function genera_excel_2($fecha_entrega = null, $idDistribuidor = null) {
+    $nombre_excel = "$fecha_entrega-$idDistribuidor.xlsx";
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
+    header('Cache-Control: max-age=0');
+    $borders = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        //,'color' => array('argb' => 'FFFF0000')
+        )
+      ),
+      'font' => array(
+        'size' => 12
+        , 'bold' => true
+      //,'color' => array('argb' => 'FFFF0000')
+      ),
+      'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+        'color' => array('rgb' => 'FF7E00')
+      )
+    );
+    $borders2 = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        )
+      )
+    );
+    $prueba = new PHPExcel();
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(15);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(12);
+    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(12);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(15);
+    $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(11);
+
+    $prueba->getActiveSheet()->getStyle('A1:k1')->applyFromArray($borders);
+    $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "CANTIDAD");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B1", "SIM");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C1", "NUM-TELEFONO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("D1", "FECHA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("E1", "Fecha de entrega");
+    $prueba->setActiveSheetIndex(0)->setCellValue("F1", "COD.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("G1", "SUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("H1", "COD.MERC");
+    $prueba->setActiveSheetIndex(0)->setCellValue("I1", "DIST.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("J1", "CIUDAD");
+    $prueba->setActiveSheetIndex(0)->setCellValue("K1", "FIRMA");
+
+    $prueba->getActiveSheet()->setTitle("LISTADO de SIM'S ASIGNADOS");
+
+    $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
+    $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
+    $this->Chip->virtualFields = array(
+      'nom_distribuidor' => "CONCAT(($sql))",
+      'ciudad_dist' => "CONCAT(($sql2))"
+    );
+    $chips = $this->Chip->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega, 'Chip.cliente_id <>' => NULL),
+      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f",
+        'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.mercado')
+    ));
+    //debug($chips);exit;
+    $cont = 1;
+    foreach ($chips as $ch) {
+      $cont++;
+      $prueba->getActiveSheet()->getStyle("A$cont:k$cont")->applyFromArray($borders2);
+      //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
+      $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $ch['Chip']['cantidad']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['sim']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $ch['Chip']['telefono']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $ch[0]['fecha_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $ch[0]['fecha_entrega_d_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $ch['Cliente']['cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $ch['Cliente']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $ch['Cliente']['mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("I" . $cont, $ch['Chip']['nom_distribuidor']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("J" . $cont, $ch['Chip']['ciudad_dist']);
+      //$prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['cantidad']);
+    }
+    $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
+    $objWriter->save('php://output');
+    exit;
+  }
+
+  public function regulariza_excel_mercado() {
+
+    //$excelSubido = $nombreExcel;
+    $objLector = new PHPExcel_Reader_Excel2007();
+    //debug($objLector);die;
+    $objPHPExcel = $objLector->load("../webroot/mercados.xlsx");
+    //debug($objPHPExcel);die;
+    
+    $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
+    $array_data = array();
+    foreach ($rowIterator as $row) {
+      $cellIterator = $row->getCellIterator();
+
+      $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
+
+      if ($row->getRowIndex() >= 2) { //a partir de la 1
+        $rowIndex = $row->getRowIndex();
+
+        $array_data[$rowIndex] = array(
+          'J' => '',
+          'N' => '');
+
+        foreach ($cellIterator as $cell) {
+          if ('J' == $cell->getColumn()) {
+            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+          } elseif ('N' == $cell->getColumn()) {
+            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+          }
+        }
+      }
+    }
+    debug('sss');
+    debug($array_data);
+    exit;
+    $i = 0;
+    $this->request->data = "";
+    
+    foreach ($array_data as $d) {
+      $this->request->data[$i]['Cliente']['num_registro'] = $d['A'];
+      $this->request->data[$i]['Cliente']['cod_dealer'] = $d['B'];
+      $this->request->data[$i]['Cliente']['nombre'] = $d['C'];
+      $this->request->data[$i]['Cliente']['direccion'] = $d['F'];
+      $this->request->data[$i]['Cliente']['celular'] = $d['E'];
+      $this->request->data[$i]['Cliente']['zona'] = $d['D'];
+      $i++;
+      if($d['A']){
+        
+      }
+    }
+
+    //debug($this->request->data);
+    //exit;
+    
+    if ($this->Cliente->saveMany($this->data)) {
+      //echo 'registro corectamente';
+      //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
+      $this->Session->setFlash('se Guardo correctamente el EXCEL', 'msgbueno');
+      $this->redirect(array('controller' => 'Clientes', 'action' => 'index'));
+    } else {
+      echo 'no se pudo guardar';
+    }
+    //fin funciones del excel
   }
 
 }
