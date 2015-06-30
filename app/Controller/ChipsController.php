@@ -983,9 +983,9 @@ class ChipsController extends AppController {
     $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(15);
     $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(12);
     $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(12);
-    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(8);
-    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(10);
-    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(10);
     $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(15);
     $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(10);
     $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(11);
@@ -1047,11 +1047,12 @@ class ChipsController extends AppController {
     //$excelSubido = $nombreExcel;
     $objLector = new PHPExcel_Reader_Excel2007();
     //debug($objLector);die;
-    $objPHPExcel = $objLector->load("../webroot/mercados.xlsx");
-    //debug($objPHPExcel);die;
+    //debug("ssss");exit;
+    $objPHPExcel = $objLector->load("../webroot/files/mercados2.xlsx");
     
     $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
     $array_data = array();
+    
     foreach ($rowIterator as $row) {
       $cellIterator = $row->getCellIterator();
 
@@ -1073,37 +1074,24 @@ class ChipsController extends AppController {
         }
       }
     }
-    debug('sss');
+    /*debug('sss');
     debug($array_data);
-    exit;
-    $i = 0;
-    $this->request->data = "";
+    exit;*/
     
     foreach ($array_data as $d) {
-      $this->request->data[$i]['Cliente']['num_registro'] = $d['A'];
-      $this->request->data[$i]['Cliente']['cod_dealer'] = $d['B'];
-      $this->request->data[$i]['Cliente']['nombre'] = $d['C'];
-      $this->request->data[$i]['Cliente']['direccion'] = $d['F'];
-      $this->request->data[$i]['Cliente']['celular'] = $d['E'];
-      $this->request->data[$i]['Cliente']['zona'] = $d['D'];
-      $i++;
-      if($d['A']){
-        
+      $cliente = $this->Cliente->find('first',array(
+        'recursive' => -1,
+        'conditions' => array('Cliente.cod_dealer' => $d['J']),
+        'fields' => array('Cliente.id')
+      ));
+      if(!empty($cliente)){
+        $this->Cliente->id = $cliente['Cliente']['id'];
+        $datos_c['mercado'] = $d['N'];
+        $this->Cliente->save($datos_c);
       }
     }
-
-    //debug($this->request->data);
-    //exit;
-    
-    if ($this->Cliente->saveMany($this->data)) {
-      //echo 'registro corectamente';
-      //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
-      $this->Session->setFlash('se Guardo correctamente el EXCEL', 'msgbueno');
-      $this->redirect(array('controller' => 'Clientes', 'action' => 'index'));
-    } else {
-      echo 'no se pudo guardar';
-    }
-    //fin funciones del excel
+    debug('termino');
+    exit;
   }
 
 }
