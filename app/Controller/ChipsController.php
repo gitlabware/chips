@@ -848,7 +848,7 @@ class ChipsController extends AppController {
       'recursive' => 0,
       'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega),
       'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id'
-        , 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre')
+        , 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre','Cliente.mercado')
     ));
     $this->set(compact('chips', 'fecha_entrega', 'idDistribuidor'));
   }
@@ -1043,28 +1043,24 @@ class ChipsController extends AppController {
   }
 
   public function regulariza_excel_mercado() {
-
     //$excelSubido = $nombreExcel;
     $objLector = new PHPExcel_Reader_Excel2007();
     //debug($objLector);die;
     //debug("ssss");exit;
+    //$objPHPExcel = PHPExcel_IOFactory::createReaderForFile("../webroot/files/mercados2.xlsx");
     $objPHPExcel = $objLector->load("../webroot/files/mercados2.xlsx");
-    
+
     $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
     $array_data = array();
-    
+
     foreach ($rowIterator as $row) {
       $cellIterator = $row->getCellIterator();
-
       $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
-
       if ($row->getRowIndex() >= 2) { //a partir de la 1
         $rowIndex = $row->getRowIndex();
-
         $array_data[$rowIndex] = array(
           'J' => '',
           'N' => '');
-
         foreach ($cellIterator as $cell) {
           if ('J' == $cell->getColumn()) {
             $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
@@ -1074,24 +1070,24 @@ class ChipsController extends AppController {
         }
       }
     }
-    /*debug('sss');
-    debug($array_data);
-    exit;*/
-    
+    /* debug('sss');
+      debug($array_data);
+      exit; */
     foreach ($array_data as $d) {
-      $cliente = $this->Cliente->find('first',array(
+      $cliente = $this->Cliente->find('first', array(
         'recursive' => -1,
         'conditions' => array('Cliente.cod_dealer' => $d['J']),
         'fields' => array('Cliente.id')
       ));
-      if(!empty($cliente)){
+      if (!empty($cliente)) {
         $this->Cliente->id = $cliente['Cliente']['id'];
-        $datos_c['mercado'] = $d['N'];
+        $mercado = explode("-", $d['N']);
+        $datos_c['mercado'] = $mercado[0];
         $this->Cliente->save($datos_c);
       }
     }
-    debug('termino');
+    debug('termino!!');
     exit;
   }
-
+  
 }
