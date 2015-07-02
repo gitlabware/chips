@@ -37,8 +37,13 @@
                     <?php echo $this->Form->text('Persona.ci', array('class' => 'input full-width')); ?>
                 </p>
             </div>
-
-            <div class="six-columns">
+            <div class="two-columns">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Ext.C.I.</label>
+                    <?php echo $this->Form->select('Persona.ext_ci',$lugares_list, array('class' => 'select full-width')); ?>
+                </p>
+            </div>
+            <div class="four-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Direccion <small>(requerido)</small></label>
@@ -79,7 +84,7 @@
                     $grupo = $this->request->data['User']['0']['group_id'];
                     //debug($grupo);
                     ?>
-                    <?php echo $this->Form->text('User.username', array('class' => 'input full-width', 'value' => "$username")); ?>
+                    <?php echo $this->Form->text('User.username', array('class' => 'input full-width')); ?>
                 </p>
             </div>
 
@@ -101,7 +106,7 @@
                     <?php echo $this->Form->select("User.sucursal_id", $tiendas, array('class' => 'select', 'id' => 'validation-select1')); ?>
                 </p>
             </div>
-            <div class=" new-row two-columns">
+            <div class=" new-row three-columns">
                 <p class="block-label button-height" id="mostrarruta" style="<?php
                 if ($grupo != 2) {
                   echo 'display: none';
@@ -109,6 +114,12 @@
                 ?>">
                     <label for="validation-select" class="label"><b>Ruta:</b></label>
                     <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select', 'value' => $idPersona['User']['ruta_id'])); ?>
+                </p>
+            </div>
+            <div class="three-columns">
+                <p class="block-label button-height">
+                    <label for="validation-select" class="label"><b>Estado:</b></label>
+                   <?php echo $this->Form->select('User.estado', array('Activo' => 'Activo','Baja' => 'Baja'), array('class' => 'select full-width')); ?>
                 </p>
             </div>
             <div class="new-row six-columns">

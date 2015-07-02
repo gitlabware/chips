@@ -110,7 +110,6 @@ class InformesController extends AppController {
     $prueba->getActiveSheet()->getColumnDimension('L')->setWidth(30);
     $prueba->getActiveSheet()->getColumnDimension('M')->setWidth(40);
     
-    
     $style4 = array(
       'alignment' => array(
         'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
@@ -146,14 +145,37 @@ class InformesController extends AppController {
     $prueba->setActiveSheetIndex(0)->setCellValue("L6", "TELÉFONO VIVA");
     $prueba->setActiveSheetIndex(0)->setCellValue("M6", "OBSERVACIONES");
     
-    
     $prueba->getActiveSheet()->getStyle('C6')->getAlignment()->setWrapText(true);
     $prueba->getActiveSheet()->getStyle('D6')->getAlignment()->setWrapText(true);
     $prueba->getActiveSheet()->getStyle('G6')->getAlignment()->setWrapText(true);
     
+    $usuarios = $this->User->find('all',array(
+      'recursive' => 0,
+      'conditions' => array('User.estado' => 'Activo'),
+      'fields' => array('Persona.nombre','Persona.ap_paterno','Persona.ap_materno','Persona.ci','Persona.ext_ci','Lugare.nombre','Group.name')
+    ));
+    $contador = 6;
+    foreach ($usuarios as $us){
+      $contador++;
+      $prueba->getActiveSheet()->getStyle("A$contador:M$contador")->applyFromArray($style3);
+      $prueba->setActiveSheetIndex(0)->setCellValue("A$contador", ($contador-5));
+      $prueba->setActiveSheetIndex(0)->setCellValue("B$contador", $us['Persona']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C$contador", $us['Persona']['ap_paterno']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D$contador", $us['Persona']['ap_materno']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E$contador", $us['Persona']['ci']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F$contador", $us['Persona']['ext_ci']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("G$contador", $us['Lugare']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("H$contador", "SS");
+      $prueba->setActiveSheetIndex(0)->setCellValue("I$contador", "TRADICIONAL");
+      $prueba->setActiveSheetIndex(0)->setCellValue("J$contador", $us['Group']['name']);
+    }
+    
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
     $objWriter->save('php://output');
     exit;
+  }
+  public function hoja_ruteo_dist(){
+    
   }
 
 }
