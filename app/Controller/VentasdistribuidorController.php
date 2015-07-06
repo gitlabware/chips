@@ -344,6 +344,8 @@ class VentasdistribuidorController extends AppController {
       $this->Movimiento->create();
       //$dat['total'] = $total - $dat['salida'];
       $dat['transaccion'] = $num_transaccion;
+      $dat['capacitacion'] = $this->request->data['Aux']['capacitacion'];
+      $dat['est_punt'] = $this->request->data['Aux']['est_punt'];
       $this->Movimiento->save($dat);
       if(!empty($dat['id'])){
         $total = $total + $dat['salida_ant'];

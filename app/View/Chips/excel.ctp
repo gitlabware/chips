@@ -45,7 +45,7 @@
                       <td><?php echo $ch[0]['fecha_entrega_d_f']; ?></td>
                       <td><?php echo $ch['Cliente']['cod_dealer']; ?></td>
                       <td><?php echo $ch['Cliente']['nombre']; ?></td>
-                      <td><?php echo $ch['Cliente']['mercado']; ?></td>
+                      <td><?php echo $ch['Cliente']['cod_mercado']; ?></td>
                       <td><?php echo $ch['Chip']['nom_distribuidor']; ?></td>
                       <td><?php echo $ch['Chip']['ciudad_dist']; ?></td>
                       <td></td>

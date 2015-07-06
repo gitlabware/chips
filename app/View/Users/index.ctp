@@ -26,25 +26,32 @@
                 $i = 1;
                 foreach ($users as $usu):
                   ?>
+                  <?php
+                  if ($usu['User']['estado'] == "Baja") {
+                    $style1 = 'background-color: #fe9b96;';
+                  } else {
+                    $style1 = '';
+                  }
+                  ?>
 
                   <tr>                      
-                      <td><?php
+                      <td style="<?php echo $style1; ?>"><?php
                           echo $i;
                           $i++;
                           ?></td> 
-                      <td><?php echo $usu['Persona']['nombre']; ?></td>
-                      <td scope="col"  class="align-center hide-on-mobile"><?php echo $usu['Persona']['ap_paterno']; ?></td>
-                      <td><?php echo $usu['User']['username']; ?></td>
+                      <td style="<?php echo $style1; ?>"><?php echo $usu['Persona']['nombre']; ?></td>
+                      <td style="<?php echo $style1; ?>" scope="col"  class="align-center hide-on-mobile"><?php echo $usu['Persona']['ap_paterno']; ?></td>
+                      <td style="<?php echo $style1; ?>"><?php echo $usu['User']['username']; ?></td>
                       <?php $nombre = $usu['Persona']['nombre']; ?>
-                      <td><?php echo $usu['Group']['name']; ?></td>
-                      <td scope="col" class="align-center">
+                      <td style="<?php echo $style1; ?>"><?php echo $usu['Group']['name']; ?></td>
+                      <td style="<?php echo $style1; ?>" scope="col" class="align-center">
                           <?php //$ajaxv = 'openAjax(' . $usu['User']['id'] . ')' ?>
                           <?php //echo $this->Html->image("iconos/menu.png", array('onclick' => $ajaxv));   ?>
                           <?php //echo $this->Html->link($this->Html->image("iconos/editar.png", array("alt" => 'Editar', 'title' => 'editar')), array('action' => 'editar', $usu['User']['id']), array('escape' => false));  ?>                          
                           <a href="<?php echo $this->Html->url(array('action' => 'editar', $usu['User']['id'])); ?>" class="button orange-gradient compact icon-pencil">Editar</a>
                           <?php if ($usu['User']['group_id'] == 2): ?>
-                            <?php echo $this->Html->link('Retorno', array('controller' => 'Almacenes', 'action' => 'devuelto', $usu['User']['persona_id']),array('class' => 'button blue-gradient compact icon-mailbox')); ?>
-                            <a href="javascript:" class="button green-gradient compact icon-page-list" onclick="precios_productos('<?php echo $usu['User']['id']?>')">Rutas</a>
+                            <?php echo $this->Html->link('Retorno', array('controller' => 'Almacenes', 'action' => 'devuelto', $usu['User']['persona_id']), array('class' => 'button blue-gradient compact icon-mailbox')); ?>
+                            <a href="javascript:" class="button green-gradient compact icon-page-list" onclick="precios_productos('<?php echo $usu['User']['id'] ?>')">Rutas</a>
                           <?php endif; ?>
                           <a href="<?php echo $this->Html->url(array('action' => 'delete', $usu['User']['id'])); ?>" onclick="if (confirm('Desea eliminar realmente a '+'<?php echo $nombre?>')) {
                                     return true;
@@ -56,7 +63,15 @@
 
                 <?php endforeach; ?>
             </tbody>
-        </table>          
+        </table> <br>     
+        <div class="columns">
+            <div class="six-columns">
+                <a href="<?php echo $this->Html->url(array('controller' => 'Informes','action' => 'excel_lista_personal'));?>" class="button full-width">
+                    <span class="button-icon"><span class="icon-download"></span></span>
+                    Descargar excel
+                </a>
+            </div>
+        </div>
     </div>
 </section>	
 
@@ -113,11 +128,13 @@
           groupSimilar: true
       });
   }
-  function editar_p(idproducto){
-    window.location = '<?php echo $this->Html->url(array('action' => 'editar'));?>/'+idproducto;
+  function editar_p(idproducto) {
+      window.location = '<?php echo $this->Html->url(array('action' => 'editar')); ?>/' + idproducto;
   }
-  function elimina_p(idproducto){
-    if(confirm('Esta seguro de eliminar el producto??')){window.location = '<?php echo $this->Html->url(array('action' => 'delete'));?>/'+idproducto;}
+  function elimina_p(idproducto) {
+      if (confirm('Esta seguro de eliminar el producto??')) {
+      window.location = '<?php echo $this->Html->url(array('action' => 'delete')); ?>/' + idproducto;
+    }
   }
 </script>
 

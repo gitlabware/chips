@@ -79,9 +79,8 @@ class UsersController extends AppController {
   }
 
   public function index() {
-
-    $this->User->find('all');
-    $this->set('users', $this->paginate());
+    $users = $this->User->find('all',array('order' => array('User.estado','User.id DESC')));
+    $this->set(compact('users'));
   }
 
   public function ajaxver($idUsuario = null) {
@@ -122,7 +121,7 @@ class UsersController extends AppController {
       $ruta = $this->request->data['User']['ruta_id'];
       $this->User->create();
       $this->Persona->create();      
-
+      
       if ($this->Persona->save($this->request->data['Persona'])) {
         //debug($this->request->data);
         $iduser = $this->Persona->getLastInsertID();
@@ -132,7 +131,7 @@ class UsersController extends AppController {
           $this->redirect(array('action' => 'add'));
           $this->Session->setFlash('Debe llenar el tipo de usuario..!!!!');
           } */
-
+        $this->request->data['User']['estado'] = 'Activo';
         if ($this->User->save($this->request->data['User'])) {
                     
           if($this->request->data['User']['group_id']==2){
@@ -159,8 +158,9 @@ class UsersController extends AppController {
     $groups2 = $this->Group->find('list', array('fields' => array('Group.name')));
     $lugares = $this->Lugare->find('all', array('recursive'=>-1));
     $rutas = $this->Ruta->find('list', array('fields' => 'Ruta.nombre'));
+    $lugares_list = $this->Lugare->find('list',array('fields' => array('Nombre','Nombre')));
     //debug($rutas); exit;
-    $this->set(compact('groups', 'tiendas', 'groups2','lugares', 'rutas'));
+    $this->set(compact('groups', 'tiendas', 'groups2','lugares', 'rutas','lugares_list'));
   }
 
   public function insertar() {
@@ -301,8 +301,9 @@ class UsersController extends AppController {
     $tiendas = $this->Sucursal->find('list', array('recursive' => -1,'fields' => 'nombre'));
     $lugares =  $this->Lugare->find('list', array('recursive'=> -1,'fields' => 'Lugare.nombre'));
     $rutas = $this->Ruta->find('list', array('fields' => 'Ruta.nombre'));
+    $lugares_list = $this->Lugare->find('list',array('fields' => array('Nombre','Nombre')));
     //debug($this->request->data);exit;
-    $this->set(compact('groups', 'tiendas', 'lugares','rutas','idPersona'));
+    $this->set(compact('groups', 'tiendas', 'lugares','rutas','idPersona','lugares_list'));
   }
 
   public function delete($id = null) {

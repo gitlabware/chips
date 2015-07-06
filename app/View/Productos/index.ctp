@@ -1,5 +1,5 @@
 <style>
-    
+
 </style>
 <section role="main" id="main">
 
@@ -26,9 +26,24 @@
             </thead>          
 
             <tbody>
-                
+
             </tbody>
-        </table>               
+        </table>     <br>    
+        <div class="columns">
+            <div class="twelve-columns">
+                <?php echo $this->Form->create('Producto', array('action' => 'registra_excel_pro', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
+                <div class="field-block button-height">							
+                    <label for="login" class="label"><b>Seleccionar Excel :</b></label>
+                    <span class="input file">
+                        <span class="file-text"></span>
+                        <span class="button compact green-gradient">Seleccione</span>
+                        <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
+                    </span>
+                    <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button>
+                </div> 
+                <?php echo $this->Form->end(); ?>
+            </div>
+        </div>
     </div>
 </section>
 <script>
@@ -83,10 +98,12 @@
           groupSimilar: true
       });
   }
-  function editar_p(idproducto){
-    window.location = '<?php echo $this->Html->url(array('action' => 'editar'));?>/'+idproducto;
+  function editar_p(idproducto) {
+      window.location = '<?php echo $this->Html->url(array('action' => 'editar')); ?>/' + idproducto;
   }
-  function elimina_p(idproducto){
-    if(confirm('Esta seguro de eliminar el producto??')){window.location = '<?php echo $this->Html->url(array('action' => 'delete'));?>/'+idproducto;}
+  function elimina_p(idproducto) {
+      if (confirm('Esta seguro de eliminar el producto??')) {
+          window.location = '<?php echo $this->Html->url(array('action' => 'delete')); ?>/' + idproducto;
+      }
   }
 </script>

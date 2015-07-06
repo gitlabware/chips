@@ -848,7 +848,7 @@ class ChipsController extends AppController {
       'recursive' => 0,
       'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega),
       'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id'
-        , 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre','Cliente.mercado')
+        , 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre','Cliente.cod_mercado')
     ));
     $this->set(compact('chips', 'fecha_entrega', 'idDistribuidor'));
   }
@@ -1017,7 +1017,7 @@ class ChipsController extends AppController {
       'recursive' => 0,
       'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega, 'Chip.cliente_id <>' => NULL),
       'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f",
-        'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.mercado')
+        'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado')
     ));
     //debug($chips);exit;
     $cont = 1;
@@ -1032,7 +1032,7 @@ class ChipsController extends AppController {
       $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $ch[0]['fecha_entrega_d_f']);
       $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $ch['Cliente']['cod_dealer']);
       $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $ch['Cliente']['nombre']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $ch['Cliente']['mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $ch['Cliente']['cod_mercado']);
       $prueba->setActiveSheetIndex(0)->setCellValue("I" . $cont, $ch['Chip']['nom_distribuidor']);
       $prueba->setActiveSheetIndex(0)->setCellValue("J" . $cont, $ch['Chip']['ciudad_dist']);
       //$prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['cantidad']);
@@ -1082,7 +1082,8 @@ class ChipsController extends AppController {
       if (!empty($cliente)) {
         $this->Cliente->id = $cliente['Cliente']['id'];
         $mercado = explode("-", $d['N']);
-        $datos_c['mercado'] = $mercado[0];
+        $datos_c['cod_mercado'] = $mercado[0];
+        $datos_c['mercado'] = $d['N'];
         $this->Cliente->save($datos_c);
       }
     }

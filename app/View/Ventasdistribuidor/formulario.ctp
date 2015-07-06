@@ -192,6 +192,21 @@
                     </table>
 
                     <br>
+                    <div class="columns" style=" font-size: 18px;">
+                        <div class="four-columns">
+                            <p class="block-label button-height">
+                                <label>Capacitacion</label>
+                                <?php echo $this->Form->select("Aux.capacitacion", array(1 => 'SI', 2 => 'NO'), array('class' => 'select full-width','required')); ?> 
+                            </p>
+                        </div>
+                        <div class="eight-columns">
+                            <p class="block-label button-height">
+                                <label>Estado del Punto</label>
+                                <?php echo $this->Form->select('Aux.est_punt', array(1 => 'ACTIVO', 2 => 'FUERA DE SERVICIO', 3 => 'CERRADO'), array('class' => 'select full-width','required')); ?> 
+                            </p>
+                        </div>
+                    </div>
+
                     <table style="width: 100%;">
                         <tr>
                             <td>
@@ -200,6 +215,8 @@
                             </td>
                         </tr>
                     </table>
+
+
                     <!--
                     <table class="simple-table responsive-table">
 
