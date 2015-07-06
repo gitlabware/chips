@@ -18,6 +18,7 @@
 	text-shadow: none !important;
 	filter: none !important;
 	-ms-filter: none !important;
+        overflow: hidden !important; 
 }
 a, a:visited {
 	color: #444 !important;
@@ -52,7 +53,4 @@ p, h2, h3 {
 }
 h2, h3 {
 	page-break-after: avoid;
-}
-.ocultar_impresion{
-    display: none;
 }

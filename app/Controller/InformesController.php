@@ -7,7 +7,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class InformesController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('User');
+  public $uses = array('User', 'Movimiento');
   public $layout = 'viva';
   public $components = array('RequestHandler', 'DataTable');
 
@@ -123,7 +123,7 @@ class InformesController extends AppController {
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
     header('Cache-Control: max-age=0');
-
+    
     $prueba = new PHPExcel();
     $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 1, 14, 1);
     $style1 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 20, 'bold' => true));
@@ -228,14 +228,31 @@ class InformesController extends AppController {
     $prueba->getActiveSheet()->getStyle('m8')->getAlignment()->setWrapText(true);
 
     $ventas = $this->Movimiento->find('all', array(
-      'recursive' => - 1,
-      'conditions' => array('DATE(Movimiento.modified) BETWEEN ? AND ?' => array($fecha_ini, $fecha_fin), 'Movimiento.salida <>' => 0, 'Movimiento.escala LIKE' => 'MAYOR'),
-      'group' => array('DATE(Movimiento.modified)', 'Movimiento_cliente_id')
+      'recursive' => 0,
+      'conditions' => array('Movimiento.created BETWEEN ? AND ?' => array($fecha_ini, $fecha_fin), 'Movimiento.salida !=' => 0, 'Movimiento.escala LIKE' => 'MAYOR'),
+      'group' => array('Movimiento.created', 'Movimiento.cliente_id')
+      ,'fields' => array("DATE_FORMAT(Movimiento.created,'%m/%d/%Y') as fecha_f",'Persona.nombre','Cliente.cod_dealer','Cliente.nombre','Cliente.cod_mercado','Cliente.mercado','Movimiento.capacitacion','Movimiento.est_punt')
     ));
-    debug($ventas);
-    exit;
-    foreach ($ventas as $ve) {
-      
+    
+    $contador = 9;
+    foreach ($ventas as $key => $ve) {
+      $contador++;
+      $prueba->getActiveSheet()->getStyle("A$contador:O$contador")->applyFromArray($style9);
+      $prueba->setActiveSheetIndex(0)->setCellValue("A$contador", ($key+1));
+      $prueba->setActiveSheetIndex(0)->setCellValue("B$contador", $ve[0]['fecha_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C$contador", $ve['Persona']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D$contador", $ve['Cliente']['cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E$contador", $ve['Cliente']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F$contador", $ve['Cliente']['cod_mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("G$contador", $ve['Cliente']['mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("H$contador", $ve['Movimiento']['capacitacion']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("I$contador", $ve['Movimiento']['est_punt']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("J$contador", 0);
+      $prueba->setActiveSheetIndex(0)->setCellValue("K$contador", 0);
+      $prueba->setActiveSheetIndex(0)->setCellValue("L$contador", 0);
+      $prueba->setActiveSheetIndex(0)->setCellValue("M$contador", 0);
+      $prueba->setActiveSheetIndex(0)->setCellValue("N$contador", 0);
+      $prueba->setActiveSheetIndex(0)->setCellValue("O$contador", "");
     }
     $prueba->getActiveSheet()->setTitle("Hoja de ruteo");
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
@@ -244,13 +261,16 @@ class InformesController extends AppController {
   }
 
   public function hoja_ruteo_d() {
+
     $datos = $this->request->data['Aux'];
+    $fecha_ini = $datos['fecha_ini'];
+    $fecha_fin = $datos['fecha_fin'];
     $ventas = $this->Movimiento->find('all', array(
-      'recursive' => - 1,
-      'conditions' => array('DATE(Movimiento.modified) BETWEEN ? AND ?' => array($datos['fecha_ini'], $datos['fecha_fin']), 'Movimiento.salida <>' => 0, 'Movimiento.escala LIKE' => 'MAYOR'),
-      'group' => array('DATE(Movimiento.modified)', 'Movimiento_cliente_id')
+      'recursive' => 0,
+      'conditions' => array('Movimiento.created BETWEEN ? AND ?' => array($fecha_ini, $fecha_fin), 'Movimiento.salida <>' => 0, 'Movimiento.escala LIKE' => 'MAYOR'),
+      'group' => array('Movimiento.created', 'Movimiento.cliente_id')
     ));
-    $this->set(compact('ventas'));
+    $this->set(compact('ventas', 'fecha_ini', 'fecha_fin'));
   }
 
   public function index() {

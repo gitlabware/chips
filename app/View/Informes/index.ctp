@@ -1,3 +1,5 @@
+<!-- glDatePicker -->
+<link rel="stylesheet" href="<?php echo $this->webroot;?>js/libs/glDatePicker/developr.fixed.css?v=1">
 <section role="main" id="main">
 
     <hgroup id="main-title" class="thin">
@@ -7,6 +9,7 @@
     <div class="with-padding">                   
         <div class="columns">
             <div class="twelve-columns">
+                <?php echo $this->Form->create('Informe',array('action' => 'hoja_ruteo_d'));?>
                 <fieldset class="fieldset">
                     <legend class="legend">HOJA DE RUTEO CONSOLIDADO DISTRIBUIDORES</legend>
                     <div class="columns">
@@ -15,14 +18,17 @@
                                 <label for="input-1" class="label">Fecha Inicial</label>
                                 <span class="input">
                                     <span class="icon-calendar"></span>
-                                    <input type="text" name="special-input-3" id="special-input-3" class="input-unstyled datepicker" value="">
+                                    <input type="text" name="data[Aux][fecha_ini]" class="input-unstyled datepicker" value="">
                                 </span>
                             </p>
                         </div>
                         <div class="six-columns">
-                            <p class="inline-label">
-                                <label for="input-1" class="label">Unstyled input</label>
-                                <input type="text" name="input-1" id="input-1" size="9" value="Unstyled text input">
+                            <p class="block-label button-height inline-label">
+                                <label for="input-1" class="label">Fecha Final</label>
+                                <span class="input">
+                                    <span class="icon-calendar"></span>
+                                    <input type="text" name="data[Aux][fecha_fin]" class="input-unstyled datepicker" value="">
+                                </span>
                             </p>
                         </div>
                         <div class="new-row twelve-columns">
@@ -32,8 +38,16 @@
                         </div>
                     </div>
                 </fieldset>
+                <?php echo $this->Form->end();?>
             </div>
         </div>
     </div>
 </section>	
 <?php echo $this->element('sidebar/administrador'); ?>
+<?php
+echo $this->Html->script(array(
+  'libs/glDatePicker/glDatePicker.min.js?v=1',
+  'ini_lg_datepicker.js'
+  ), array('block' => 'js_add'));
+?>
+
