@@ -75,8 +75,8 @@
                     <label for="block-label-1" class="label">Usuario <small>(requerido)</small></label>
                     <?php
                     //debug($this->request->data); 
-                    $username = $this->request->data['User']['0']['username'];
-                    $grupo = $this->request->data['User']['0']['group_id'];
+                    $username = $this->request->data['User']['username'];
+                    $grupo = $this->request->data['User']['group_id'];
                     //debug($grupo);
                     ?>
                     <?php echo $this->Form->text('User.username', array('class' => 'input full-width', 'value' => "$username")); ?>
@@ -115,13 +115,13 @@
 
                 <button type="submit" class="button glossy mid-margin-right" onClick="javascript:verificar()">
                     <span class="button-icon"><span class="icon-tick"></span></span>
-                    Guardar Usuario
-                </button>
+                    Modificar Usuario
+                </button>              
 
-                <button type="submit" class="button glossy">
+                <a href="<?php echo $this->Html->url(['action'=>'index']); ?>" class="button glossy">
                     <span class="button-icon red-gradient"><span class="icon-cross-round"></span></span>
-                    Cancelar
-                </button>
+                    Listado Usuarios
+                </a>
 
             </div>
         </div>

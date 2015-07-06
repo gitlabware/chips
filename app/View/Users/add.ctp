@@ -128,10 +128,10 @@
                     Guardar Usuario
                 </button>
 
-                <button type="submit" class="button glossy">
+                <a href="<?php echo $this->Html->url(['action'=>'index']); ?>" class="button glossy">
                     <span class="button-icon red-gradient"><span class="icon-cross-round"></span></span>
-                    Cancelar
-                </button>
+                    Listado Usuarios
+                </a>
 
             </div>
         </div>

@@ -100,13 +100,18 @@
 
                         <button type="submit" class="button glossy mid-margin-right">
                             <span class="button-icon"><span class="icon-tick"></span></span>
-                            Guardar Usuario
+                            Modificar Usuario
                         </button>
 
                         <button type="submit" class="button glossy">
                             <span class="button-icon red-gradient"><span class="icon-cross-round"></span></span>
-                            Cancelar
+                            Listado Usuarios
                         </button>
+                        
+                        <a href="#" class="button glossy">
+                            <span class="button-icon red-gradient"><span class="icon-cross-round"></span></span>
+                            Listado Usuarios
+                        </a>
 
                     </div>
 
