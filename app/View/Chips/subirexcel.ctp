@@ -133,7 +133,6 @@
           }
           ;
         </script>
-
         <p>&nbsp;</p>
         <table class="table responsive-table" id="sorting-advanced">
 

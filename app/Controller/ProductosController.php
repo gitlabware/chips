@@ -1,12 +1,16 @@
 <?php
 
+App::import('Vendor', 'PHPExcel', array('file' => 'PHPExcel.php'));
+App::import('Vendor', 'PHPExcel_Reader_Excel2007', array('file' => 'PHPExcel/Excel2007.php'));
+App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/IOFactory.php'));
+
 class ProductosController extends AppController {
 
   public $layout = 'viva';
   public $name = 'Productos';
   public $uses = array('Producto', 'Preciosventa', 'Tiposproducto', 'Marca',
     'Productosprecio', 'Almacene', 'Movimiento', 'Colore',
-    'Ventascelulare', 'Totale');
+    'Ventascelulare', 'Totale', 'Excel');
   public $helpers = array('Html', 'Form');
   public $components = array('Session', 'RequestHandler', 'DataTable');
 
@@ -302,6 +306,106 @@ class ProductosController extends AppController {
       return $dato_total['Totale']['total'];
     } else {
       return 0;
+    }
+  }
+
+  public function registra_excel_pro() {
+    /*debug($this->request->data);
+    die;*/
+    $archivoExcel = $this->request->data['Excel']['excel'];
+    $nombreOriginal = $this->request->data['Excel']['excel']['name'];
+
+    if ($archivoExcel['error'] === UPLOAD_ERR_OK) {
+      $nombre = string::uuid();
+      if (move_uploaded_file($archivoExcel['tmp_name'], WWW_ROOT . 'files' . DS . $nombre . '.xlsx')) {
+        $nombreExcel = $nombre . '.xlsx';
+        $direccionExcel = WWW_ROOT . 'files';
+        $this->request->data['Excelg']['nombre'] = $nombreExcel;
+        $this->request->data['Excelg']['nombre_original'] = $nombreOriginal;
+        $this->request->data['Excelg']['direccion'] = "";
+        $this->request->data['Excelg']['tipo'] = "asignacion";
+      }
+    }
+
+    if ($this->Excel->save($this->data['Excelg'])) {
+      $ultimoExcel = $this->Excel->getLastInsertID();
+      //debug($ultimoExcel);die;
+      $excelSubido = $nombreExcel;
+      $objLector = new PHPExcel_Reader_Excel2007();
+      //debug($objLector);die;
+      $objPHPExcel = $objLector->load("../webroot/files/$excelSubido");
+      //debug($objPHPExcel);die;
+
+      $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
+
+      $array_data = array();
+
+      foreach ($rowIterator as $row) {
+        $cellIterator = $row->getCellIterator();
+        $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
+        if ($row->getRowIndex() >= 2) { //a partir de la 1
+          $rowIndex = $row->getRowIndex();
+          $array_data[$rowIndex] = array(
+            'A' => '',
+            'B' => '',
+            'C' => '',
+            'D' => '',
+            'E' => '',
+            'F' => '',
+            'G' => '',
+            'H' => '');
+          foreach ($cellIterator as $cell) {
+            if ('A' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('B' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('C' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('D' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('E' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('F' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('G' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('H' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            }
+          }
+        }
+      }
+      $i = 0;
+      $this->request->data = "";
+      debug($array_data);exit;
+      foreach ($array_data as $d) {
+        $this->request->data[$i]['Producto']['cantidad'] = $d['B'];
+        $this->request->data[$i]['Producto']['cantidad'] = $d['C'];
+        $i++;
+      }
+      if (!empty($this->request->data[0]['Chip']['telefono'])) {
+        $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $this->request->data[0]['Chip']['telefono'])));
+        if (!empty($verifica_tel)) {
+          $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
+          $this->redirect(array('action' => 'subirexcel'));
+        }
+      }
+
+      //debug($this->data);
+      //exit;
+      /*
+      if ($this->Chip->saveMany($this->data)) {
+        //echo 'registro corectamente';
+        //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
+        $this->Session->setFlash('se Guardo correctamente el EXCEL', 'msgbueno');
+        $this->redirect(array('action' => 'subirexcel'));
+      } else {
+        echo 'no se pudo guardar';
+      }*/
+      //fin funciones del excel
+    } else {
+
+      //echo 'no';
     }
   }
 
