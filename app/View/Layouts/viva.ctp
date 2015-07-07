@@ -82,7 +82,7 @@
 
     <body class="clearfix with-menu with-shortcuts">
         <script>var urljsontabla = '';
-        var datos_tabla2 = null;</script>
+          var datos_tabla2 = null;</script>
         <!-- Prompt IE 6 users to install Chrome Frame -->
         <!--[if lt IE 7]><p class="message red-gradient simpler">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
@@ -110,7 +110,9 @@
         <?php elseif ($this->Session->read('Auth.User.group_id') == 1): ?>          
           <?php echo $this->element('menu/admin'); ?>             
         <?php elseif ($this->Session->read('Auth.User.group_id') == 3): ?>          
-          <?php echo $this->element('menu/adminalmacen'); ?>             
+          <?php echo $this->element('menu/adminalmacen'); ?>    
+        <?php elseif ($this->Session->read('Auth.User.group_id') == 4): ?>          
+          <?php echo $this->element('menu/adminrecargas'); ?>  
         <?php endif; ?>
 
         <!-- JavaScript at the bottom for fast page loading -->
@@ -140,8 +142,8 @@
           var table = $('#sorting-advanced');
           table.dataTable({
               /*"oLanguage": {
-                  "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-              },*/
+               "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+               },*/
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
               "order": [],
@@ -151,14 +153,14 @@
                   table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
                   tableStyled = true;
               }
-          });          
+          });
 
           var table2 = $('#tabla-json');
           if (datos_tabla2 == null) {
               datos_tabla2 = {
                   /*"oLanguage": {
-                      "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-                  },*/
+                   "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+                   },*/
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,
