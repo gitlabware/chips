@@ -39,7 +39,11 @@
                         <span class="button compact green-gradient">Seleccione</span>
                         <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
                     </span>
-                    <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button>
+                    <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
+                    <button type="button" class="button glossy mid-margin-right" onclick="openModal2();">
+                        <span class="button-icon"><span class="icon-search"></span></span>
+                        Ver Formato
+                    </button>
                 </div> 
                 <?php echo $this->Form->end(); ?>
             </div>
@@ -105,5 +109,16 @@
       if (confirm('Esta seguro de eliminar el producto??')) {
           window.location = '<?php echo $this->Html->url(array('action' => 'delete')); ?>/' + idproducto;
       }
+  }
+  function openModal2()
+  {
+      //console.log('hizo click');
+      $.modal({
+          title: 'Formato del Archivo',
+          content: '<?php echo $this->Html->image('iconos/productos.png'); ?>',
+          center: true,
+          width: 1000,
+          height: 450,
+      });
   }
 </script>
