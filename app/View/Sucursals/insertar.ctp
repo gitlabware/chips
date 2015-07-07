@@ -59,5 +59,11 @@
     });
 </script>
 <!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/administrador'); ?>
+<?php if($this->Session->read('Auth.User.Group.name')=='Almaceneros'):?>
+<!-- Sidebar/drop-down menu -->
+<?php echo $this->element('sidebar/almacenero'); ?>
+<!-- End sidebar/drop-down menu --> 
+<?php elseif($this->Session->read('Auth.User.Group.name')=='Administradores'):?>
+<?php echo $this->element('sidebar/administrador');?>
+<?php endif;?>
 <!-- End sidebar/drop-down menu --> 

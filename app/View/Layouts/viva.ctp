@@ -107,9 +107,10 @@
         <!-- Side tabs shortcuts -->
         <?php if ($this->Session->read('Auth.User.group_id') == 2): ?>
           <?php echo $this->element('menu/admindistribuidor'); ?>
-        <?php elseif ($this->Session->read('Auth.User.group_id') == 1): ?>
-          <?php //echo $this->element('menu/admindistribuidor'); ?>
+        <?php elseif ($this->Session->read('Auth.User.group_id') == 1): ?>          
           <?php echo $this->element('menu/admin'); ?>             
+        <?php elseif ($this->Session->read('Auth.User.group_id') == 3): ?>          
+          <?php echo $this->element('menu/adminalmacen'); ?>             
         <?php endif; ?>
 
         <!-- JavaScript at the bottom for fast page loading -->

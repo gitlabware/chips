@@ -53,7 +53,7 @@
                             <?php echo $this->Html->link('Retorno', array('controller' => 'Almacenes', 'action' => 'devuelto', $usu['User']['persona_id']), array('class' => 'button blue-gradient compact icon-mailbox')); ?>
                             <a href="javascript:" class="button green-gradient compact icon-page-list" onclick="precios_productos('<?php echo $usu['User']['id'] ?>')">Rutas</a>
                           <?php endif; ?>
-                          <a href="<?php echo $this->Html->url(array('action' => 'delete', $usu['User']['id'])); ?>" onclick="if (confirm('Desea eliminar realmente??')) {
+                          <a href="<?php echo $this->Html->url(array('action' => 'delete', $usu['User']['id'])); ?>" onclick="if (confirm('Desea eliminar realmente a '+'<?php echo $nombre?>')) {
                                     return true;
                                 }
                                 return false;" class="button red-gradient compact icon-cross-round">Elim</a>

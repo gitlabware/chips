@@ -36,7 +36,7 @@
                                 }
                                 return false;" class="button red-gradient compact icon-cross-round">Eliminar</a>
                             <?php $ajaxv = 'openAjax2(' . $p['Sucursal']['id'] . ')' ?>
-                            <?php echo $this->Html->image("iconos/menu.png", array('onclick' => $ajaxv)); ?>
+                            <?php //echo $this->Html->image("iconos/menu.png", array('onclick' => $ajaxv)); ?>
                             <?php //echo $this->Html->link($this->Html->image("iconos/editar.png", array("alt" => 'Editar', 'title' => 'editar')), array('action' => 'editar', $p['Sucursal']['id']), array('escape' => false)); ?>
                             &nbsp;
                             <?php //echo $this->html->link('usuarios', array('action'=>'usuarios',$p['Sucursal']['id'])); ?>
@@ -52,7 +52,15 @@
 </section>	
 
 <!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/administrador'); ?>
+<?php //echo $this->element('sidebar/administrador'); ?>
+<?php if($this->Session->read('Auth.User.Group.name')=='Almaceneros'):?>
+<!-- Sidebar/drop-down menu -->
+<?php echo $this->element('sidebar/almacenero'); ?>
+<!-- End sidebar/drop-down menu --> 
+<?php elseif($this->Session->read('Auth.User.Group.name')=='Administradores'):?>
+<?php echo $this->element('sidebar/administrador');?>
+<?php endif;?>
+<?php //echo $this->element('sidebar/administrador'); ?>
 <!-- End sidebar/drop-down menu --> 
 <script>
 
