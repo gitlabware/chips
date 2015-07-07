@@ -155,7 +155,7 @@
               $('#divplus-precio').hide(200);
               $('#divplus-cantidad').hide(200);
           } else {
-              if (categoria[$('#validation-select').val()] == 'TARJETAS' || categoria[$('#validation-select').val()] == 'CHIPS') {
+              //if (categoria[$('#validation-select').val()] == 'TARJETAS' || categoria[$('#validation-select').val()] == 'CHIPS') {
                   $('#iddivimagen').removeClass('eight-columns');
                   $('#iddivimagen').addClass('four-columns');
                   $('#iddivmarca').show(200);
@@ -166,7 +166,7 @@
                   $('#divpluscelulares-color').hide(200);
                   $('#divpluscelulares-precio').hide(200);
                   $('#divpluscelulares-cantidad').hide(200);
-              } else {
+              /*} else {
                   $('#iddivimagen').removeClass('four-columns');
                   $('#iddivimagen').addClass('eight-columns');
                   $('#iddivmarca').hide(200);
@@ -177,7 +177,7 @@
                   $('#divpluscelulares-color').hide(200);
                   $('#divpluscelulares-precio').hide(200);
                   $('#divpluscelulares-cantidad').hide(200);
-              }
+              }*/
           }
 
       });
