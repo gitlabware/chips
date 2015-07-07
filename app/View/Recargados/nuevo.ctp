@@ -186,8 +186,8 @@
 </section>
 <?php if ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
     <?php echo $this->element('sidebar/administrador'); ?>
-<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
-    <?php echo $this->element('sidebar/almacenero'); ?>
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
+    <?php echo $this->element('sidebar/recargas'); ?>
 <?php endif; ?>
 
 

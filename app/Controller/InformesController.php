@@ -274,7 +274,13 @@ class InformesController extends AppController {
   }
 
   public function index() {
-    
+    $distribuidores = $this->User->find('list',array(
+      'recursive' => 0,
+      'conditions' => array('User.group_id' => 2),
+      'fields' => array('Persona.id',"CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)")
+    ));
+    $this->set(compact('distribuidores'));
   }
+  
 
 }
