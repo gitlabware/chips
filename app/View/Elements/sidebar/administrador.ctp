@@ -77,8 +77,7 @@
                             <span>Tiendas</span>
                             <ul class="big-menu">
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Sucursals', 'action' => 'index')); ?>">Listado de tiendas</a></li>
-                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Sucursals', 'action' => 'insertar')); ?>">Nueva tienda</a></li>
-                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Sucursals', 'action' => 'addrecargacabina')); ?>">Nuevo Producto Cabina</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Sucursals', 'action' => 'insertar')); ?>">Nueva tienda</a></li>                                
                             </ul>
                         </li> 
 
