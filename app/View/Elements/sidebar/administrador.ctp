@@ -68,7 +68,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Productos', 'action' => 'insertar')); ?>">Nuevo Producto</a></li>
                                 <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'index'));             ?>">Listado de Precio</a></li>-->
                                 <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'nuevoprecio'));             ?>">Nuevos Precios</a></li>-->
-                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiposproductos', 'action' => 'index')); ?>"></a>Listado de Categorias</li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiposproductos', 'action' => 'index')); ?>">Listado de Categorias</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiposproductos', 'action' => 'add')); ?>">Nueva Categoria</a></li>
                             </ul>
                         </li> 
