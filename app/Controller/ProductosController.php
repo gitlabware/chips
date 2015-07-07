@@ -310,8 +310,8 @@ class ProductosController extends AppController {
   }
 
   public function registra_excel_pro() {
-    /*debug($this->request->data);
-    die;*/
+    /* debug($this->request->data);
+      die; */
     $archivoExcel = $this->request->data['Excel']['excel'];
     $nombreOriginal = $this->request->data['Excel']['excel']['name'];
 
@@ -376,35 +376,90 @@ class ProductosController extends AppController {
         }
       }
       $i = 0;
+      debug($array_data);
+      exit;
       $this->request->data = "";
-      debug($array_data);exit;
       foreach ($array_data as $d) {
-        $this->request->data[$i]['Producto']['cantidad'] = $d['B'];
-        $this->request->data[$i]['Producto']['cantidad'] = $d['C'];
-        $i++;
-      }
-      if (!empty($this->request->data[0]['Chip']['telefono'])) {
-        $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $this->request->data[0]['Chip']['telefono'])));
-        if (!empty($verifica_tel)) {
-          $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
-          $this->redirect(array('action' => 'subirexcel'));
+        // ------ tipos producto -------
+        $tipo_prod = $this->Tiposproducto->find('first', array(
+          'conditions' => array('Tiposproducto.nombre LIKE' => $d['B'])
+        ));
+        if (!empty($tipo_prod)) {
+          $idTip_prod = $tipo_prod['Tiposproducto']['id'];
+          $nombre_tip_prod = $tipo_prod['Tiposproducto']['nombre'];
+        } else {
+          $this->Tiposproducto->create();
+          $dtip_p['nombre'] = $d['B'];
+          $this->Tiposproducto->save($dtip_p);
+          $idTip_prod = $this->Tiposproducto->getLastInsertID();
+          $nombre_tip_prod = $d['B'];
+        }
+        //------- termina tipos producto -----
+        // ------ Marca -------
+        $marca = $this->Marca->find('first', array(
+          'recursive' => -1,
+          'conditions' => array('Marca.nombre LIKE' => $d['C'])
+        ));
+        if (!empty($marca)) {
+          $idMarca = $marca['Marca']['id'];
+        } else {
+          $this->Marca->create();
+          $dmarca['nombre'] = $d['C'];
+          $this->Marca->save($dmarca);
+          $idMarca = $this->Marca->getLastInsertID();
+        }
+        //------- termina Marca -----
+
+
+        $this->request->data['Producto']['tiposproducto_id'] = $idTip_prod;
+        $this->request->data['Producto']['tipo_producto'] = $nombre_tip_prod;
+        $this->request->data['Producto']['marca_id'] = $idMarca;
+        $this->request->data['Producto']['nombre'] = $d['D'];
+        $this->request->data['Producto']['observaciones'] = $d['E'];
+        $this->request->data['Producto']['proveedor'] = 'VIVA';
+        $this->request->data['Producto']['precio_compra'] = 0.00;
+        $this->request->data['Producto']['fecha_ingreso'] = date("Y-m-d");
+        $this->Producto->create();
+        $this->Producto->save($this->request->data['Producto']);
+        $idProducto = $this->Producto->getLastInsertID();
+
+        $this->request->data['Productosprecio']['producto_id'] = $idProducto;
+        $this->request->data['Productosprecio']['fecha'] = date('Y-m-d');
+        if (!empty($d['F'])) {
+          $this->request->data['Productosprecio']['precio'] = $d['F'];
+          $this->request->data['Productosprecio']['tipousuario_id'] = 3;
+          $this->request->data['Productosprecio']['escala_id'] = 1;
+          $this->request->data['Productosprecio']['escala'] = 'MAYOR';
+          $this->Productosprecio->create();
+          $this->Productosprecio->save($this->request->data['Productosprecio']);
+        }
+        if (!empty($d['G'])) {
+          $this->request->data['Productosprecio']['precio'] = $d['G'];
+          $this->request->data['Productosprecio']['tipousuario_id'] = 2;
+          $this->request->data['Productosprecio']['escala_id'] = 3;
+          $this->request->data['Productosprecio']['escala'] = 'TIENDA';
+          $this->Productosprecio->create();
+          $this->Productosprecio->save($this->request->data['Productosprecio']);
+        }
+        if (!empty($d['H'])) {
+          $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
+          $this->set_total($idProducto, 1, $almacen['Almacene']['id'], $d['H']);
+          $this->request->data['Movimiento']['user_id'] = $this->Session->read('Auth.User.id');
+          $this->request->data['Movimiento']['producto_id'] = $idProducto;
+          $this->request->data['Movimiento']['ingreso'] = $d['H'];
+          $this->request->data['Movimiento']['almacene_id'] = $almacen['Almacene']['id'];
+          $this->request->data['Movimiento']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+          $this->request->data['Movimiento']['transaccion'] = $this->get_num_trans();
+          $this->Movimiento->create();
+          $this->Movimiento->save($this->request->data['Movimiento']);
         }
       }
+      $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
+      $this->redirect($this->referer());
 
-      //debug($this->data);
-      //exit;
-      /*
-      if ($this->Chip->saveMany($this->data)) {
-        //echo 'registro corectamente';
-        //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
-        $this->Session->setFlash('se Guardo correctamente el EXCEL', 'msgbueno');
-        $this->redirect(array('action' => 'subirexcel'));
-      } else {
-        echo 'no se pudo guardar';
-      }*/
       //fin funciones del excel
     } else {
-
+      $this->redirect($this->referer());
       //echo 'no';
     }
   }
