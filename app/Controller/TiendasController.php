@@ -65,27 +65,28 @@ class TiendasController extends AppController {
   }
 
   public function registra_venta_t() {
+    $idAlmacen = $this->get_id_almacen();
     foreach ($this->request->data['productos'] as $key => $ped) {
-      $total = $this->get_total_almacen($key);
+      $total = $this->get_total($key, 1, $idAlmacen);
       if ($ped['cantidad'] > $total) {
         $this->Session->setFlash('No se pudo registrar verifique las cantidades antes!!!', 'msgerror');
         $this->redirect(array('action' => 'index'));
       }
     }
     foreach ($this->request->data['productos'] as $key => $ped) {
-      $total = $this->get_total_almacen($key);
+      $total = $this->get_total($key, 1, $idAlmacen);
       $this->Movimiento->create();
       $this->request->data['Movimiento']['producto_id'] = $key;
       $this->request->data['Movimiento']['user_id'] = $this->Session->read('Auth.User.id');
       $this->request->data['Movimiento']['sucursal_id'] = $this->Session->read('Auth.User.sucursal_id');
-      $this->request->data['Movimiento']['almacene_id'] = $this->get_id_almacen();
+      $this->request->data['Movimiento']['almacene_id'] = $idAlmacen;
       $this->request->data['Movimiento']['escala'] = 'TIENDA';
       $this->request->data['Movimiento']['salida'] = $ped['cantidad'];
       $this->request->data['Movimiento']['precio_uni'] = $ped['precio'];
       $this->request->data['Movimiento']['ingreso'] = 0;
-      $this->request->data['Movimiento']['total'] = $total - $ped['cantidad'];
       $this->request->data['Movimiento']['transaccion'] = $this->get_num_trans();
       $this->Movimiento->save($this->request->data['Movimiento']);
+      $this->set_total($key, 1, $idAlmacen, ($total - $ped['cantidad']));
     }
     $this->Session->setFlash('Venta registrada', 'msgbueno');
     $this->redirect(array('action' => 'index'));
