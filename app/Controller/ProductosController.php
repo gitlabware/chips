@@ -323,7 +323,7 @@ class ProductosController extends AppController {
         $this->request->data['Excelg']['nombre'] = $nombreExcel;
         $this->request->data['Excelg']['nombre_original'] = $nombreOriginal;
         $this->request->data['Excelg']['direccion'] = "";
-        $this->request->data['Excelg']['tipo'] = "asignacion";
+        $this->request->data['Excelg']['tipo'] = "PRODUCTO";
       }
     }
 
@@ -376,8 +376,8 @@ class ProductosController extends AppController {
         }
       }
       $i = 0;
-      debug($array_data);
-      exit;
+      /* debug($array_data);
+        exit; */
       $this->request->data = "";
       foreach ($array_data as $d) {
         // ------ tipos producto -------
@@ -452,6 +452,148 @@ class ProductosController extends AppController {
           $this->request->data['Movimiento']['transaccion'] = $this->get_num_trans();
           $this->Movimiento->create();
           $this->Movimiento->save($this->request->data['Movimiento']);
+        }
+      }
+      $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
+      $this->redirect($this->referer());
+
+      //fin funciones del excel
+    } else {
+      $this->redirect($this->referer());
+      //echo 'no';
+    }
+  }
+
+  public function registra_excel_cel() {
+    /* debug($this->request->data);
+      die; */
+    $archivoExcel = $this->request->data['Excel']['excel'];
+    $nombreOriginal = $this->request->data['Excel']['excel']['name'];
+
+    if ($archivoExcel['error'] === UPLOAD_ERR_OK) {
+      $nombre = string::uuid();
+      if (move_uploaded_file($archivoExcel['tmp_name'], WWW_ROOT . 'files' . DS . $nombre . '.xlsx')) {
+        $nombreExcel = $nombre . '.xlsx';
+        $direccionExcel = WWW_ROOT . 'files';
+        $this->request->data['Excelg']['nombre'] = $nombreExcel;
+        $this->request->data['Excelg']['nombre_original'] = $nombreOriginal;
+        $this->request->data['Excelg']['direccion'] = "";
+        $this->request->data['Excelg']['tipo'] = "CELULAR";
+      }
+    }
+
+    if ($this->Excel->save($this->data['Excelg'])) {
+      $ultimoExcel = $this->Excel->getLastInsertID();
+      //debug($ultimoExcel);die;
+      $excelSubido = $nombreExcel;
+      $objLector = new PHPExcel_Reader_Excel2007();
+      //debug($objLector);die;
+      $objPHPExcel = $objLector->load("../webroot/files/$excelSubido");
+      //debug($objPHPExcel);die;
+
+      $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
+
+      $array_data = array();
+
+      foreach ($rowIterator as $row) {
+        $cellIterator = $row->getCellIterator();
+        $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
+        if ($row->getRowIndex() >= 2) { //a partir de la 1
+          $rowIndex = $row->getRowIndex();
+          $array_data[$rowIndex] = array(
+            'A' => '',
+            'B' => '',
+            'C' => '',
+            'D' => '',
+            'E' => '',
+            'F' => '');
+          foreach ($cellIterator as $cell) {
+            if ('A' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('B' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('C' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('D' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('E' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('F' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            }
+          }
+        }
+      }
+      $i = 0;
+      /* debug($array_data);
+        exit; */
+      $this->request->data = "";
+      foreach ($array_data as $d) {
+
+        // ------ Marca -------
+        $marca = $this->Marca->find('first', array(
+          'recursive' => -1,
+          'conditions' => array('Marca.nombre LIKE' => $d['C'])
+        ));
+        if (!empty($marca)) {
+          $idMarca = $marca['Marca']['id'];
+        } else {
+          $this->Marca->create();
+          $dmarca['nombre'] = $d['C'];
+          $this->Marca->save($dmarca);
+          $idMarca = $this->Marca->getLastInsertID();
+        }
+        //------- termina Marca -----
+        // ------ Color -------
+        $color = $this->Colore->find('first', array(
+          'recursive' => -1,
+          'conditions' => array('Colore.nombre LIKE' => $d['D'])
+        ));
+        if (!empty($color)) {
+          $idColor = $color['Colore']['id'];
+        } else {
+          $this->Colore->create();
+          $dcolor['nombre'] = $d['D'];
+          $this->Colore->save($dcolor);
+          $idColor = $this->Colore->getLastInsertID();
+        }
+        //------- termina Color -----
+
+
+        $this->request->data['Producto']['tiposproducto_id'] = 5;
+        $this->request->data['Producto']['tipo_producto'] = 'CELULARES';
+        $this->request->data['Producto']['marca_id'] = $idMarca;
+        $this->request->data['Producto']['colore_id'] = $idColor;
+        $this->request->data['Producto']['nombre'] = $d['A'];
+        $this->request->data['Producto']['proveedor'] = 'VIVA';
+        $this->request->data['Producto']['precio_compra'] = $d['B'];
+        $this->request->data['Producto']['fecha_ingreso'] = date("Y-m-d");
+        $this->Producto->create();
+        $this->Producto->save($this->request->data['Producto']);
+        $idProducto = $this->Producto->getLastInsertID();
+
+        if (!empty($d['E'])) {
+          $this->request->data['Productosprecio']['producto_id'] = $idProducto;
+          $this->request->data['Productosprecio']['escala_id'] = 3;
+          $this->request->data['Productosprecio']['escala'] = 'TIENDA';
+          $this->request->data['Productosprecio']['tipousuario_id'] = 2;
+          $this->request->data['Productosprecio']['precio'] = $d['E'];
+          $this->request->data['Productosprecio']['fecha'] = date('Y-m-d');
+          $this->Productosprecio->create();
+          $this->Productosprecio->save($this->request->data['Productosprecio']);
+        }
+        if (!empty($d['F'])) {
+          $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
+          $this->set_total($idProducto, 1, $almacen['Almacene']['id'], $d['F']);
+          $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
+          $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
+          $this->request->data['Ventascelulare']['entrada'] = $d['F'];
+          //$this->request->data['Ventascelulare']['total'] = $total;
+          $this->request->data['Ventascelulare']['almacene_id'] = $almacen['Almacene']['id'];
+          $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+          $this->request->data['Ventascelulare']['transaccion'] = $this->get_num_trans_cel();
+          $this->Ventascelulare->create();
+          $this->Ventascelulare->save($this->request->data['Ventascelulare']);
         }
       }
       $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');

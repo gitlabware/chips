@@ -33,7 +33,7 @@
             <div class="twelve-columns">
                 <?php echo $this->Form->create('Producto', array('action' => 'registra_excel_pro', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
                 <div class="field-block button-height">							
-                    <label for="login" class="label"><b>Seleccionar Excel :</b></label>
+                    <label for="login" class="label"><b>Seleccionar Excel:</b></label>
                     <span class="input file">
                         <span class="file-text"></span>
                         <span class="button compact green-gradient">Seleccione</span>
@@ -42,7 +42,24 @@
                     <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
                     <button type="button" class="button glossy mid-margin-right" onclick="openModal2();">
                         <span class="button-icon"><span class="icon-search"></span></span>
-                        Ver Formato
+                        Ver Formato Productos
+                    </button>
+                </div> 
+                <?php echo $this->Form->end(); ?>
+            </div>
+            <div class="new-row twelve-columns">
+                <?php echo $this->Form->create('Producto', array('action' => 'registra_excel_cel', 'id' => 'formActicel', 'enctype' => 'multipart/form-data')); ?>
+                <div class="field-block button-height">							
+                    <label for="login" class="label"><b>Seleccionar Excel:</b></label>
+                    <span class="input file">
+                        <span class="file-text"></span>
+                        <span class="button compact green-gradient">Seleccione</span>
+                        <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
+                    </span>
+                    <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
+                    <button type="button" class="button glossy mid-margin-right" onclick="openModal3();">
+                        <span class="button-icon"><span class="icon-search"></span></span>
+                        Ver Formato Celulares
                     </button>
                 </div> 
                 <?php echo $this->Form->end(); ?>
@@ -119,6 +136,17 @@
           center: true,
           width: 1000,
           height: 450,
+      });
+  }
+  function openModal3()
+  {
+      //console.log('hizo click');
+      $.modal({
+          title: 'Formato del Archivo',
+          content: '<?php echo $this->Html->image('iconos/excelCelulares.png'); ?>',
+          center: true,
+          width: 570,
+          height: 160,
       });
   }
 </script>
