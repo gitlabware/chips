@@ -51,7 +51,7 @@
   datos_tabla2 = {};
   datos_tabla2 = {
       "oLanguage": {
-          "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+          "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
       },
       'sPaginationType': 'full_numbers',
       'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
