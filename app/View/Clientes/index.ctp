@@ -10,7 +10,6 @@
 
             <thead>
                 <tr>                      
-
                     <th style="width: 10%;">numero de registro</th>
                     <th >nombre</th>
                     <th style="width: 30%;" class="hide-on-mobile">direccion</th>  
@@ -23,7 +22,27 @@
             <tbody>
 
             </tbody>
-        </table>  
+        </table>  <br>
+        
+        <div class="columns">
+            <div class="twelve-columns">
+                <?php echo $this->Form->create('Cliente', array('action' => 'guardaexcel', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
+                <div class="field-block button-height">							
+                    <label for="login" class="label"><b>Seleccionar Excel:</b></label>
+                    <span class="input file">
+                        <span class="file-text"></span>
+                        <span class="button compact green-gradient">Seleccione</span>
+                        <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
+                    </span>
+                    <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
+                    <button type="button" class="button glossy mid-margin-right" onclick="openModal2();">
+                        <span class="button-icon"><span class="icon-search"></span></span>
+                        Ver Formato Clientes
+                    </button>
+                </div> 
+                <?php echo $this->Form->end(); ?>
+            </div>
+        </div>
     </div>
 </section>	
 
@@ -58,6 +77,17 @@
       if (confirm("Esta seguro de eliminar al cliente??")) {
           location = '<?php echo $this->Html->url(array('action' => 'delete')); ?>/' + idcliente;
       }
+  }
+  function openModal2()
+  {
+      //console.log('hizo click');
+      $.modal({
+          title: 'Formato del Archivo',
+          content: '<?php echo $this->Html->image('iconos/clientes.png'); ?>',
+          center: true,
+          width: 1250,
+          height: 450,
+      });
   }
 </script>
 <?php if ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
