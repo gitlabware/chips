@@ -99,7 +99,7 @@
 
         <!-- Main content -->
 
-        <?php echo $this->Session->flash(); ?>
+        
         <?php echo $this->fetch('content'); ?>
 
         <!-- End main content -->       
@@ -196,6 +196,7 @@
               $('#idmodal').load(url);
           }
         </script>
+        <?php echo $this->Session->flash(); ?>
 
         <div style="text-align: center; color:gray;">
             <p class="f-left">&copy; 2015 <strong class="green">SEJAS SRL.</strong>, Todos Los Derechos Reservados &reg;</p>
