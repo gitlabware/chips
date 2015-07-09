@@ -765,12 +765,12 @@ class ChipsController extends AppController {
   public function verexcel($idExcel = null) {
     if ($this->RequestHandler->responseType() == 'json') {
       $this->paginate = array(
-        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.tipo_sim', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.caja'),
+        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.tipo_sim', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.factura', 'Chip.fecha', 'Chip.caja'),
         'recursive' => 0,
         //'order' => 'Chip.created',
         'conditions' => array('Chip.excel_id' => $idExcel)
       );
-      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.tipo_sim', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.caja');
+      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.tipo_sim', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.factura', 'Chip.fecha', 'Chip.caja');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('chips', $this->DataTable->getResponse('Chips', 'Chip'));
       $this->set('_serialize', 'chips');
@@ -786,6 +786,7 @@ class ChipsController extends AppController {
     $tel_ini = $this->request->data['Dato']['tel_ini'];
     $tel_fin = $this->request->data['Dato']['tel_fin'];
     $caja = $this->request->data['Dato']['caja'];
+    $factura_ini = $this->request->data['Dato']['ini_factura'];
     $condiciones = array();
     if (!empty($tel_fin)) {
       $idtel_ini = $this->get_id_tel($tel_ini);
@@ -815,10 +816,15 @@ class ChipsController extends AppController {
     ));
     $datoc['caja'] = $caja;
     foreach ($chips as $ch) {
+      if (!empty($factura_ini)) {
+        $datoc['factura'] = $factura_ini;
+        $factura_ini++;
+      }
       $this->Chip->id = $ch['Chip']['id'];
       $this->Chip->save($datoc);
     }
     $numero_c = count($chips);
+
     $this->Session->setFlash("Se asigno correctamente $numero_c chips", 'msgbueno');
     $this->redirect($this->referer());
   }
@@ -848,7 +854,7 @@ class ChipsController extends AppController {
       'recursive' => 0,
       'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega),
       'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id'
-        , 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre','Cliente.cod_mercado')
+        , 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado')
     ));
     $this->set(compact('chips', 'fecha_entrega', 'idDistribuidor'));
   }
@@ -1090,5 +1096,5 @@ class ChipsController extends AppController {
     debug('termino!!');
     exit;
   }
-  
+
 }

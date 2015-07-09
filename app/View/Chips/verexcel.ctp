@@ -6,25 +6,31 @@
     <div class="with-padding">       
         <?php echo $this->Form->create('Chip', array('action' => 'registra_caja')); ?>
         <div class="columns">
-            <div class="new-row four-columns">
+            <div class="new-row three-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Caja</label>
                     <?php echo $this->Form->select('Dato.caja', $cajas, array('class' => 'full-width select')); ?>
                 </p>
             </div>
-            <div class="three-columns">
+            <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Telefono Inicial</label>
                     <?php echo $this->Form->text('Dato.tel_ini', array('class' => 'full-width input', 'required')); ?>
                 </p>
             </div>
-            <div class="three-columns">
+            <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Telefono Final</label>
                     <?php echo $this->Form->text('Dato.tel_fin', array('class' => 'full-width input')); ?>
                 </p>
             </div>
-            <div class="two-columns-columns">
+            <div class="two-columns">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Inicio Factura</label>
+                    <?php echo $this->Form->text('Dato.ini_factura', array('class' => 'full-width input')); ?>
+                </p>
+            </div>
+            <div class="three-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <button class="button green-gradient full-width" type="submit">REGISTRAR</button>
@@ -42,6 +48,7 @@
                     <th>SIM</th>
                     <th>IMSI</th>
                     <th>Num Telefono</th>
+                    <th>N.Factura</th>
                     <th>Fecha</th>
                     <th>Caja</th>
                 </tr>
