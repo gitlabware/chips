@@ -294,4 +294,18 @@ class RecargadosController extends AppController {
     $this->redirect($this->referer());
   }
 
+  public function reporte() {
+
+    if (!empty($this->request->data)) {
+      
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $recargas = $this->Recargado->find('all',array(
+        'recursive' => 0,
+        'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini,'DATE(Recargado.created) <=' => $fecha_fin)
+      ));
+      $this->set(compact('recargas'));
+    }
+  }
+
 }

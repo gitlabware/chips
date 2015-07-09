@@ -6,7 +6,6 @@
     <hgroup id="main-title" class="thin">
         <h1>Nuevo Cliente</h1>
     </hgroup>
-
     <div class="with-padding"> 
         <?php echo $this->Form->create('Cliente', array('id' => 'formID')) ?>
         <div class="columns">

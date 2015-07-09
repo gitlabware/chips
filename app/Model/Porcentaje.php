@@ -17,19 +17,6 @@ class Porcentaje extends AppModel {
  * @var array
  */
 	public $hasMany = array(
-		'Recargado' => array(
-			'className' => 'Recargado',
-			'foreignKey' => 'porcentaje_id',
-			'dependent' => false,
-			'conditions' => '',
-			'fields' => '',
-			'order' => '',
-			'limit' => '',
-			'offset' => '',
-			'exclusive' => '',
-			'finderQuery' => '',
-			'counterQuery' => ''
-		),
 		'Recarga' => array(
 			'className' => 'Recarga',
 			'foreignKey' => 'porcentaje_id',

@@ -7,7 +7,6 @@ App::uses('AppModel', 'Model');
  * @property Deposito $Deposito
  * @property Detalle $Detalle
  * @property Movimiento $Movimiento
- * @property Recargado $Recargado
  * @property Recarga $Recarga
  * @property User $User
  * @property Ventascelulare $Ventascelulare
@@ -67,19 +66,6 @@ class Persona extends AppModel {
 		),
 		'Movimiento' => array(
 			'className' => 'Movimiento',
-			'foreignKey' => 'persona_id',
-			'dependent' => false,
-			'conditions' => '',
-			'fields' => '',
-			'order' => '',
-			'limit' => '',
-			'offset' => '',
-			'exclusive' => '',
-			'finderQuery' => '',
-			'counterQuery' => ''
-		),
-		'Recargado' => array(
-			'className' => 'Recargado',
 			'foreignKey' => 'persona_id',
 			'dependent' => false,
 			'conditions' => '',

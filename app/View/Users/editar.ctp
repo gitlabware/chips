@@ -40,7 +40,7 @@
             <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Ext.C.I.</label>
-                    <?php echo $this->Form->select('Persona.ext_ci',$lugares_list, array('class' => 'select full-width')); ?>
+                    <?php echo $this->Form->select('Persona.ext_ci', $lugares_list, array('class' => 'select full-width')); ?>
                 </p>
             </div>
             <div class="four-columns">
@@ -56,7 +56,6 @@
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Telefono <small>(requerido)</small></label>
                     <?php echo $this->Form->text('Persona.telefono', array('class' => 'input full-width')) ?>
-
                 </p>
             </div>
 
@@ -94,12 +93,14 @@
                     <?php echo $this->Form->password('User.password2', array('class' => 'input full-width', 'placeholder' => 'Si desea cambiarlo')) ?>
                 </p>
             </div>
-            <div class="two-columns">
-                <p class="block-label button-height">
-                    <label for="validation-select" class="label">Tipo <small>(requerido)</small></label>
-                    <?php echo $this->Form->select("User.group_id", $groups, array('class' => 'select validate[required]', 'id' => 'validation-select1')) ?>
-                </p>  
-            </div>
+            <?php if ($this->Session->read('Auth.User.group_id') == 1): ?>
+              <div class="two-columns">
+                  <p class="block-label button-height">
+                      <label for="validation-select" class="label">Tipo <small>(requerido)</small></label>
+                      <?php echo $this->Form->select("User.group_id", $groups, array('class' => 'select validate[required]', 'id' => 'validation-select1')) ?>
+                  </p>  
+              </div>
+            <?php endif; ?>
             <div class="two-columns">
                 <p class="block-label button-height" id="mostrartienda" style="display: none">
                     <label for="validation-select" class="label"><b>Tienda de trabajo:</b></label>
@@ -116,20 +117,21 @@
                     <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select', 'value' => $idPersona['User']['ruta_id'])); ?>
                 </p>
             </div>
-            <div class="three-columns">
-                <p class="block-label button-height">
-                    <label for="validation-select" class="label"><b>Estado:</b></label>
-                   <?php echo $this->Form->select('User.estado', array('Activo' => 'Activo','Baja' => 'Baja'), array('class' => 'select full-width')); ?>
-                </p>
-            </div>
+            <?php if ($this->Session->read('Auth.User.group_id') == 1): ?>
+              <div class="three-columns">
+                  <p class="block-label button-height">
+                      <label for="validation-select" class="label"><b>Estado:</b></label>
+                      <?php echo $this->Form->select('User.estado', array('Activo' => 'Activo', 'Baja' => 'Baja'), array('class' => 'select full-width')); ?>
+                  </p>
+              </div>
+            <?php endif; ?>
             <div class="new-row six-columns">
-
                 <button type="submit" class="button glossy mid-margin-right" onClick="javascript:verificar()">
                     <span class="button-icon"><span class="icon-tick"></span></span>
                     Modificar Usuario
                 </button>              
 
-                <a href="<?php echo $this->Html->url(['action'=>'index']); ?>" class="button glossy">
+                <a href="<?php echo $this->Html->url(['action' => 'index']); ?>" class="button glossy">
                     <span class="button-icon red-gradient"><span class="icon-cross-round"></span></span>
                     Listado Usuarios
                 </a>
@@ -140,7 +142,12 @@
 </section>
 
 <!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/administrador'); ?>
+<?php if ($this->Session->read('Auth.User.group_id') == 1): ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
+<?php elseif ($this->Session->read('Auth.User.group_id') == 4): ?>
+  <?php echo $this->element('sidebar/recargas'); ?>
+<?php endif; ?>
+
 <!-- End sidebar/drop-down menu --> 
 <script>
   $(document).ready(function () {
