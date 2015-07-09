@@ -1,3 +1,4 @@
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
 <section role="main" id="main">
 
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
@@ -83,6 +84,12 @@
                     </select>
                 </p>
             </div>
+            
+            <div class="three-columns new-row-mobile twelve-columns">
+                <?php echo $this->Form->text('lat', ['id' => 'frmlat']); ?>
+                                <?php echo $this->Form->text('lng', ['id' => 'frmlng']); ?>
+                <div id="mapa" style="width: 100%; height: 400px;"></div>
+            </div>
 
             <div class="six-columns new-row-mobile twelve-columns">
 
@@ -106,6 +113,41 @@
     $(document).ready(function () {
         $("#formID").validationEngine();
     });
+</script>
+<script type="text/javascript">
+  var map;
+
+  function initialize() {
+      var mapOptions = {
+          zoom: 14,
+          center: new google.maps.LatLng(-16.49, -68.12),
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      map = new google.maps.Map(document.getElementById('mapa'), mapOptions);
+
+      var pos = new google.maps.LatLng(-16.49, -68.12);
+
+      var marker = new google.maps.Marker({
+          position: pos,
+          map: map,
+          title: "Arrastrar para mover",
+          animation: google.maps.Animation.BOUNCE,
+          draggable: true
+      });
+
+      function funcionArrastra() {
+          var lat = marker.getPosition().lat();
+          var lng = marker.getPosition().lng();
+          //console.log(lat + '-' + lng);
+          $('#frmlat').val(lat);
+          $('#frmlng').val(lng);
+      }
+
+      google.maps.event.addListener(marker, 'drag', funcionArrastra);
+      marker.setIcon('https://dl.dropboxusercontent.com/u/20056281/Iconos/male-2.png');
+  }
+  google.maps.event.addDomListener(window, 'load', initialize);
+
 </script>
 <?php if ($this->Session->read('Auth.User.Group.name') == 'Distribuidores'): ?>
     <!-- Sidebar/drop-down menu -->
