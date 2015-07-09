@@ -5,7 +5,7 @@
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
 
     <hgroup id="main-title" class="thin">
-        <h1>MOVIMIENTOS RECARGAS</h1>
+        <h1>MOVIMIENTOS RECARGAS <span style="font-size: 19px;color: #01ab01;">TOTAL: <?php echo $this->requestAction(array('action' => 'get_total'));?></span></h1>
     </hgroup>
 
     <div class="with-padding">        
@@ -18,7 +18,7 @@
                 ?>
                 <?php echo $this->Form->hidden('Recargado.user_id', array('value' => $this->Session->read('Auth.User.id'))); ?>
 
-                <h3 class="thin underline">Recargas</h3>
+                <h3 class="thin underline">Recargas </h3>
                 <p class="button-height">
                     <input type="checkbox" name="data[Recargado][tipo]" id="switch-custom-3" class="switch wider green-active mid-margin-right" value="1" checked data-text-on="RECARGA" data-text-off="CARGA">                    
                 </p>                
@@ -65,40 +65,33 @@
                             <th scope="col" width="12%" class="align-center hide-on-mobile">Monto</th>
                             <th scope="col" width="8%" class="align-center hide-on-mobile">%</th>
                             <th scope="col" width="10" class="align-center hide-on-mobile">Rec</th>
-                            <th scope="col" width="10" class="align-center hide-on-mobile">Total</th>
+                            <!--<th scope="col" width="10" class="align-center hide-on-mobile">Total</th>-->
                             <th scope="col" width="8%" class="align-center">Eliminar</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($movimientosHoy as $rec): ?>
-                            <?php
-                            $salida = $rec['Recarga']['salida'];
-                            if ($salida != 0) {
-                                $color = '#f00';
-                            } else {
-                                $color = '#000';
-                            }
-                            ?>
-                            <tr>
-                                <td><?php echo $rec['Recargado']['id']; ?></td>
-                                <td><?php echo $rec['Persona']['nombre']; ?></td>
-                                <td><?php echo $rec['Recargado']['num_celular']; ?></td>                                
-                                <td><?php echo $this->Number->currency($rec['Recargado']['entrada'], ''); ?></td>
-                                <td><?php echo $this->Number->currency($rec['Recargado']['salida'], ''); ?></td>
-                                <td><?php echo $rec['Porcentaje']['nombre']; ?></td>
-                                <td><?php echo $this->Number->currency($rec['Recargado']['monto'], ''); ?> </td>
-                                <td><?php echo $this->Number->currency($rec['Recargado']['total'], ''); ?></td>
-                                <td scope="col" width="8%" class="align-center">
-                                    <?php if ($ultimo['Recargado']['id'] == $rec['Recargado']['id']): ?>
-
-                                        <a href="<?php echo $this->Html->url(array('action' => 'delete', $rec['Recargado']['id'])); ?>" onclick="if (confirm( & quot; Desea eliminar realmente?? & quot; )) {
-                                                    return true;
-                                                }
-                                                return false;" class="button red-gradient compact icon-cross-round"></a>
-
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
+                          <?php
+                          $salida = $rec['Recarga']['salida'];
+                          if ($salida != 0) {
+                            $color = '#f00';
+                          } else {
+                            $color = '#000';
+                          }
+                          ?>
+                          <tr>
+                              <td><?php echo $rec['Recargado']['id']; ?></td>
+                              <td><?php echo $rec['Persona']['nombre']; ?></td>
+                              <td><?php echo $rec['Recargado']['num_celular']; ?></td>                                
+                              <td><?php echo $this->Number->currency($rec['Recargado']['entrada'], ''); ?></td>
+                              <td><?php echo $this->Number->currency($rec['Recargado']['salida'], ''); ?></td>
+                              <td><?php echo $rec['Porcentaje']['nombre']; ?></td>
+                              <td><?php echo $this->Number->currency($rec['Recargado']['monto'], ''); ?> </td>
+                              <!--<td><?php //echo $this->Number->currency($rec['Recargado']['total'], ''); ?></td>-->
+                              <td scope="col" width="8%" class="align-center">
+                                  <?php echo $this->Html->link("", array('action' => 'elimina', $rec['Recargado']['id']), array('class' => 'button red-gradient compact icon-cross-round','confirm' => 'Esta seguro de eliminar el registro de recarga??')) ?>
+                              </td>
+                          </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -116,32 +109,32 @@
                     </thead>          
 
                     <tbody>
-                        <?php 
-                          $sumEfectivo = 0; 
-                          $sumRecargado = 0;
+                        <?php
+                        $sumEfectivo = 0;
+                        $sumRecargado = 0;
                         ?>
                         <?php foreach ($movimientosHoy2 as $rec): ?>
-                            <tr>
-                                <td>Al <b><?php echo $rec['Porcentaje']['nombre'] ?></b> %</td>
-                                <td><?php echo $rec[0]['recargados'] ?></td>
-                                <td><?php echo $rec[0]['rec_porcentaje'] ?></td>
-                                <?php 
-                                  $sumEfectivo += $rec[0]['recargados']; 
-                                  $sumRecargado += $rec[0]['rec_porcentaje']; 
-                                ?>
-                            </tr>
+                          <tr>
+                              <td>Al <b><?php echo $rec['Porcentaje']['nombre'] ?></b> %</td>
+                              <td><?php echo $rec[0]['recargados'] ?></td>
+                              <td><?php echo $rec[0]['rec_porcentaje'] ?></td>
+                              <?php
+                              $sumEfectivo += $rec[0]['recargados'];
+                              $sumRecargado += $rec[0]['rec_porcentaje'];
+                              ?>
+                          </tr>
                         <?php endforeach; ?>
-                            <tr>
-                                <td>SALDO TOTAL</td>
-                                <td>
-                                  <?php echo $sumEfectivo; ?>
-                                </td>
-                                <td><?php echo $sumRecargado; ?></td>
-                            </tr>
+                        <tr>
+                            <td>SALDO TOTAL</td>
+                            <td>
+                                <?php echo $sumEfectivo; ?>
+                            </td>
+                            <td><?php echo $sumRecargado; ?></td>
+                        </tr>
                     </tbody>
                 </table> 
             </div>
-            
+
             <div class="nine-columns twelve-columns-tablet">
                 <table class="table responsive-table">
                     <thead>
@@ -153,28 +146,28 @@
                     </thead>          
 
                     <tbody>
-                        <?php 
-                          $sumEfectivo = 0; 
-                          $sumRecargado = 0;
+                        <?php
+                        $sumEfectivo = 0;
+                        $sumRecargado = 0;
                         ?>
-                        <?php foreach ($movimientosDistribuidor  as $md): ?>
-                            <tr>
-                                <td><b><?php echo $md['Persona']['nombre'] ?></b></td>
-                                <td><?php echo $md[0]['recargados'] ?></td>
-                                <td><?php echo $md[0]['rec_porcentaje'] ?></td>
-                                <?php 
-                                  $sumEfectivo += $md[0]['recargados']; 
-                                  $sumRecargado += $md[0]['rec_porcentaje']; 
-                                ?>
-                            </tr>
+                        <?php foreach ($movimientosDistribuidor as $md): ?>
+                          <tr>
+                              <td><b><?php echo $md['Persona']['nombre'] ?></b></td>
+                              <td><?php echo $md[0]['recargados'] ?></td>
+                              <td><?php echo $md[0]['rec_porcentaje'] ?></td>
+                              <?php
+                              $sumEfectivo += $md[0]['recargados'];
+                              $sumRecargado += $md[0]['rec_porcentaje'];
+                              ?>
+                          </tr>
                         <?php endforeach; ?>
-                            <tr>
-                                <td>SALDO TOTAL</td>
-                                <td>
-                                  <?php echo $sumEfectivo; ?>
-                                </td>
-                                <td><?php echo $sumRecargado; ?></td>
-                            </tr>
+                        <tr>
+                            <td>SALDO TOTAL</td>
+                            <td>
+                                <?php echo $sumEfectivo; ?>
+                            </td>
+                            <td><?php echo $sumRecargado; ?></td>
+                        </tr>
                     </tbody>
                 </table> 
             </div>
@@ -185,40 +178,40 @@
 
 </section>
 <?php if ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
-    <?php echo $this->element('sidebar/administrador'); ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
 <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
-    <?php echo $this->element('sidebar/recargas'); ?>
+  <?php echo $this->element('sidebar/recargas'); ?>
 <?php endif; ?>
 
 
 <script>
-    $(document).ready(function () {
-      
+  $(document).ready(function () {
+
       var tabla = $('#orden1');
-          tabla.dataTable({
-            "order": [[ 0, "desc" ]],
-              "oLanguage": {
-                  "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-              },              
-              'fnInitComplete': function (oSettings)
-              {
-                  // Style length select
-                  tabla.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
-                  tableStyled = true;
-              }
-          });
+      tabla.dataTable({
+          "order": [[0, "desc"]],
+          "oLanguage": {
+              "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+          },
+          'fnInitComplete': function (oSettings)
+          {
+              // Style length select
+              tabla.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+              tableStyled = true;
+          }
+      });
 
-        $("#formID").validationEngine();
+      $("#formID").validationEngine();
 
-        $("#monto").keyup(function () {
-            var porcentaje = $('#porcentaje :selected').text();
-            var numpor = parseFloat(porcentaje);
-            var monto = $('#monto').val();
-            var montonum = parseFloat(monto);
-            var monto_total = montonum + (montonum * (numpor / 100));
-            $('#montoporcentaje').html('<h3>'+monto_total+'</h3>');
-        });
+      $("#monto").keyup(function () {
+          var porcentaje = $('#porcentaje :selected').text();
+          var numpor = parseFloat(porcentaje);
+          var monto = $('#monto').val();
+          var montonum = parseFloat(monto);
+          var monto_total = montonum + (montonum * (numpor / 100));
+          $('#montoporcentaje').html('<h3>' + monto_total + '</h3>');
+      });
 
 
-    });
+  });
 </script>
