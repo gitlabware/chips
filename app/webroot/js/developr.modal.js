@@ -1528,7 +1528,7 @@
 		 * @var boolean
 		 */
 		actions: {
-			'Close' : {
+			'Cerrar' : {
 				color: 'red',
 				click: function(modal) { modal.closeModal(); }
 			}
@@ -1563,7 +1563,7 @@
 		 * @var object
 		 */
 		buttons: {
-			'Close': {
+			'Cerrar': {
 				classes :	'blue-gradient glossy big full-width',
 				click :		function(modal) { modal.closeModal(); }
 			}

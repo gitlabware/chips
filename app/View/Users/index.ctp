@@ -100,7 +100,7 @@
           width: 600,
           height: 400,
           actions: {
-              'Close': {
+              'Cerrar': {
                   color: 'red',
                   click: function (win) {
                       win.closeModal();
