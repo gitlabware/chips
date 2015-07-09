@@ -9,6 +9,7 @@
 /dist
 /tags
 /app/webroot/imagenest/
+/app/webroot/files/
 *.mo
 
 # IDE and editor specific files #
