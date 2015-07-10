@@ -81,7 +81,8 @@
     </head>
 
     <body class="clearfix with-menu with-shortcuts">
-        <script>var urljsontabla = '';var datos_tabla2 = null;</script>
+        <script>var urljsontabla = '';
+          var datos_tabla2 = null;</script>
 
         <!-- Prompt IE 6 users to install Chrome Frame -->
         <!--[if lt IE 7]><p class="message red-gradient simpler">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
@@ -105,7 +106,7 @@
         <!-- End main content -->       
 
         <!-- Side tabs shortcuts -->
-        <?php //echo $this->element('menu/admin'); ?>             
+        <?php //echo $this->element('menu/admin');  ?>             
         <!-- JavaScript at the bottom for fast page loading -->
         <!-- Scripts -->
         <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.8.2.min.js"></script>
@@ -133,6 +134,9 @@
           // Table sort - DataTables
           var table = $('#sorting-advanced');
           table.dataTable({
+              "oLanguage": {
+                  "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+              },
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
               'fnInitComplete': function (oSettings)
@@ -142,11 +146,14 @@
                   tableStyled = true;
               }
           });
-          
+
           var table2 = $('#tabla-json');
           //console.log(datos_tabla2);
           if (datos_tabla2 == null) {
               datos_tabla2 = {
+                  "oLanguage": {
+                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                  },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,

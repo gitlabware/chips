@@ -99,7 +99,7 @@
 
         <!-- Main content -->
 
-        
+
         <?php echo $this->fetch('content'); ?>
 
         <!-- End main content -->       
@@ -141,9 +141,9 @@
           // Table sort - DataTables
           var table = $('#sorting-advanced');
           table.dataTable({
-              /*"oLanguage": {
-               "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-               },*/
+              "oLanguage": {
+                  "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+              },
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
               "order": [],
@@ -158,9 +158,9 @@
           var table2 = $('#tabla-json');
           if (datos_tabla2 == null) {
               datos_tabla2 = {
-                  /*"oLanguage": {
-                   "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-                   },*/
+                  "oLanguage": {
+                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                  },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,

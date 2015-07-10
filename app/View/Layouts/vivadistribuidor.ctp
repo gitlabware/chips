@@ -73,7 +73,7 @@
         <!-- Scripts -->
         <script src="<?php echo $this->webroot; ?>js/libs/jquery-1.10.2.min.js"></script>
 
-        
+
 
         <?php
         echo $this->fetch('css');
@@ -104,7 +104,7 @@
 
         <!-- Main content -->
 
-        
+
         <?php echo $this->fetch('content'); ?>
 
         <!-- End main content -->       
@@ -115,7 +115,7 @@
         <!-- JavaScript at the bottom for fast page loading -->
 
         <!-- Scripts -->
-        
+
         <script src="<?php echo $this->webroot; ?>js/setup.js"></script>
 
         <!-- Template functions -->
@@ -141,6 +141,9 @@
           var table = $('#sorting-advanced');
           if (datos_tabla1 == null) {
               datos_tabla1 = {
+                  "oLanguage": {
+                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                  },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'fnInitComplete': function (oSettings)
@@ -157,9 +160,9 @@
           //console.log(datos_tabla2);
           if (datos_tabla2 == null) {
               datos_tabla2 = {
-                  /*"oLanguage": {
-                      "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-                  },*/
+                  "oLanguage": {
+                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                  },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,
