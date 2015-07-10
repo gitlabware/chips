@@ -20,6 +20,7 @@ class VentasdistribuidorController extends AppController {
     'Ruta',
     'Chip',
     'Pedido',
+    'Lugare',
     'Tiposobservacione',
     'Deposito',
     'Recargado',
@@ -1199,6 +1200,7 @@ class VentasdistribuidorController extends AppController {
     if ($this->RequestHandler->responseType() == 'json') {
       $asignar = '<button class="button blue-gradient compact icon-list" type="button" onclick="asignar(' . "',Cliente.id,'" . ')">Asignar</button>';
       $venta = '<button class="button green-gradient compact icon-list" type="button" onclick="venta(' . "',Cliente.id,'" . ')">Venta</button>';
+      //$clientes = '<button class="button green-gradient compact icon-list" type="button" onclick="venta(' . "',Cliente.id,'" . ')">Venta</button>';
       $acciones = "$asignar $venta";
       $rutas_usuario = $this->Rutasusuario->find('list', array(
         'conditions' => array('Rutasusuario.user_id' => $this->Session->read('Auth.User.id')),
@@ -1537,6 +1539,23 @@ class VentasdistribuidorController extends AppController {
     $this->Pedido->deleteAll(array('Pedido.numero' => $NumPedido));
     $this->Session->setFlash("Se elimino correctamente el pedido!!",'msgbueno');
     $this->redirect($this->referer());
+  }
+  public function cliente($idCliente = null){
+    $this->Cliente->id = $idCliente;
+    $this->request->data = $this->Cliente->read();
+    $lugares = $this->Lugare->find('list',array('fields' => 'nombre'));
+    $this->set(compact('lugares'));
+  }
+
+  public function registra_cliente(){
+    if(!empty($this->request->data['Cliente'])){
+      $this->request->data['Cliente']['estado'] = 1;
+      $this->Cliente->create();
+      $this->Cliente->save($this->request->data['Cliente']);
+      $this->Session->setFlash("Se registro correctamente!!",'msgbueno');
+      
+    }
+    $this->redirect(array('action' => 'clientes'));
   }
 }
 

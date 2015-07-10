@@ -146,6 +146,8 @@
   <?php echo $this->element('sidebar/administrador'); ?>
 <?php elseif ($this->Session->read('Auth.User.group_id') == 4): ?>
   <?php echo $this->element('sidebar/recargas'); ?>
+<?php elseif ($this->Session->read('Auth.User.group_id') == 2): ?>
+  <?php echo $this->element('sidebar/distribuidor'); ?>
 <?php endif; ?>
 
 <!-- End sidebar/drop-down menu --> 

@@ -16,20 +16,12 @@
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
             <li><a href="<?php echo $this->Html->url(array('controller' => 'ventasdistribuidor', 'action' => 'clientes')) ?>" title="INICIO"><span class="icon-gear"></span></span></a></li>
-            <li><a href="<?php echo $this->Html->url(array('controller' => 'users', 'action' => 'salir')) ?>" title="Cerrar Session"><span class="icon-user"></span></a></li>
+            <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'editar', $this->Session->read('Auth.User.id'))) ?>" title="Mis Datos"><span class="icon-user"></span></span></a></li>
+            <li><a href="<?php echo $this->Html->url(array('controller' => 'users', 'action' => 'salir')) ?>" title="Salir"><span class="icon-extract"></span></a></li>     
         </ul>
         <section class="navigable">
             <ul class="big-menu">
                 <?php $id = $this->Session->read("Auth.User.id") ?>
-                <li><a href="<?php echo $this->Html->url(array('controller' => 'ventasdistribuidor', 'action' => 'cambiopass', $id)); ?>">Cambiar Password</a></li>
-                <li><a href="<?php echo $this->Html->url(array('controller' => 'ventasdistribuidor', 'action' => 'registrafecha')); ?>">Registrar por Fecha</a></li>
-                <li class="with-right-arrow">
-                    <span>Depositos</span>
-                    <ul class="big-menu">
-                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'deposito')) ?>">Ingresar Deposito</a></li>
-                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listadepositos')); ?>">Depositos Realizados</a></li>                                                                        
-                    </ul>
-                </li>
                 <li class="with-right-arrow">
                     <span>Reportes</span>
                     <ul class="big-menu">
