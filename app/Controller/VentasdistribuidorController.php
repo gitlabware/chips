@@ -327,7 +327,7 @@ class VentasdistribuidorController extends AppController {
   }
 
   public function registra_venta_mayor() {
-    /*debug($this->request->data);
+    /* debug($this->request->data);
       exit; */
     foreach ($this->request->data['Movimiento'] as $dat) {
       $total = $this->get_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'));
@@ -348,7 +348,7 @@ class VentasdistribuidorController extends AppController {
       $dat['capacitacion'] = $this->request->data['Aux']['capacitacion'];
       $dat['est_punt'] = $this->request->data['Aux']['est_punt'];
       $this->Movimiento->save($dat);
-      if(!empty($dat['id'])){
+      if (!empty($dat['id'])) {
         $total = $total + $dat['salida_ant'];
       }
       $this->set_total($dat['producto_id'], 0, $this->Session->read('Auth.User.persona_id'), ($total - $dat['salida']));
@@ -1200,8 +1200,8 @@ class VentasdistribuidorController extends AppController {
     if ($this->RequestHandler->responseType() == 'json') {
       $asignar = '<button class="button blue-gradient compact icon-list" type="button" onclick="asignar(' . "',Cliente.id,'" . ')">Asignar</button>';
       $venta = '<button class="button green-gradient compact icon-list" type="button" onclick="venta(' . "',Cliente.id,'" . ')">Venta</button>';
-      //$clientes = '<button class="button green-gradient compact icon-list" type="button" onclick="venta(' . "',Cliente.id,'" . ')">Venta</button>';
-      $acciones = "$asignar $venta";
+      $editar = '<button class="button orange-gradient compact icon-list" type="button" onclick="editar(' . "',Cliente.id,'" . ')">Editar</button>';
+      $acciones = "$asignar $venta $editar";
       $rutas_usuario = $this->Rutasusuario->find('list', array(
         'conditions' => array('Rutasusuario.user_id' => $this->Session->read('Auth.User.id')),
         'fields' => array('Rutasusuario.ruta_id')
@@ -1526,37 +1526,42 @@ class VentasdistribuidorController extends AppController {
   public function get_d_edit_v($num_trans = null, $idProducto = null, $precio = null) {
     $movimiento = $this->Movimiento->find('first', array(
       'recursive' => -1,
-      'conditions' => array('Movimiento.transaccion' => $num_trans, 'Movimiento.producto_id' => $idProducto, 'Movimiento.precio_uni' => $precio,'Movimiento.created' => date("Y-m-d")),
-      'fields' => array('Movimiento.id','Movimiento.salida')
+      'conditions' => array('Movimiento.transaccion' => $num_trans, 'Movimiento.producto_id' => $idProducto, 'Movimiento.precio_uni' => $precio, 'Movimiento.created' => date("Y-m-d")),
+      'fields' => array('Movimiento.id', 'Movimiento.salida')
     ));
-    if(!empty($movimiento)){
+    if (!empty($movimiento)) {
       return $movimiento['Movimiento'];
-    }else{
+    } else {
       return NULL;
     }
   }
-  public function eliminar_pedido($NumPedido = null){
+
+  public function eliminar_pedido($NumPedido = null) {
     $this->Pedido->deleteAll(array('Pedido.numero' => $NumPedido));
-    $this->Session->setFlash("Se elimino correctamente el pedido!!",'msgbueno');
+    $this->Session->setFlash("Se elimino correctamente el pedido!!", 'msgbueno');
     $this->redirect($this->referer());
   }
-  public function cliente($idCliente = null){
+
+  public function cliente($idCliente = null) {
     $this->Cliente->id = $idCliente;
     $this->request->data = $this->Cliente->read();
-    $lugares = $this->Lugare->find('list',array('fields' => 'nombre'));
-    $this->set(compact('lugares'));
+    $lugares = $this->Lugare->find('list', array('fields' => 'nombre'));
+    $rutas = $this->Ruta->find('list', array('fields' => 'nombre'));
+    $this->set(compact('lugares', 'rutas'));
   }
 
-  public function registra_cliente(){
-    if(!empty($this->request->data['Cliente'])){
+  public function registra_cliente() {
+    if (!empty($this->request->data['Cliente'])) {
       $this->request->data['Cliente']['estado'] = 1;
       $this->Cliente->create();
       $this->Cliente->save($this->request->data['Cliente']);
-      $this->Session->setFlash("Se registro correctamente!!",'msgbueno');
-      
+      $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
+    } else {
+      $this->Session->setFlash("No se pudo registrar!!", 'msgerror');
     }
     $this->redirect(array('action' => 'clientes'));
   }
+
 }
 
 ?>

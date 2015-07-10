@@ -8,7 +8,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 
 class ClientesController extends AppController {
 
-  public $uses = array('Cliente', 'Recarga', 'Lugare', 'Ruta', 'Rutasusuario','Excel');
+  public $uses = array('Cliente', 'Recarga', 'Lugare', 'Ruta', 'Rutasusuario', 'Excel');
   var $components = array('RequestHandler', 'DataTable');
   public $layout = 'viva';
 
@@ -80,26 +80,18 @@ class ClientesController extends AppController {
     //$this->set(compact('groups'));
   }
 
-  public function insertar() {
+  public function insertar($idCliente = null) {
     if ($this->request->is('post')) {
-
       $this->Cliente->create();
-      //debug($this->request->data); 
-      //debug($this->request->data['User']); exit;
       $this->request->data['Cliente']['estado'] = 1;
       if ($this->Cliente->save($this->request->data['Cliente'])) {
-
-        //debug($iduser);exit;
-
-        $this->Session->setFlash(__('The user has been saved'));
-
+        $this->Session->setFlash('Se registro correctamente!!', 'msgbueno');
         $this->redirect(array('action' => 'index'));
       } else {
-        $this->Session->setFlash(__('The user could not be saved. Please, try again.'));
+        $this->Session->setFlash('No Se pudo registrar', 'msgerror');
       }
     }
-    $lugares = $this->Lugare->find('all', array('recursive' => -1));
-
+    $lugares = $this->Lugare->find('list', array('recursive' => -1, 'fields' => 'Lugare.nombre'));
     $condiciones = array();
     if ($this->Session->read('Auth.User.Group.name') == 'Distribuidores') {
       $rutas_usuario = $this->Rutasusuario->find('list', array(
@@ -109,8 +101,8 @@ class ClientesController extends AppController {
       $condiciones['Ruta.id'] = $rutas_usuario;
     }
     $rutas = $this->Ruta->find('list', array('fields' => 'Ruta.nombre', 'conditions' => $condiciones));
-
-
+    $this->Cliente->id = $idCliente;
+    $this->request->data = $this->Cliente->read();
     $this->set(compact('lugares', 'rutas'));
     //$groups = $this->User->Group->find('all', array ('recursive'=>-1));
     //$this->set(compact('groups'));
@@ -204,8 +196,8 @@ class ClientesController extends AppController {
             if ('A' == $cell->getColumn()) {
               $dato_a = $cell->getCalculatedValue();
               $cliente = $this->Cliente->find('first', array(
-                'recursive' => -1, 
-                'conditions' => array('Cliente.num_registro' => $dato_a), 
+                'recursive' => -1,
+                'conditions' => array('Cliente.num_registro' => $dato_a),
                 'fields' => array('Cliente.id')));
               if (!empty($cliente)) {
                 $this->Session->setFlash("El clieente con numero de registro: $dato_a ya esta registrado!!", 'msgerror');

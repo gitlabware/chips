@@ -71,7 +71,7 @@
       }
   };
   function editarc(idcliente) {
-      location = '<?php echo $this->Html->url(array('action' => 'edit')); ?>/' + idcliente;
+      location = '<?php echo $this->Html->url(array('action' => 'insertar')); ?>/' + idcliente;
   }
   function eliminarc(idcliente) {
       if (confirm("Esta seguro de eliminar al cliente??")) {

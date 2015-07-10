@@ -559,7 +559,6 @@ class ProductosController extends AppController {
         }
         //------- termina Color -----
 
-
         $this->request->data['Producto']['tiposproducto_id'] = 5;
         $this->request->data['Producto']['tipo_producto'] = 'CELULARES';
         $this->request->data['Producto']['marca_id'] = $idMarca;

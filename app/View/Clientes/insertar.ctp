@@ -1,24 +1,22 @@
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
 <section role="main" id="main">
-
-    <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
-
     <hgroup id="main-title" class="thin">
-        <h1>Nuevo Cliente</h1>
+        <h1>Formulario Cliente</h1>
     </hgroup>
     <div class="with-padding"> 
         <?php echo $this->Form->create('Cliente', array('id' => 'formID')) ?>
+        <?php echo $this->Form->hidden('id'); ?>
         <div class="columns">
-            <?php if($this->Session->read('Auth.User.Group.name') == 'Administradores'):?>
-            <div class="new-row six-columns new-row-mobile twelve-columns">
+            <?php if ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
+              <div class="new-row six-columns">
 
-                <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Codigo 149 <small>(requerido)</small></label>                    
-                    <?php echo $this->Form->text('num_registro', array('class' => 'input full-width')); ?>
-                </p>
-            </div>
-            <?php endif;?>
-            <div class="new-row six-columns new-row-mobile twelve-columns">
+                  <p class="block-label button-height">
+                      <label for="block-label-1" class="label">Codigo 149 <small>(requerido)</small></label>                    
+                      <?php echo $this->Form->text('num_registro', array('class' => 'input full-width')); ?>
+                  </p>
+              </div>
+            <?php endif; ?>
+            <div class="six-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Nombre <small>(requerido)</small></label>                    
@@ -32,7 +30,7 @@
                 </p>  
             </div>
 
-            <div class="three-columns new-row-mobile twelve-columns">
+            <div class="six-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Celular<small>(requerido)</small></label>
@@ -40,7 +38,7 @@
                 </p>
             </div>
 
-            <div class="three-columns new-row-mobile twelve-columns">
+            <div class="six-columns">
 
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Zona<small>(requerido)</small></label>
@@ -53,10 +51,16 @@
                     <?php echo $this->Form->text('mercado', array('class' => 'input full-width')); ?>
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns">
+            <div class="six-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Ruta<small>(Requerido)</small></label>
-                    <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select', 'style' => 'width: 222px', 'required')); ?>
+                    <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select full-width', 'style' => 'width: 222px', 'required')); ?>
+                </p>
+            </div>
+            <div class="six-columns">
+                <p class="block-label button-height">
+                    <label for="validation-select" class="label">Lugar<small>(Requerido)</small></label>
+                    <?php echo $this->Form->select('lugare_id', $lugares, array('class' => 'select full-width')); ?>
                 </p>
             </div>
 
@@ -68,25 +72,9 @@
 
                 </p>
             </div>
-
-            
-
             <div class="three-columns new-row-mobile twelve-columns">
-                <p class="block-label button-height">
-                    <label for="validation-select" class="label">Lugar<small>(Requerido)</small></label>
-                    <select id="validation-select" name="data[cliente][lugare_id]" class="select" style="width: 222px">
-                        <?php foreach ($lugares as $lug): ?>
-                            <option value="<?php echo $lug['Lugare']['id'] ?>">
-                                <?php echo $lug['Lugare']['nombre'] ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </p>
-            </div>
-            
-            <div class="three-columns new-row-mobile twelve-columns">
-                <?php echo $this->Form->text('lat', ['id' => 'frmlat']); ?>
-                                <?php echo $this->Form->text('lng', ['id' => 'frmlng']); ?>
+                <?php echo $this->Form->hidden('lat', ['id' => 'frmlat']); ?>
+                <?php echo $this->Form->hidden('lng', ['id' => 'frmlng']); ?>
                 <div id="mapa" style="width: 100%; height: 400px;"></div>
             </div>
 
@@ -109,9 +97,9 @@
 </section>
 
 <script>
-    $(document).ready(function () {
-        $("#formID").validationEngine();
-    });
+  $(document).ready(function () {
+      $("#formID").validationEngine();
+  });
 </script>
 <script type="text/javascript">
   var map;
@@ -149,9 +137,9 @@
 
 </script>
 <?php if ($this->Session->read('Auth.User.Group.name') == 'Distribuidores'): ?>
-    <!-- Sidebar/drop-down menu -->
-    <?php echo $this->element('sidebar/distribuidor'); ?>
-    <!-- End sidebar/drop-down menu --> 
+  <!-- Sidebar/drop-down menu -->
+  <?php echo $this->element('sidebar/distribuidor'); ?>
+  <!-- End sidebar/drop-down menu --> 
 <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
-    <?php echo $this->element('sidebar/administrador'); ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
 <?php endif; ?>

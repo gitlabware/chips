@@ -34,6 +34,9 @@
   function venta(idcliente) {
       location = '<?php echo $this->Html->url(array('action' => 'formulario')); ?>/' + idcliente;
   }
+  function editar(idcliente) {
+      location = '<?php echo $this->Html->url(array('action' => 'cliente')); ?>/' + idcliente;
+  }
 </script>
 <script>
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'clientes.json')); ?>';

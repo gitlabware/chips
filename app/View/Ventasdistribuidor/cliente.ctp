@@ -7,7 +7,7 @@
         <h1>Formulario de cliente</h1>
     </hgroup>
     <div class="with-padding"> 
-        <?php echo $this->Form->create('Ventasdistribuidor', array('id' => 'formID','action' => 'registra_cliente')) ?>
+        <?php echo $this->Form->create(NULL, array('id' => 'formID','url' => array('controller' => 'Ventasdistribuidor','action' => 'registra_cliente'))) ?>
         <?php echo $this->Form->hidden("Cliente.id");?>
         <div class="columns">
             <div class="new-row six-columns new-row-mobile twelve-columns">
@@ -48,7 +48,7 @@
             <div class="three-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Ruta<small>(Requerido)</small></label>
-                    <?php echo $this->Form->select('Cliente.ruta_id', $rutas, array('class' => 'select', 'style' => 'width: 222px', 'required')); ?>
+                    <?php echo $this->Form->select('Cliente.ruta_id', $rutas, array('class' => 'select full-width', 'required')); ?>
                 </p>
             </div>
 
@@ -66,14 +66,10 @@
             <div class="three-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Lugar<small>(Requerido)</small></label>
-                    <?php echo $this->Form->select("Cliente.lugare_id",$lugares,['class' => 'select','id' => 'validation-select']);?>
+                    <?php echo $this->Form->select("Cliente.lugare_id",$lugares,['class' => 'select full-width','id' => 'validation-select']);?>
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns">
-                <?php echo $this->Form->text('lat', ['id' => 'frmlat']); ?>
-                                <?php echo $this->Form->text('lng', ['id' => 'frmlng']); ?>
-                <div id="mapa" style="width: 100%; height: 400px;"></div>
-            </div>
+            
 
             <div class="six-columns new-row-mobile twelve-columns">
 
@@ -82,7 +78,7 @@
                     Guardar
                 </button>
 
-                <button type="submit" class="button glossy">
+                <button type="button" class="button glossy" onclick="window.location.href = '<?php echo $this->Html->url($this->request->referer());?>';">
                     <span class="button-icon red-gradient"><span class="icon-cross-round"></span></span>
                     Cancelar
                 </button>
