@@ -53,16 +53,8 @@
                     </ul>
                 </li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'ventas')); ?>">Ventas Hoy</a></li>
-                <li class="with-right-arrow">
-                    <span>Minievento</span>
-                    <ul class="big-menu">
-                        <li>
-                            <a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minieventos')); ?>">Listado de Minieventos</a>
-                        </li>
-                        <li>
-                            <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento')); ?>','Minievento')">Nuevo Minievento</a>
-                        </li>
-                    </ul>
+                <li>
+                    <a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minieventos')); ?>">Listado de Minieventos</a>
                 </li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'premios')); ?>">Premios</a></li>
             </ul>

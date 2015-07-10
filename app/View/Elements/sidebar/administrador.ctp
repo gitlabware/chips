@@ -66,8 +66,8 @@
                             <ul class="big-menu">
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Productos', 'action' => 'index')); ?>">Listado de Productos</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Productos', 'action' => 'insertar')); ?>">Nuevo Producto</a></li>
-                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'index'));             ?>">Listado de Precio</a></li>-->
-                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'nuevoprecio'));             ?>">Nuevos Precios</a></li>-->
+                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'index'));              ?>">Listado de Precio</a></li>-->
+                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'nuevoprecio'));              ?>">Nuevos Precios</a></li>-->
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiposproductos', 'action' => 'index')); ?>">Listado de Categorias</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiposproductos', 'action' => 'add')); ?>">Nueva Categoria</a></li>
                             </ul>
@@ -88,7 +88,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'index')); ?>">Listado de Almacenes</a></li>                                                                        
                             </ul>
                         </li>
-                        <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Users','action'=>'ajaxprecios'))?>','Precios chip/4g');">Precios Chip/4g</a></li>
+                        <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'ajaxprecios')) ?>', 'Precios chip/4g');">Precios Chip/4g</a></li>
 
                     </ul>
                 </li>                                                                
@@ -138,10 +138,10 @@
                 <!--<li class="with-right-arrow">
                     <span>Depositos</span>
                     <ul class="big-menu">
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listadepositos'))     ?>">Listado depositos</a></li>	
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'deposito'));     ?>">Nuevo Deposito</a></li>
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'index'))     ?>">Listado de Bancos</a></li>
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'add'));     ?>">Nuevo Banco</a></li>
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listadepositos'))      ?>">Listado depositos</a></li>	
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'deposito'));      ?>">Nuevo Deposito</a></li>
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'index'))      ?>">Listado de Bancos</a></li>
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'add'));      ?>">Nuevo Banco</a></li>
                     </ul>
                 </li>-->
 
@@ -175,7 +175,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_chips_c_total')); ?>">Totales</a></li>
                             </ul>
                         </li>  
-                        
+
                         <li class="with-right-arrow">
                             <span>Celulares</span>
                             <ul class="big-menu">
@@ -185,7 +185,18 @@
                             </ul>
                         </li>
                     </ul>
-                </li>               
+                </li>
+                <li class="with-right-arrow">
+                    <span>Minievento</span>
+                    <ul class="big-menu">
+                        <li>
+                            <a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minieventos')); ?>">Listado de Minieventos</a>
+                        </li>
+                        <li>
+                            <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento')); ?>', 'Minievento')">Nuevo Minievento</a>
+                        </li>
+                    </ul>
+                </li>
 
             </ul>
         </section>

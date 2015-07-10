@@ -17,17 +17,26 @@
             </thead>
             <tbody>
                 <?php foreach ($minieventos as $mi): ?>
-                <tr>
-                    <td><?php echo $mi['Minievento']['fecha'];?></td>
-                    <td><?php echo $mi['Minievento']['direccion'];?></td>
-                    <td>
-                      <?php echo $this->Html->link("Ventas",array('action' => 'ventas_minievento',$mi['Minievento']['id']));?>
-                    </td>
-                </tr>
+                  <tr>
+                      <td><?php echo $mi['Minievento']['fecha']; ?></td>
+                      <td><?php echo $mi['Minievento']['direccion']; ?></td>
+                      <td>
+                          <?php if ($this->Session->read('Auth.User.group_id') == 1): ?> 
+                            <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento',$mi['Minievento']['id'])); ?>', 'Minievento')" class="button orange-gradient glossy">Editar</a>
+                          <?php else: ?>
+                            <?php echo $this->Html->link("Ventas", array('action' => 'ventas_minievento', $mi['Minievento']['id']), ['class' => 'button green-gradient glossy']); ?>
+                          <?php endif; ?>
+                      </td>
+                  </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
-</section>	
-
-<?php echo $this->element('sidebar/distribuidor'); ?>
+</section>
+<?php 
+if($this->Session->read('Auth.User.group_id') == 1){
+  echo $this->element('sidebar/administrador');
+}else{
+  echo $this->element('sidebar/distribuidor');
+}
+?>

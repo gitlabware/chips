@@ -14,10 +14,8 @@ class ImpulsadoresController extends AppController {
   }
 
   public function minieventos() {
-
     $minieventos = $this->Minievento->find('all', array(
       'recursive' => -1,
-      'conditions' => array('Minievento.impulsador_id' => $this->Session->read('Auth.User.id')),
       'order' => array('Minievento.id DESC')
     ));
     $this->set(compact('minieventos'));
