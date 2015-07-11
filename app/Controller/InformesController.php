@@ -60,7 +60,7 @@ class InformesController extends AppController {
     $objImagen->setPath(WWW_ROOT . 'img' . DS . 'logoviva.png');
     $objImagen->setCoordinates('A1');
     $objImagen->setWorksheet($prueba->getActiveSheet());
-    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(7);
     $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(24);
     $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(13);
     $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(13);
@@ -282,5 +282,5 @@ class InformesController extends AppController {
     $this->set(compact('distribuidores'));
   }
   
-
+  
 }

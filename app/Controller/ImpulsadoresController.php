@@ -1,10 +1,13 @@
 <?php
 
+App::import('Vendor', 'PHPExcel', array('file' => 'PHPExcel.php'));
+App::import('Vendor', 'PHPExcel_Reader_Excel2007', array('file' => 'PHPExcel/Excel2007.php'));
+App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/IOFactory.php'));
 App::uses('AppController', 'Controller');
 
 class ImpulsadoresController extends AppController {
 
-  var $uses = array('User', 'Minievento', 'Ventasimpulsadore', 'Premio', 'Movimientospremio','Precio');
+  var $uses = array('User', 'Minievento', 'Ventasimpulsadore', 'Premio', 'Movimientospremio', 'Precio');
   public $layout = 'viva';
 
   public function minievento($idMini = null) {
@@ -41,19 +44,19 @@ class ImpulsadoresController extends AppController {
     $this->Premio->virtualFields = array(
       'nombre_total' => "CONCAT(Premio.nombre,' (',Premio.total,')')"
     );
-    $premios = $this->Premio->find('list',array('fields' => 'Premio.nombre_total','conditions' => array('Premio.total >' => 0))); 
-    $precios = $this->Precio->find('list',array('fields' => array('Precio.monto','Precio.monto')));
+    $premios = $this->Premio->find('list', array('fields' => 'Premio.nombre_total', 'conditions' => array('Premio.total >' => 0)));
+    $precios = $this->Precio->find('list', array('fields' => array('Precio.monto', 'Precio.monto')));
     //debug($minievento);exit;
-    $this->set(compact('minievento', 'ventas','premios','precios'));
+    $this->set(compact('minievento', 'ventas', 'premios', 'precios'));
   }
 
   public function registra_venta() {
-    
-    if(!empty($this->request->data['Ventasimpulsadore']['premio_id'])){
-      $premio = $this->Premio->findByid($this->request->data['Ventasimpulsadore']['premio_id'],null,null,-1);
-      if($premio['Premio']['total'] >= 1){
+
+    if (!empty($this->request->data['Ventasimpulsadore']['premio_id'])) {
+      $premio = $this->Premio->findByid($this->request->data['Ventasimpulsadore']['premio_id'], null, null, -1);
+      if ($premio['Premio']['total'] >= 1) {
         $this->Premio->id = $premio['Premio']['id'];
-        $dpre['total'] = $premio['Premio']['total']-1;
+        $dpre['total'] = $premio['Premio']['total'] - 1;
         $this->Premio->save($dpre);
         $this->Movimientospremio->create();
         $dmov['premio_id'] = $premio['Premio']['id'];
@@ -61,11 +64,12 @@ class ImpulsadoresController extends AppController {
         $dmov['salida'] = 1;
         $dmov['persona_id'] = $this->Session->read('Auth.User.persona_id');
         $this->Movimientospremio->save($dmov);
-      }else{
-        $this->Session->setFlash("No se pudo registrar no hay premio!!",'msgerror');
+      } else {
+        $this->Session->setFlash("No se pudo registrar no hay premio!!", 'msgerror');
         $this->redirect($this->referer());
       }
     }
+    $this->request->data['Ventasimpulsadore']['persona_id'] = $this->Session->read('Auth.User.persona_id');
     $this->Ventasimpulsadore->create();
     $this->Ventasimpulsadore->save($this->request->data['Ventasimpulsadore']);
     $this->Session->setFlash("Se registro correctamente la venta!!", 'msgbueno');
@@ -73,8 +77,8 @@ class ImpulsadoresController extends AppController {
   }
 
   public function quita_venta($idVenta = null) {
-    $venta = $this->Ventasimpulsadore->findByid($idVenta,null,null,-1);
-    if(!empty($venta['Ventasimpulsadore']['premio_id'])){
+    $venta = $this->Ventasimpulsadore->findByid($idVenta, null, null, -1);
+    if (!empty($venta['Ventasimpulsadore']['premio_id'])) {
       $premio = $this->Premio->findByid($venta['Ventasimpulsadore']['premio_id']);
       $this->Premio->id = $premio['Premio']['id'];
       $dpre['total'] = $premio['Premio']['total'] + 1;
@@ -111,37 +115,144 @@ class ImpulsadoresController extends AppController {
 
   public function movimientospremios($idPremio = null) {
     $premio = $this->Premio->findByid($idPremio);
-    $movimientos = $this->Movimientospremio->find('all',array(
+    $movimientos = $this->Movimientospremio->find('all', array(
       'recursive' => 0,
-      'conditions' => array('Movimientospremio.premio_id' => $idPremio,'Movimientospremio.user_id' => $this->Session->read('Auth.User.id')),
-      'fields' => array('Movimientospremio.created','Movimientospremio.ingreso','Movimientospremio.id'),
+      'conditions' => array('Movimientospremio.premio_id' => $idPremio, 'Movimientospremio.user_id' => $this->Session->read('Auth.User.id')),
+      'fields' => array('Movimientospremio.created', 'Movimientospremio.ingreso', 'Movimientospremio.id'),
       'order' => array('Movimientospremio.id DESC')
     ));
-    $this->set(compact('premio','movimientos'));
+    $this->set(compact('premio', 'movimientos'));
   }
-  public function registra_entrega_pre(){
+
+  public function registra_entrega_pre() {
     $this->Movimientospremio->create();
     $this->Movimientospremio->save($this->request->data['Movimientospremio']);
     $premio = $this->Premio->findByid($this->request->data['Movimientospremio']['premio_id']);
     $this->Premio->id = $premio['Premio']['id'];
     $datp['total'] = $premio['Premio']['total'] + $this->request->data['Movimientospremio']['ingreso'];
     $this->Premio->save($datp);
-    $this->Session->setFlash("Se registro correctamente!!",'msgbueno');
+    $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
     $this->redirect($this->referer());
   }
-  public function cancela_ent_pre($idMov = null){
-    $movimiento = $this->Movimientospremio->findByid($idMov,null,null,-1);
-    $premio = $this->Premio->findByid($movimiento['Movimientospremio']['premio_id'],null,null,-1);
-    if($premio['Premio']['total'] >= $movimiento['Movimientospremio']['ingreso']){
+
+  public function cancela_ent_pre($idMov = null) {
+    $movimiento = $this->Movimientospremio->findByid($idMov, null, null, -1);
+    $premio = $this->Premio->findByid($movimiento['Movimientospremio']['premio_id'], null, null, -1);
+    if ($premio['Premio']['total'] >= $movimiento['Movimientospremio']['ingreso']) {
       $this->Premio->id = $premio['Premio']['id'];
       $dmov['total'] = $premio['Premio']['total'] - $movimiento['Movimientospremio']['ingreso'];
       $this->Premio->save($dmov);
       $this->Movimientospremio->delete($idMov);
-      $this->Session->setFlash("Se cancelo correctamente la entrega!!",'msgbueno');
-    }else{
-      $this->Session->setFlash("No se pudo tegistrar debido a que el total es inferior al monto!!",'msgerror');
+      $this->Session->setFlash("Se cancelo correctamente la entrega!!", 'msgbueno');
+    } else {
+      $this->Session->setFlash("No se pudo tegistrar debido a que el total es inferior al monto!!", 'msgerror');
     }
     $this->redirect($this->referer());
+  }
+
+  public function genera_excel($idMinievento = NULL) {
+    $minievento = $this->Minievento->findByid($idMinievento, NULL, NULL, -1);
+    $nombre_excel = $minievento['Minievento']['direccion'] . ".xlsx";
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
+    header('Cache-Control: max-age=0');
+    $prueba = new PHPExcel();
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 1, 13, 1);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 2, 13, 2);
+    $style1 = array('alignment' => array(
+        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+        'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+      ), 'font' => array(
+        'size' => 14,
+        'bold' => true,
+        'underline' => 'single'
+    ));
+    $style2 = array(
+      'alignment' => array(
+        'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+        'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+      ),
+      'font' => array('size' => 8, 'bold' => true),
+      'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN))
+    );
+    $prueba->getActiveSheet()->getStyle("A1:N1")->applyFromArray($style1);
+    $prueba->getActiveSheet()->getStyle("A2:N2")->applyFromArray($style1);
+    $prueba->getActiveSheet()->getStyle("A4:N4")->applyFromArray($style2);
+    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "CONTROL DE VENTAS MINIEVENTOS");
+    $prueba->setActiveSheetIndex(0)->setCellValue("A2", "TRADICIONAL EL ALTO");
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("A4", "N°");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B4", "FECHA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C4", "LUGAR MINIEVENTO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("D4", "MEGADEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("E4", "TIPO DE\nMINIEVENTO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("F4", "IMPULSADOR\n/ BRIGADISTA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("G4", "CODIGO\nSUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("H4", "NOMBRE\nSUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("I4", "NUMERO\nPREPAGO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("J4", "NUMERO\n4G");
+    $prueba->setActiveSheetIndex(0)->setCellValue("K4", "NOMBRE\nCLIENTE");
+    $prueba->setActiveSheetIndex(0)->setCellValue("L4", "MONTO BS.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("M4", "PREMIO\nENTREGADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("N4", "N°\nREFERENCIA");
+
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(7);
+    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(20);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('L')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('M')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('N')->setWidth(11);
+
+    $prueba->getActiveSheet()->getStyle('A4:N4')->getAlignment()->setWrapText(true);
+
+    $prueba->getActiveSheet()->setTitle("CONTROL DE VENTAS MINIEVENTOS");
+
+    $ventas = $this->Ventasimpulsadore->find('list', array(
+      'recursive' => 0,
+      'conditions' => array('Ventasimpulsadore.minievento_id' => $idMinievento),
+      'fields' => array('Minievento.fecha', 'Minievento.direccion', 'Persona.nombre', 'Persona.ap_paterno', 'Persona.ap_materno', 'Ventasimpulsadore.4g', 'Ventasimpulsadore.numero', 'Ventasimpulsadore.nombre_cliente', 'Ventasimpulsadore.monto', 'Premio.nombre', 'Ventasimpulsadore.tel_referencia')
+    ));
+    $indice = 4;
+    $contador = 0;
+    foreach ($ventas as $ve) {
+      $indice++;
+      $contador++;
+      $prueba->getActiveSheet()->getStyle("A$indice:N$indice")->applyFromArray($style2);
+      if ($ve['Ventasimpulsadore']['4g'] == 1) {
+        $numero_prepago = "";
+        $numero_4g = $ve['Ventasimpulsadore']['numero'];
+      } else {
+        $numero_prepago = $ve['Ventasimpulsadore']['numero'];
+        $numero_4g = "";
+      }
+
+      $prueba->setActiveSheetIndex(0)->setCellValue("A$indice", $contador);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B$indice", $ve['Minievento']['fecha']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C$indice", $ve['Minievento']['direccion']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D$indice", "");
+      $prueba->setActiveSheetIndex(0)->setCellValue("E$indice", "");
+      $prueba->setActiveSheetIndex(0)->setCellValue("F$indice", $ve['Persona']['nombre'] . " " . $ve['Persona']['ap_paterno'] . ' ' . $ve['Persona']['ap_materno']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("G$indice", "");
+      $prueba->setActiveSheetIndex(0)->setCellValue("H$indice", "");
+      $prueba->setActiveSheetIndex(0)->setCellValue("I$indice", $numero_prepago);
+      $prueba->setActiveSheetIndex(0)->setCellValue("J$indice", $numero_4g);
+      $prueba->setActiveSheetIndex(0)->setCellValue("K$indice", $ve['Ventasimpulsadore']['nombre_cliente']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("L$indice", $ve['Ventasimpulsadore']['monto']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("M$indice", $ve['Premio']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("N$indice", $ve['Ventasimpulsadore']['tel_referencia']);
+    }
+
+    $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
+    $objWriter->save('php://output');
+    exit;
   }
 
 }

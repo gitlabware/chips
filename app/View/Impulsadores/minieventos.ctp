@@ -21,8 +21,9 @@
                       <td><?php echo $mi['Minievento']['fecha']; ?></td>
                       <td><?php echo $mi['Minievento']['direccion']; ?></td>
                       <td>
-                          <?php if ($this->Session->read('Auth.User.group_id') == 1): ?> 
-                            <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento',$mi['Minievento']['id'])); ?>', 'Minievento')" class="button orange-gradient glossy">Editar</a>
+                          <?php if ($this->Session->read('Auth.User.group_id') == 1): ?>
+                            <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento', $mi['Minievento']['id'])); ?>', 'Minievento')" class="button orange-gradient glossy">Editar</a>
+                            <?php echo $this->Html->link("Excel", ['action' => 'genera_excel', $mi['Minievento']['id']], ['class' => 'button green-gradient glossy']); ?>
                           <?php else: ?>
                             <?php echo $this->Html->link("Ventas", array('action' => 'ventas_minievento', $mi['Minievento']['id']), ['class' => 'button green-gradient glossy']); ?>
                           <?php endif; ?>
@@ -33,10 +34,10 @@
         </table>
     </div>
 </section>
-<?php 
-if($this->Session->read('Auth.User.group_id') == 1){
+<?php
+if ($this->Session->read('Auth.User.group_id') == 1) {
   echo $this->element('sidebar/administrador');
-}else{
+} else {
   echo $this->element('sidebar/distribuidor');
 }
 ?>

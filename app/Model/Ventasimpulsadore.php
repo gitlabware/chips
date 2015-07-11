@@ -22,6 +22,20 @@ class Ventasimpulsadore extends AppModel {
       'conditions' => '',
       'fields' => '',
       'order' => ''
+    ),
+    'Premio' => array(
+      'className' => 'Premio',
+      'foreignKey' => 'premio_id',
+      'conditions' => '',
+      'fields' => '',
+      'order' => ''
+    ),
+    'Persona' => array(
+      'className' => 'Persona',
+      'foreignKey' => 'persona_id',
+      'conditions' => '',
+      'fields' => '',
+      'order' => ''
     )
   );
 
