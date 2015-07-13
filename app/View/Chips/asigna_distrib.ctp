@@ -4,24 +4,30 @@
         <h1>LISTADO DE SIM'S SIN ASIGNAR</h1>
     </hgroup>
     <div class="with-padding">
-        <?php echo $this->Form->create('Chip', array('action' => 'registra_asignado')); ?>
+        <?php echo $this->Form->create('Chip', array('action' => 'registra_asignado', 'id'=>'formID')); ?>
         <div class="columns">
             <div class="new-row four-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Distribuidor</label>
-                    <?php echo $this->Form->select('Dato.distribuidor_id', $distribuidores, array('class' => 'full-width select')); ?>
+                    <?php echo $this->Form->select('Dato.distribuidor_id', $distribuidores, array('class' => 'input validate[required] full-width select')); ?>
                 </p>
             </div>
-            <div class="three-columns">
+            <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Inicial</label>
-                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'full-width input')); ?>
+                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'input validate[required] full-width input', 'id'=>'rinicio')); ?>
                 </p>
-            </div>
-            <div class="three-columns">
+            </div>            
+            <div class="two-columns">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Rang. Final</label>
+                    <?php echo $this->Form->text('Dato.rango_fin', array('onkeyup'=>'calcula()', 'class' => 'full-width input', 'id'=>'rfin', 'value'=>0)); ?>
+                </p>
+            </div>            
+            <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Cantidad</label>
-                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'full-width input')); ?>
+                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'input validate[required] full-width input', 'id'=>'rtotal')); ?>
                 </p>
             </div>
             <div class="two-columns-columns">
@@ -37,7 +43,6 @@
 
             <thead>
                 <tr>                      
-
                     <th style="width: 10%;">Id</th>
                     <th style="width: 10%;">Cant.</th>
                     <th style="width: 20%;">SIM</th>
@@ -59,4 +64,23 @@
 </script>
 <!-- Sidebar/drop-down menu -->
 <?php echo $this->element('sidebar/administrador'); ?>
+<script>
+  function calcula(){
+    console.log('digito');
+    var total = 0;
+    var inicio = $('#rinicio').val();
+    var fin = $('#rfin').val();
+    var res = fin - inicio;
+    //console.log(res);
+    $('#rtotal').val(Math.abs(res+1));
+  }
+</script>
+<script>
+  $(document).ready(function () {
+
+      $("#formID").validationEngine();
+
+
+  });
+</script>
 <!-- End sidebar/drop-down menu -->
