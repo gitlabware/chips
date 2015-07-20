@@ -21,7 +21,7 @@
                   <tr>
                       <td class="hide-on-mobile"><?php echo $ent['Chip']['fecha_entrega_d'] ?></td>
                       <td><?php echo $ent['Cliente']['nombre'] ?></td>
-                      <td><?php echo $ent['Cliente']['num_tegistro'] ?></td>
+                      <td><?php echo $ent['Cliente']['num_registro'] ?></td>
                       <td><?php echo $ent[0]['num_chips'] ?></td>
                       <td>
                           <?php echo $this->Html->link('Detalle', array('action' => 'detalle_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Cliente']['id'])); ?>
