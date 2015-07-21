@@ -216,7 +216,7 @@
                                 </tr>
                                 <tr>
                                     <td>FECHA:</td>
-                                    <td><?= date('d/m/Y')?></td>
+                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>DISTRIBUIDOR</td>
