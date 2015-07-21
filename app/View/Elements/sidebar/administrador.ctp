@@ -1,4 +1,4 @@
-<section id="menu" role="complementary">
+<section id="menu" role="complementary" class="no-imprime">
     <!-- This wrapper is used by several responsive layouts -->
     <div id="menu-content">
         <header>

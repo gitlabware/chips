@@ -123,7 +123,7 @@ class InformesController extends AppController {
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
     header('Cache-Control: max-age=0');
-    
+
     $prueba = new PHPExcel();
     $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 1, 14, 1);
     $style1 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 20, 'bold' => true));
@@ -231,14 +231,14 @@ class InformesController extends AppController {
       'recursive' => 0,
       'conditions' => array('Movimiento.created BETWEEN ? AND ?' => array($fecha_ini, $fecha_fin), 'Movimiento.salida !=' => 0, 'Movimiento.escala LIKE' => 'MAYOR'),
       'group' => array('Movimiento.created', 'Movimiento.cliente_id')
-      ,'fields' => array("DATE_FORMAT(Movimiento.created,'%m/%d/%Y') as fecha_f",'Persona.nombre','Cliente.cod_dealer','Cliente.nombre','Cliente.cod_mercado','Cliente.mercado','Movimiento.capacitacion','Movimiento.est_punt')
+      , 'fields' => array("DATE_FORMAT(Movimiento.created,'%m/%d/%Y') as fecha_f", 'Persona.nombre', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado', 'Cliente.mercado', 'Movimiento.capacitacion', 'Movimiento.est_punt')
     ));
-    
+
     $contador = 9;
     foreach ($ventas as $key => $ve) {
       $contador++;
       $prueba->getActiveSheet()->getStyle("A$contador:O$contador")->applyFromArray($style9);
-      $prueba->setActiveSheetIndex(0)->setCellValue("A$contador", ($key+1));
+      $prueba->setActiveSheetIndex(0)->setCellValue("A$contador", ($key + 1));
       $prueba->setActiveSheetIndex(0)->setCellValue("B$contador", $ve[0]['fecha_f']);
       $prueba->setActiveSheetIndex(0)->setCellValue("C$contador", $ve['Persona']['nombre']);
       $prueba->setActiveSheetIndex(0)->setCellValue("D$contador", $ve['Cliente']['cod_dealer']);
@@ -274,13 +274,23 @@ class InformesController extends AppController {
   }
 
   public function index() {
-    $distribuidores = $this->User->find('list',array(
+    $this->User->virtualFields = [
+      'nombre_persona' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    ];
+    $distribuidores = $this->User->find('list', array(
       'recursive' => 0,
       'conditions' => array('User.group_id' => 2),
-      'fields' => array('Persona.id',"CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)")
+      'fields' => array('Persona.id', "User.nombre_persona")
     ));
     $this->set(compact('distribuidores'));
   }
-  
-  
+
+  public function ruteo_diario() {
+    if (!empty($this->request->data['Dato']['distribuidor_id'])) {
+      $idDis = $this->request->data['Dato']['distribuidor_id'];
+      
+    }
+    
+  }
+
 }

@@ -1,4 +1,5 @@
-<ul id="shortcuts" role="complementary" class="children-tooltip tooltip-right">
+
+<ul id="shortcuts" role="complementary" class="children-tooltip tooltip-right no-imprime">
     <li><a href="<?php echo $this->Html->url(array('controller'=>'Almacenes', 'action'=>'principal'))?>" class="shortcut-dashboard" title="INICIO">INICIO</a></li>
     <li><a href="<?php echo $this->Html->url(array('controller'=>'Users', 'action'=>'index'))?>" class="shortcut-messages" title="USUARIOS">USUARIOS</a></li>
     <li><a href="<?php echo $this->Html->url(array('controller'=>'Productos', 'action'=>'index'))?>" class="shortcut-agenda" title="PRODUCTOS">PRODUCTOS</a></li>    

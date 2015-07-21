@@ -1,5 +1,5 @@
 <!-- glDatePicker -->
-<link rel="stylesheet" href="<?php echo $this->webroot;?>js/libs/glDatePicker/developr.fixed.css?v=1">
+<link rel="stylesheet" href="<?php echo $this->webroot; ?>js/libs/glDatePicker/developr.fixed.css?v=1">
 <section role="main" id="main">
 
     <hgroup id="main-title" class="thin">
@@ -9,7 +9,7 @@
     <div class="with-padding">                   
         <div class="columns">
             <div class="twelve-columns">
-                <?php echo $this->Form->create('Informe',array('action' => 'hoja_ruteo_d'));?>
+                <?php echo $this->Form->create('Informe', array('action' => 'hoja_ruteo_d')); ?>
                 <fieldset class="fieldset">
                     <legend class="legend">HOJA DE RUTEO CONSOLIDADO DISTRIBUIDORES</legend>
                     <div class="columns">
@@ -34,6 +34,26 @@
                         <div class="new-row twelve-columns">
                             <p class="inline-label">
                                 <?php echo $this->Form->submit("GENERAR", array('class' => 'button anthracite-gradient glossy full-width')); ?>
+                            </p>
+                        </div>
+                    </div>
+                </fieldset>
+                <?php echo $this->Form->end(); ?>
+                <br>
+                <?php echo $this->Form->create('Informe', array('action' => 'ruteo_diario')); ?>
+                  <fieldset class="fieldset">
+                      <legend class="legend">HOJA DE RUTEO DIARIO DISTRIBUIDORES</legend>
+                      <div class="columns">
+                          <div class="six-columns">
+                              <p class="block-label button-height inline-label">
+                                  <label for="input-1" class="label">Distribuidor</label>
+                                  <?= $this->Form->select('Dato.distribuidor_id' ,$distribuidores,['class' => 'select full-width']);?>
+                              </p>
+                          </div>
+                          <div class="new-row twelve-columns">
+                              <p class="inline-label">
+                                  <?php
+                                  echo $this->Form->submit("GENERAR", array  ('class' => 'button anthracite-gradient glossy full-width')); ?>
                             </p>
                         </div>
                     </div>
