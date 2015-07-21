@@ -1,6 +1,6 @@
 <style type="text/css" media="print">
     @page {
-        size: landscape;
+        size: letter landscape;
         margin: 0;
     }
     .no-imprime{
@@ -14,8 +14,8 @@
         background-color: white !important;
         padding: 13px !important;
         width: 950px !important;
-        height: 735px !important;
-        margin-left: 5px!important;
+        height: 554pt !important;
+        margin-left: 5px !important;
     }
 
     .cabecera{
@@ -177,7 +177,7 @@
     .printable{
         background-color: white; 
         padding: 13px;
-        width: 100%;
+        width: 95%;
         height: 800px;
     }
 
