@@ -47,7 +47,7 @@
                           <div class="six-columns">
                               <p class="block-label button-height inline-label">
                                   <label for="input-1" class="label">Distribuidor</label>
-                                  <?= $this->Form->select('Dato.distribuidor_id' ,$distribuidores,['class' => 'select full-width']);?>
+                                  <?= $this->Form->select('Dato.user_id' ,$distribuidores,['class' => 'select full-width']);?>
                               </p>
                           </div>
                           <div class="new-row twelve-columns">

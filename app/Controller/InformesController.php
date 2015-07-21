@@ -7,7 +7,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class InformesController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('User', 'Movimiento');
+  public $uses = array('User', 'Movimiento', 'Cliente', 'Rutasusuario', 'Persona');
   public $layout = 'viva';
   public $components = array('RequestHandler', 'DataTable');
 
@@ -280,17 +280,59 @@ class InformesController extends AppController {
     $distribuidores = $this->User->find('list', array(
       'recursive' => 0,
       'conditions' => array('User.group_id' => 2),
-      'fields' => array('Persona.id', "User.nombre_persona")
+      'fields' => array('User.id', "User.nombre_persona")
     ));
     $this->set(compact('distribuidores'));
   }
 
   public function ruteo_diario() {
-    if (!empty($this->request->data['Dato']['distribuidor_id'])) {
-      $idDis = $this->request->data['Dato']['distribuidor_id'];
-      
+    if (!empty($this->request->data['Dato']['user_id'])) {
+      $idUser = $this->request->data['Dato']['user_id'];
+      $this->User->virtualFields = [
+        'nombre_persona' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+      ];
+      $persona = $this->User->find('first', ['recursive' => 0, 'conditions' => ['User.id' => $idUser], 'fields' => ['User.nombre_persona']]);
+      $rutasusuario = $this->Rutasusuario->find('all', [
+        'recursive' => -1,
+        'conditions' => ['Rutasusuario.user_id' => $idUser],
+        'fields' => ['Rutasusuario.ruta_id']
+      ]);
+      /* debug($rutasusuario);
+        exit; */
+      $subdealers = [];
+      if (!empty($rutasusuario)) {
+        $i = 0;
+        foreach ($rutasusuario as $ru) {
+          $continua = null;
+          $cantidad = $this->Cliente->find('count', [
+            'recursive' => -1,
+            'conditions' => ['Cliente.ruta_id' => $ru['Rutasusuario']['ruta_id']]
+          ]);
+          //debug(round($cantidad / 30));exit;
+          $total = round($cantidad / 30);
+          for ($j = 1; $j <= $total; $j++) {
+            $condiciones = [];
+            $condiciones['Cliente.ruta_id'] = $ru['Rutasusuario']['ruta_id'];
+            if (!empty($continua)) {
+              $condiciones['Cliente.id >='] = $continua;
+            }
+            $subdealers[$i] = $ru;
+            $subdealers[$i]['subdealers'] = $this->Cliente->find('all', [
+              'recursive' => -1,
+              'conditions' => $condiciones,
+              'limit' => 30
+            ]);
+            if (!empty($subdealers[$i]['subdealers'][29]['Cliente']['id'])) {
+              $continua = $subdealers[$i]['subdealers'][29]['Cliente']['id'];
+            } else {
+              $continua = null;
+            }
+            $i++;
+          }
+        }
+      }
     }
-    
+    $this->set(compact('subdealers', 'persona'));
   }
 
 }
