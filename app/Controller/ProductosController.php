@@ -35,11 +35,11 @@ class ProductosController extends AppController {
         'acciones' => "CONCAT('$acciones')"
       );
       $this->paginate = array(
-        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.fecha_ingreso', 'Producto.acciones'),
+        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.fecha_ingreso', 'Producto.acciones'),
         'recursive' => -1,
         'order' => 'Producto.id DESC'
       );
-      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.fecha_ingreso', 'Producto.acciones');
+      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.fecha_ingreso', 'Producto.acciones');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('productos', $this->DataTable->getResponse());
       $this->set('_serialize', 'productos');
@@ -233,9 +233,22 @@ class ProductosController extends AppController {
       $this->redirect(array('action' => 'index'), null, true);
     }
     if ($this->Producto->delete($id)) {
+      $this->Totale->deleteAll(array(['Totale.producto_id' => $id]));
       $this->Session->setFlash('El producto  ' . $id . ' fue borrado');
       $this->redirect(array('action' => 'index'), null, true);
     }
+  }
+  //Elimina los totales de  los productos no existentes
+  public function regulariza_eli(){
+    $totales = $this->Totale->find('all',['recursive' => 0,'fields' => ['Producto.id','Totale.id']]);
+    foreach ($totales as $to){
+      if(empty($to['Producto']['id']))
+      {
+        $this->Totale->delete($to['Totale']['id']);
+      }
+    }
+    debug("Termino de regularizar");
+    exit;
   }
 
   public function get_num_trans() {

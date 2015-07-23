@@ -15,13 +15,14 @@
 
             <thead>
                 <tr>
-                    <th scope="col" width="5%">Precios</th>
+                    <th scope="col" width="4%">Precios</th>
                     <th scope="col" width="5%">Imagen</th>
+                    <th scope="col" width="10%">Categoria</th>
                     <th scope="col" width="15%" class="align-center hide-on-mobile">Nombre</th>
                     <th scope="col" width="5%" class="align-center hide-on-mobile">Precio compra</th>
                     <th scope="col" width="10%" class="align-center hide-on-mobile-portrait">proveedor</th>  
                     <th scope="col" width="8%" class="align-center hide-on-mobile-portrait">Fecha Ingreso</th>  
-                    <th scope="col" width="20%" class="align-center">Acciones</th>
+                    <th scope="col" width="15%" class="align-center">Acciones</th>
                 </tr>
             </thead>          
 
