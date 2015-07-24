@@ -44,8 +44,8 @@ class Cliente extends AppModel {
       'fields' => '',
       'order' => ''
     ),
-    'Rutasusuario' => array(
-      'className' => 'Rutasusuarios',
+    'Ruta' => array(
+      'className' => 'Ruta',
       'foreignKey' => 'ruta_id',
       'conditions' => '',
       'fields' => '',
@@ -71,20 +71,7 @@ class Cliente extends AppModel {
       'exclusive' => '',
       'finderQuery' => '',
       'counterQuery' => ''
-    ),
-    'Ventasdistribuidore' => array(
-      'className' => 'Ventasdistribuidore',
-      'foreignKey' => 'cliente_id',
-      'dependent' => false,
-      'conditions' => '',
-      'fields' => '',
-      'order' => '',
-      'limit' => '',
-      'offset' => '',
-      'exclusive' => '',
-      'finderQuery' => '',
-      'counterQuery' => ''
-    ) 
+    )
   );
 
 }

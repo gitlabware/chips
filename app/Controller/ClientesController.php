@@ -40,12 +40,12 @@ class ClientesController extends AppController {
         $condiciones['Cliente.ruta_id'] = $rutas_usuario;
       }
       $this->paginate = array(
-        'fields' => array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Cliente.zona', 'Cliente.acciones'),
-        'recursive' => -1,
+        'fields' => array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Ruta.nombre', 'Cliente.zona', 'Cliente.acciones'),
+        'recursive' => 0,
         'order' => 'Cliente.id DESC',
         'conditions' => $condiciones
       );
-      $this->DataTable->fields = array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Cliente.zona', 'Cliente.acciones');
+      $this->DataTable->fields = array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Ruta.nombre', 'Cliente.zona', 'Cliente.acciones');
 
       $this->set('clientes', $this->DataTable->getResponse());
       $this->set('_serialize', 'clientes');
