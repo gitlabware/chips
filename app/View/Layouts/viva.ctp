@@ -44,6 +44,7 @@
         <!-- DataTables -->
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.css?v=1">
 
+
         <!-- JavaScript at bottom except for Modernizr -->
         <script src="<?php echo $this->webroot; ?>js/libs/modernizr.custom.js"></script>
 
@@ -77,12 +78,22 @@
         echo $this->fetch('css');
         echo $this->fetch('script');
         ?>        
+        <style>
+            #tabla-json input{
+                width: 100%;
+            }
+            #sorting-advanced input{
+                width: 100%;
+            }
 
+        </style>
     </head>
 
     <body class="clearfix with-menu with-shortcuts">
-        <script>var urljsontabla = '';
-          var datos_tabla2 = null;</script>
+        <script>
+          var urljsontabla = '';
+          var datos_tabla2 = null;
+          var filtro_c = [];</script>
         <!-- Prompt IE 6 users to install Chrome Frame -->
         <!--[if lt IE 7]><p class="message red-gradient simpler">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
@@ -133,16 +144,30 @@
         <!-- Plugins -->
         <script src="<?php echo $this->webroot; ?>js/libs/jquery.tablesorter.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.min.js"></script>
+        <!--<script src="https://jquery-datatables-column-filter.googlecode.com/svn/trunk/media/js/jquery.dataTables.js"></script>-->
+
+        <script src="<?php echo $this->webroot; ?>js/jquery.dataTables.columnFilter.js"></script>
+
         <?php echo $this->fetch('js_add'); ?>
         <script>
           // Call template init (optional, but faster if called manually)
           $.template.init();
-
           // Table sort - DataTables
           var table = $('#sorting-advanced');
           table.dataTable({
+              /*"oLanguage": {
+               "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+               },*/
               "oLanguage": {
-                  "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                  "oPaginate": {
+                      "sPrevious": "Anterior",
+                      "sNext": "Siguiente",
+                      "sFirst": "Primero",
+                      "sLast": "Ultimo"
+                  },
+                  "sSearch": "Buscar",
+                  "sLengthMenu": "Mostrar _MENU_ registros",
+                  "sInfo": "Tiene un total de _TOTAL_ registros para mostrar (_START_ to _END_)"
               },
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
@@ -153,13 +178,26 @@
                   table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
                   tableStyled = true;
               }
+          }).columnFilter({
+              sPlaceHolder: "head:before",
+              aoColumns: filtro_c
           });
-
           var table2 = $('#tabla-json');
           if (datos_tabla2 == null) {
               datos_tabla2 = {
+                  /*"oLanguage": {
+                   "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                   },*/
                   "oLanguage": {
-                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                      "oPaginate": {
+                          "sPrevious": "Anterior",
+                          "sNext": "Siguiente",
+                          "sFirst": "Primero",
+                          "sLast": "Ultimo"
+                      },
+                      "sSearch": "Buscar",
+                      "sLengthMenu": "Mostrar _MENU_ registros",
+                      "sInfo": "Tiene un total de _TOTAL_ registros para mostrar (_START_ to _END_)"
                   },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
@@ -175,8 +213,10 @@
                   }
               };
           }
-          table2.dataTable(datos_tabla2);
-
+          table2.dataTable(datos_tabla2).columnFilter({
+              sPlaceHolder: "head:before",
+              aoColumns: filtro_c
+          });
           function cargarmodal(url, titulo) {
               $.modal({
                   content: '<div id="idmodal"></div>',

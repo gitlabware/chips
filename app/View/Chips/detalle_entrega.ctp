@@ -3,7 +3,7 @@
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
 
     <hgroup id="main-title" class="thin">
-        <h1>Entregas a <?php echo $distribuidor['Persona']['nombre'].' '.$distribuidor['Persona']['ap_paterno'].' '.$distribuidor['Persona']['ap_materno'] ?> de <?php echo $fecha; ?></h1>
+        <h1>Entregas a <?php echo $distribuidor['Persona']['nombre'] . ' ' . $distribuidor['Persona']['ap_paterno'] . ' ' . $distribuidor['Persona']['ap_materno'] ?> de <?php echo $fecha; ?></h1>
     </hgroup>
     <div class="with-padding">   
         <?php echo $this->Form->create('Chip', array('action' => 'cancela_asignado')); ?>
@@ -11,8 +11,8 @@
             <div class="four-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Inicial</label>
-                    <?php echo $this->Form->hidden("Dato.fecha",array('value' => $fecha));?>
-                    <?php echo $this->Form->hidden("Dato.distribuidor_id",array('value' => $idDistribuidor));?>
+                    <?php echo $this->Form->hidden("Dato.fecha", array('value' => $fecha)); ?>
+                    <?php echo $this->Form->hidden("Dato.distribuidor_id", array('value' => $idDistribuidor)); ?>
                     <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'full-width input')); ?>
                 </p>
             </div>
@@ -29,7 +29,21 @@
                 </p>
             </div>
         </div>
-        <br>
+        
+        <div class="columns">
+            <div class="three-columns">
+                <a href="<?php echo $this->Html->url(array('action' => 'genera_excel_1', $fecha, $idDistribuidor));?>" class="button full-width">
+                    <span class="button-icon"><span class="icon-download"></span></span>
+                    Sin asignaciones
+                </a>
+            </div>
+            <div class="three-columns">
+                <a href="<?php echo $this->Html->url(array('action' => 'genera_excel_2', $fecha, $idDistribuidor));?>" class="button full-width">
+                    <span class="button-icon green-gradient"><span class="icon-download"></span></span>
+                    Solo Asignados
+                </a>
+            </div>
+        </div><br>
         <?php echo $this->Form->end(); ?>
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
@@ -63,11 +77,20 @@
 </section>	
 
 <script>
-  function cancelar(url){
-    if(confirm("Esta seguro de cancelar la entrega??")){
-      window.location = url;
-    }
+  function cancelar(url) {
+      if (confirm("Esta seguro de cancelar la entrega??")) {
+          window.location = url;
+      }
   }
+
+  filtro_c = [
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"}
+  ];
 </script>
 <!-- Sidebar/drop-down menu -->
 <?php echo $this->element('sidebar/administrador'); ?>

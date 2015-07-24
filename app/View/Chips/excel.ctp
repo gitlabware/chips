@@ -7,52 +7,57 @@
     <div class="with-padding">
         <div class="columns">
             <div class="three-columns">
-                <a href="<?php echo $this->Html->url(array('action' => 'genera_excel_1', $fecha_entrega, $idDistribuidor));?>" class="button full-width">
+                <a href="<?php echo $this->Html->url(array('action' => 'genera_excel_1', $fecha_entrega, $idDistribuidor)); ?>" class="button full-width">
                     <span class="button-icon"><span class="icon-download"></span></span>
                     Sin asignaciones
                 </a>
             </div>
             <div class="three-columns">
-                <a href="<?php echo $this->Html->url(array('action' => 'genera_excel_2', $fecha_entrega, $idDistribuidor));?>" class="button full-width">
+                <a href="<?php echo $this->Html->url(array('action' => 'genera_excel_2', $fecha_entrega, $idDistribuidor)); ?>" class="button full-width">
                     <span class="button-icon green-gradient"><span class="icon-download"></span></span>
                     Solo Asignados
                 </a>
             </div>
         </div>
-        <table class="table responsive-table">
-            <thead>
-                <tr>
-                    <th>Cantidad</th>
-                    <th>Sim</th>
-                    <th>Telefono</th>
-                    <th>Fecha</th>
-                    <th>Fecha de entrega</th>
-                    <th>Codigo</th>
-                    <th>Subdealer</th>
-                    <th>Cod.Merc</th>
-                    <th>Distribuidor</th>
-                    <th>Ciudad</th>
-                    <th>Firma</th>
-                </tr>
-            </thead>          
-            <tbody>
-                <?php foreach ($chips as $ch): ?>
-                  <tr>
-                      <td><?php echo $ch['Chip']['cantidad']; ?></td>
-                      <td><?php echo $ch['Chip']['sim']; ?></td>
-                      <td><?php echo $ch['Chip']['telefono']; ?></td>
-                      <td><?php echo $ch[0]['fecha_f']; ?></td>
-                      <td><?php echo $ch[0]['fecha_entrega_d_f']; ?></td>
-                      <td><?php echo $ch['Cliente']['cod_dealer']; ?></td>
-                      <td><?php echo $ch['Cliente']['nombre']; ?></td>
-                      <td><?php echo $ch['Cliente']['cod_mercado']; ?></td>
-                      <td><?php echo $ch['Chip']['nom_distribuidor']; ?></td>
-                      <td><?php echo $ch['Chip']['ciudad_dist']; ?></td>
-                      <td></td>
-                  </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>  
+        <div class="columns">
+            <div class="twelve-columns" style="height: 500px;overflow: scroll;">
+                <table class="table responsive-table">
+                    <thead>
+                        <tr>
+                            <th>Cantidad</th>
+                            <th>Sim</th>
+                            <th>Telefono</th>
+                            <th>Fecha</th>
+                            <th>Fecha de entrega</th>
+                            <th>Codigo</th>
+                            <th>Subdealer</th>
+                            <th>Cod.Merc</th>
+                            <th>Distribuidor</th>
+                            <th>Ciudad</th>
+                            <th>Firma</th>
+                        </tr>
+                    </thead>          
+                    <tbody>
+                        <?php foreach ($chips as $ch): ?>
+                          <tr>
+                              <td><?php echo $ch['Chip']['cantidad']; ?></td>
+                              <td><?php echo $ch['Chip']['sim']; ?></td>
+                              <td><?php echo $ch['Chip']['telefono']; ?></td>
+                              <td><?php echo $ch[0]['fecha_f']; ?></td>
+                              <td><?php echo $ch[0]['fecha_entrega_d_f']; ?></td>
+                              <td><?php echo $ch['Cliente']['cod_dealer']; ?></td>
+                              <td><?php echo $ch['Cliente']['nombre']; ?></td>
+                              <td><?php echo $ch['Cliente']['cod_mercado']; ?></td>
+                              <td><?php echo $ch['Chip']['nom_distribuidor']; ?></td>
+                              <td><?php echo $ch['Chip']['ciudad_dist']; ?></td>
+                              <td></td>
+                          </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 </section>	
 

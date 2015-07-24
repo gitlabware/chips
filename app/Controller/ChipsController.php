@@ -578,12 +578,12 @@ class ChipsController extends AppController {
         'acciones' => "CONCAT('$acciones')"
         ); */
       $this->paginate = array(
-        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Excel.nombre_original'),
+        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja'),
         'recursive' => 0,
         'order' => 'Chip.created'
         , 'conditions' => array('Chip.distribuidor_id' => NULL)
       );
-      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Excel.nombre_original');
+      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('chips', $this->DataTable->getResponse());
       $this->set('_serialize', 'chips');
@@ -891,32 +891,34 @@ class ChipsController extends AppController {
       )
     );
     $prueba = new PHPExcel();
-    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(8);
-    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(25);
-    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(15);
-    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(12);
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(5);
+    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(15);
     $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(12);
-    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(8);
-    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(10);
-    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(8);
-    $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(15);
-    $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(10);
-    $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(12);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(15);
+    $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('L')->setWidth(11);
 
-    $prueba->getActiveSheet()->getStyle('A1:k1')->applyFromArray($borders);
+    $prueba->getActiveSheet()->getStyle('A1:L1')->applyFromArray($borders);
     $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
 
-    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "CANTIDAD");
-    $prueba->setActiveSheetIndex(0)->setCellValue("B1", "SIM");
-    $prueba->setActiveSheetIndex(0)->setCellValue("C1", "NUM-TELEFONO");
-    $prueba->setActiveSheetIndex(0)->setCellValue("D1", "FECHA");
-    $prueba->setActiveSheetIndex(0)->setCellValue("E1", "Fecha de entrega");
-    $prueba->setActiveSheetIndex(0)->setCellValue("F1", "COD.");
-    $prueba->setActiveSheetIndex(0)->setCellValue("G1", "SUBDEALER");
-    $prueba->setActiveSheetIndex(0)->setCellValue("H1", "COD.MERC");
-    $prueba->setActiveSheetIndex(0)->setCellValue("I1", "DIST.");
-    $prueba->setActiveSheetIndex(0)->setCellValue("J1", "CIUDAD");
-    $prueba->setActiveSheetIndex(0)->setCellValue("K1", "FIRMA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "N");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B1", "CANTIDAD");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C1", "SIM");
+    $prueba->setActiveSheetIndex(0)->setCellValue("D1", "NUM-TELEFONO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("E1", "FECHA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("F1", "Fecha de entrega");
+    $prueba->setActiveSheetIndex(0)->setCellValue("G1", "COD.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("H1", "SUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("I1", "COD.MERC");
+    $prueba->setActiveSheetIndex(0)->setCellValue("J1", "DIST.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("K1", "CIUDAD");
+    $prueba->setActiveSheetIndex(0)->setCellValue("L1", "FIRMA");
 
     $prueba->getActiveSheet()->setTitle("LISTADO de SIM'S ASIGNADOS");
 
@@ -933,21 +935,24 @@ class ChipsController extends AppController {
     ));
     //debug($chips);exit;
     $cont = 1;
+    $num = 0;
     foreach ($chips as $ch) {
       $cont++;
-      $prueba->getActiveSheet()->getStyle("A$cont:k$cont")->applyFromArray($borders2);
+      $num++;
+      $prueba->getActiveSheet()->getStyle("A$cont:L$cont")->applyFromArray($borders2);
       //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
-      $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $ch['Chip']['cantidad']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['sim']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $ch['Chip']['telefono']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $ch[0]['fecha_f']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $ch[0]['fecha_entrega_d_f']);
-      //$prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $ch['Chip']['cantidad']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $num);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['cantidad']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $ch['Chip']['sim'] . " ");
+      $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $ch['Chip']['telefono']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $ch[0]['fecha_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $ch[0]['fecha_entrega_d_f']);
       //$prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $ch['Chip']['cantidad']);
       //$prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $ch['Chip']['cantidad']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("I" . $cont, $ch['Chip']['nom_distribuidor']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("J" . $cont, $ch['Chip']['ciudad_dist']);
-      //$prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['cantidad']);
+      //$prueba->setActiveSheetIndex(0)->setCellValue("I" . $cont, $ch['Chip']['cantidad']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("J" . $cont, $ch['Chip']['nom_distribuidor']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['ciudad_dist']);
+      //$prueba->setActiveSheetIndex(0)->setCellValue("L" . $cont, $ch['Chip']['cantidad']);
     }
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
     $objWriter->save('php://output');
@@ -1032,7 +1037,7 @@ class ChipsController extends AppController {
       $prueba->getActiveSheet()->getStyle("A$cont:k$cont")->applyFromArray($borders2);
       //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
       $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $ch['Chip']['cantidad']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['sim']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['sim'] . " ");
       $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $ch['Chip']['telefono']);
       $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $ch[0]['fecha_f']);
       $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $ch[0]['fecha_entrega_d_f']);
@@ -1095,6 +1100,41 @@ class ChipsController extends AppController {
     }
     debug('termino!!');
     exit;
+  }
+
+  public function todos() {
+    
+    if ($this->RequestHandler->responseType() == 'json') {
+      $sql1 = "SELECT fecha_act FROM activados ac WHERE ac.phone_number = Chip.telefono";
+      $ver = '<a href="javascript:void(0)" class="button blue-gradient glossy" onclick="infochip('."',Chip.id,'".')"><span class="icon-info"></span></a>';
+      $this->Chip->virtualFields = array(
+        'fecha_activacion' => "($sql1)",
+        'ver' => "CONCAT('$ver')"
+      );
+      $this->paginate = array(
+        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver'),
+        'recursive' => 0,
+        'order' => 'Chip.created'
+      );
+      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver');
+      $this->DataTable->emptyEleget_usuarios_adminments = 1;
+      $this->set('chips', $this->DataTable->getResponse());
+      $this->set('_serialize', 'chips');
+    }
+  }
+  
+  public function info_chip($idChip = null){
+    $this->layout = 'ajax';
+    $chip = $this->Chip->find('first',array(
+      'recursive' => 0,
+      'conditions' => array('Chip.id' => $idChip)
+    ));
+    $activacion = $this->Activado->find('first',array(
+      'recursive' => -1,
+      'conditions' => array('Activado.phone_number' => $chip['Chip.telefono']),
+      'fields' => array('Activado.fecha_act')
+    ));
+    $this->set(compact('chip','activacion'));
   }
 
 }

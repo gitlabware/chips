@@ -85,5 +85,17 @@
           tableStyled = true;
       }
   };
-  
+
+  filtro_c = [
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"}
+  ];
+
 </script>

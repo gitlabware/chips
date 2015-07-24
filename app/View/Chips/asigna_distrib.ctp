@@ -1,10 +1,11 @@
+
 <div id="main" class="contenedor">
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
     <hgroup id="main-title" class="thin">
         <h1>LISTADO DE SIM'S SIN ASIGNAR</h1>
     </hgroup>
     <div class="with-padding">
-        <?php echo $this->Form->create('Chip', array('action' => 'registra_asignado', 'id'=>'formID')); ?>
+        <?php echo $this->Form->create('Chip', array('action' => 'registra_asignado', 'id' => 'formID')); ?>
         <div class="columns">
             <div class="new-row four-columns">
                 <p class="block-label button-height">
@@ -15,19 +16,19 @@
             <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Inicial</label>
-                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'input validate[required] full-width input', 'id'=>'rinicio')); ?>
+                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'input validate[required] full-width input', 'id' => 'rinicio')); ?>
                 </p>
             </div>            
             <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Final</label>
-                    <?php echo $this->Form->text('Dato.rango_fin', array('onkeyup'=>'calcula()', 'class' => 'full-width input', 'id'=>'rfin', 'value'=>0)); ?>
+                    <?php echo $this->Form->text('Dato.rango_fin', array('onkeyup' => 'calcula()', 'class' => 'full-width input', 'id' => 'rfin', 'value' => 0)); ?>
                 </p>
             </div>            
             <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Cantidad</label>
-                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'input validate[required] full-width input', 'id'=>'rtotal')); ?>
+                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'input validate[required] full-width input', 'id' => 'rtotal')); ?>
                 </p>
             </div>
             <div class="two-columns-columns">
@@ -49,7 +50,8 @@
                     <th style="width: 15%;">IMSI</th>
                     <th style="width: 15%;">Telefono</th>
                     <th style="width: 10%;">Fecha</th>
-                    <th style="width: 20%;">Excel</th>
+                    <th style="width: 12%;">Factura</th>
+                    <th style="width: 8%;">Caja</th>
                 </tr>
             </thead>          
 
@@ -65,15 +67,25 @@
 <!-- Sidebar/drop-down menu -->
 <?php echo $this->element('sidebar/administrador'); ?>
 <script>
-  function calcula(){
-    console.log('digito');
-    var total = 0;
-    var inicio = $('#rinicio').val();
-    var fin = $('#rfin').val();
-    var res = fin - inicio;
-    //console.log(res);
-    $('#rtotal').val(Math.abs(res+1));
+  function calcula() {
+      console.log('digito');
+      var total = 0;
+      var inicio = $('#rinicio').val();
+      var fin = $('#rfin').val();
+      var res = fin - inicio;
+      //console.log(res);
+      $('#rtotal').val(Math.abs(res + 1));
   }
+  filtro_c = [
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"}
+  ];
 </script>
 <script>
   $(document).ready(function () {

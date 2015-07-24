@@ -40,6 +40,8 @@
           window.location = url;
       }
   }
+  
+
 
 </script>
 <!-- Sidebar/drop-down menu -->

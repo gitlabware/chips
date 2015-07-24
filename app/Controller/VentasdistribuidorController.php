@@ -1247,7 +1247,7 @@ class VentasdistribuidorController extends AppController {
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $datos['cantidad'], 'fields' => array('Chip.id'),
-        'conditions' => array('Chip.id >=' => $datos['rango_ini'], 'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
+        'conditions' => array('Chip.id >=' => $datos['rango_ini'],'Chip.cliente_id' => NULL, 'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
       ));
       foreach ($chips as $ch) {
         $this->Chip->id = $ch['Chip']['id'];
@@ -1260,6 +1260,8 @@ class VentasdistribuidorController extends AppController {
     }
     $this->redirect(array('action' => 'chips', $datos['cliente_id']));
   }
+  
+  
 
   public function reporte_detallado_precio() {
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
