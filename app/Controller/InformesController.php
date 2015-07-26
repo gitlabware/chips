@@ -7,7 +7,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class InformesController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('User', 'Movimiento', 'Cliente', 'Rutasusuario', 'Persona');
+  public $uses = array('User', 'Movimiento', 'Cliente', 'Rutasusuario', 'Persona', 'Ventasdistribuidore', 'Ventasproducto', 'Ventascliente');
   public $layout = 'viva';
   public $components = array('RequestHandler', 'DataTable');
 
@@ -333,6 +333,123 @@ class InformesController extends AppController {
       }
     }
     $this->set(compact('subdealers', 'persona'));
+  }
+
+  public function excel_ruteo_diario($idMercado = null) {
+
+    $nombre_excel = "Hoja-ruteo.xlsx";
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
+    header('Cache-Control: max-age=0');
+
+    $prueba = new PHPExcel();
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 1, 16, 1);
+    $style1 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 20, 'bold' => true, 'underline' => 'single'));
+    $style2 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)));
+    $style3 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'CCCCFF')));
+    $style4 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FFCC99')));
+    $style5 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FFFF00')));
+    $style6 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '00FF00')));
+    $style7 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '339966')));
+    $prueba->getActiveSheet()->getStyle('A1')->applyFromArray($style1);
+    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "HOJA DE RUTEO DIARIO DEL DISTRIBUIDOR");
+    $prueba->getActiveSheet()->getStyle('B4:C4')->applyFromArray($style2);
+    $prueba->getActiveSheet()->getStyle('K3:M3')->applyFromArray($style3);
+    $prueba->getActiveSheet()->getStyle('L4:M4')->applyFromArray($style3);
+    $prueba->getActiveSheet()->getStyle('L5:M5')->applyFromArray($style3);
+    $prueba->getActiveSheet()->getStyle('L6:M6')->applyFromArray($style3);
+    $prueba->getActiveSheet()->getStyle('O3:Q3')->applyFromArray($style4);
+    $prueba->getActiveSheet()->getStyle('O4:Q4')->applyFromArray($style4);
+    $prueba->getActiveSheet()->getStyle('O5:Q5')->applyFromArray($style5);
+    $prueba->getActiveSheet()->getStyle('O6:Q6')->applyFromArray($style5);
+    $prueba->getActiveSheet()->getStyle('A8:Q9')->applyFromArray($style6);
+    $prueba->getActiveSheet()->getStyle('I9:J9')->applyFromArray($style7);
+    $prueba->setActiveSheetIndex(0)->setCellValue("B4", "DEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("K3", "ESTADO DEL PUNTO:");
+    $prueba->setActiveSheetIndex(0)->setCellValue("L3", '1');
+    $prueba->setActiveSheetIndex(0)->setCellValue("L4", '2');
+    $prueba->setActiveSheetIndex(0)->setCellValue("L5", '3');
+    $prueba->setActiveSheetIndex(0)->setCellValue("L6", '4');
+    $prueba->setActiveSheetIndex(0)->setCellValue("M3", "VENDE");
+    $prueba->setActiveSheetIndex(0)->setCellValue("M4", "NO VENDE");
+    $prueba->setActiveSheetIndex(0)->setCellValue("M5", "NO EXISTE");
+    $prueba->setActiveSheetIndex(0)->setCellValue("M6", "CERRADO");
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("O3", "DEJO MATERIAL");
+    $prueba->setActiveSheetIndex(0)->setCellValue("O5", "COMUNICO  PROM.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("P3", '1');
+    $prueba->setActiveSheetIndex(0)->setCellValue("P4", '2');
+    $prueba->setActiveSheetIndex(0)->setCellValue("P5", '1');
+    $prueba->setActiveSheetIndex(0)->setCellValue("P6", '2');
+    $prueba->setActiveSheetIndex(0)->setCellValue("Q3", 'SI');
+    $prueba->setActiveSheetIndex(0)->setCellValue("Q4", 'NO');
+    $prueba->setActiveSheetIndex(0)->setCellValue("Q5", 'SI');
+    $prueba->setActiveSheetIndex(0)->setCellValue("Q6", 'NO');
+
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 8, 0, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(1, 8, 1, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(2, 8, 2, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(3, 8, 3, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(4, 8, 4, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(5, 8, 5, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(6, 8, 6, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(7, 8, 7, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(8, 8, 9, 8);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(10, 8, 10, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(11, 8, 11, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(12, 8, 12, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(13, 8, 13, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(14, 8, 14, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(15, 8, 15, 9);
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(16, 8, 16, 9);
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("A8", "FECHA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B8", "DISTRIBUIDOR");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C8", "CODIGO SUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("D8", "NOMBRE SUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("E8", "CODIGO DE MERCADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("F8", "MERCADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("G8", "* ESTADO DEL PUNTO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("H8", "LINEA ABONABLE");
+    $prueba->setActiveSheetIndex(0)->setCellValue("I8", "CANTIDAD PRE PAGO ENTREGADA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("K8", "Q TARJETAS 10");
+    $prueba->setActiveSheetIndex(0)->setCellValue("L8", "MICRORECARGA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("M8", "DEJO MATERIAL POP?");
+    $prueba->setActiveSheetIndex(0)->setCellValue("N8", "COMUNICO PROMOCION?");
+    $prueba->setActiveSheetIndex(0)->setCellValue("O8", "OBSERVACIONES");
+    $prueba->setActiveSheetIndex(0)->setCellValue("P8", "FIRMA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("Q8", "ACLARACION FIRMA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("I9", "SIM MOVIL");
+    $prueba->setActiveSheetIndex(0)->setCellValue("J9", "SIM 4G");
+
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(14);
+    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(18);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(19);
+    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(17);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(16);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(19);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(17);
+    $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(13);
+    $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(13);
+    $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(18);
+    $prueba->getActiveSheet()->getColumnDimension('L')->setWidth(17);
+    $prueba->getActiveSheet()->getColumnDimension('M')->setWidth(19);
+    $prueba->getActiveSheet()->getColumnDimension('N')->setWidth(20);
+    $prueba->getActiveSheet()->getColumnDimension('O')->setWidth(18);
+    $prueba->getActiveSheet()->getColumnDimension('P')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('Q')->setWidth(15);
+
+    $clientes = $this->Cliente->find('all',array(
+      'recursive' => -1,
+      'conditions' => array('')
+    ));
+
+    $prueba->getActiveSheet()->setTitle("Hoja de ruteo Diario");
+    $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
+    $objWriter->save('php://output');
+    exit;
   }
 
 }

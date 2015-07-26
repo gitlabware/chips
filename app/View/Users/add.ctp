@@ -1,6 +1,4 @@
-
 <section role="main" id="main">
-
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
 
     <hgroup id="main-title" class="thin">
@@ -166,9 +164,6 @@
 </script>
 <script>
   $(document).ready(function () {
-
       $("#formID").validationEngine();
-
-
   });
 </script>

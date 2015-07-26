@@ -149,19 +149,6 @@ class User extends AppModel {
 			'finderQuery' => '',
 			'counterQuery' => ''
 		),
-		'Ventasdistribuidore' => array(
-			'className' => 'Ventasdistribuidore',
-			'foreignKey' => 'user_id',
-			'dependent' => false,
-			'conditions' => '',
-			'fields' => '',
-			'order' => '',
-			'limit' => '',
-			'offset' => '',
-			'exclusive' => '',
-			'finderQuery' => '',
-			'counterQuery' => ''
-		),
     'Rutasusuario' => array(
       'className' => 'Rutasusuario',
       'foreignKey' => 'user_id',

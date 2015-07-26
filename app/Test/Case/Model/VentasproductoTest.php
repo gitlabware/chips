@@ -1,11 +1,11 @@
 <?php
-App::uses('Ventasdistribuidore', 'Model');
+App::uses('Ventasproducto', 'Model');
 
 /**
- * Ventasdistribuidore Test Case
+ * Ventasproducto Test Case
  *
  */
-class VentasdistribuidoreTest extends CakeTestCase {
+class VentasproductoTest extends CakeTestCase {
 
 /**
  * Fixtures
@@ -13,6 +13,7 @@ class VentasdistribuidoreTest extends CakeTestCase {
  * @var array
  */
 	public $fixtures = array(
+		'app.ventasproducto',
 		'app.ventasdistribuidore',
 		'app.persona',
 		'app.sucursal',
@@ -47,7 +48,7 @@ class VentasdistribuidoreTest extends CakeTestCase {
  */
 	public function setUp() {
 		parent::setUp();
-		$this->Ventasdistribuidore = ClassRegistry::init('Ventasdistribuidore');
+		$this->Ventasproducto = ClassRegistry::init('Ventasproducto');
 	}
 
 /**
@@ -56,7 +57,7 @@ class VentasdistribuidoreTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown() {
-		unset($this->Ventasdistribuidore);
+		unset($this->Ventasproducto);
 
 		parent::tearDown();
 	}
