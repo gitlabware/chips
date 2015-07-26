@@ -197,7 +197,12 @@
                         </li>
                     </ul>
                 </li>
-
+                <li>
+                    <a href="<?php echo $this->Html->url(array('controller' => 'Informes', 'action' => 'index')); ?>">Informes</a>
+                </li>
+                <li>
+                    <a href="<?php echo $this->Html->url(array('controller' => 'Ventas', 'action' => 'distribuidores')); ?>">Ventas</a>
+                </li>
             </ul>
         </section>
 

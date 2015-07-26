@@ -7,7 +7,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class InformesController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('User', 'Movimiento', 'Cliente', 'Rutasusuario', 'Persona', 'Ventasdistribuidore', 'Ventasproducto', 'Ventascliente');
+  public $uses = array('User', 'Movimiento', 'Cliente', 'Rutasusuario', 'Persona', 'Ventasdistribuidore', 'Ventasproducto', 'Ventascliente','Lugare');
   public $layout = 'viva';
   public $components = array('RequestHandler', 'DataTable');
 
@@ -282,7 +282,8 @@ class InformesController extends AppController {
       'conditions' => array('User.group_id' => 2),
       'fields' => array('User.id', "User.nombre_persona")
     ));
-    $this->set(compact('distribuidores'));
+    $lugares = $this->Lugare->find('list',array('fields' => 'Lugare.nombre'));
+    $this->set(compact('distribuidores','lugares'));
   }
 
   public function ruteo_diario() {
@@ -335,8 +336,22 @@ class InformesController extends AppController {
     $this->set(compact('subdealers', 'persona'));
   }
 
-  public function excel_ruteo_diario($idMercado = null) {
+  public function excel_ruteo_diario() {
 
+    $mercado = $this->request->data['Dato']['mercado'];
+    $idUser = $this->request->data['Dato']['user_id'];
+
+    $this->User->virtualFields = array(
+      'nombre_persona' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+    $user = $this->User->find('first', array(
+      'recursive' => 0,
+      'conditions' => array('User.id' => $idUser),
+      'fields' => array('User.nombre_persona')
+    ));
+    /* debug($user);
+      exit; */
+    //debug($idUser);exit;
     $nombre_excel = "Hoja-ruteo.xlsx";
 
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -352,6 +367,7 @@ class InformesController extends AppController {
     $style5 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FFFF00')));
     $style6 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '00FF00')));
     $style7 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '339966')));
+    $style8 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)));
     $prueba->getActiveSheet()->getStyle('A1')->applyFromArray($style1);
     $prueba->setActiveSheetIndex(0)->setCellValue("A1", "HOJA DE RUTEO DIARIO DEL DISTRIBUIDOR");
     $prueba->getActiveSheet()->getStyle('B4:C4')->applyFromArray($style2);
@@ -426,9 +442,9 @@ class InformesController extends AppController {
     $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(8);
     $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(14);
     $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(18);
-    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(19);
-    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(17);
-    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(16);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(20);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(20);
     $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(19);
     $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(17);
     $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(13);
@@ -441,15 +457,147 @@ class InformesController extends AppController {
     $prueba->getActiveSheet()->getColumnDimension('P')->setWidth(11);
     $prueba->getActiveSheet()->getColumnDimension('Q')->setWidth(15);
 
-    $clientes = $this->Cliente->find('all',array(
+    $clientes = $this->Cliente->find('all', array(
       'recursive' => -1,
-      'conditions' => array('')
+      'conditions' => array('Cliente.cod_mercado' => $mercado)
     ));
+    $num = 9;
+    foreach ($clientes as $cli) {
+      $num++;
+      $prueba->getActiveSheet()->getStyle("A$num:Q$num")->applyFromArray($style8);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B$num", $user['User']['nombre_persona']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C$num", $cli['Cliente']['cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D$num", $cli['Cliente']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E$num", $cli['Cliente']['cod_mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F$num", $cli['Cliente']['mercado']);
+    }
 
     $prueba->getActiveSheet()->setTitle("Hoja de ruteo Diario");
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
     $objWriter->save('php://output');
     exit;
+  }
+
+  public function excel_rutas_semana() {
+    
+    $lugar = $this->request->data['Dato']['lugare_id'];
+    $rutas = $this->Rutasusuario->find('list', array(
+      'recursive' => 0,
+      'conditions' => array('User.lugare_id' => $lugar),
+      'fields' => 'Rutasusuario.ruta_id',
+      'group' => 'Rutasusuario.ruta_id'
+    ));
+
+    $sql = "(SELECT ru.user_id FROM rutasusuarios ru WHERE Cliente.ruta_id = ru.ruta_id LIMIT 1)";
+    $sql1 = "(SELECT us.persona_id FROM users us WHERE us.id = $sql LIMIT 1)";
+    $sql2 = "SELECT CONCAT(pe.nombre,' ',pe.ap_paterno,' ',pe.ap_materno) FROM personas pe WHERE pe.id = $sql1";
+    $this->Cliente->virtualFields = array(
+      'encargado' => "($sql2)"
+    );
+    $clientes = $this->Cliente->find('all', array(
+      'recursive' => -1,
+      'conditions' => array(
+        'Cliente.ruta_id' => $rutas
+      ),
+      'order' => 'Cliente.encargado'
+    ));
+    
+    
+    $nombre_excel = "control-rutas-frecue.xlsx";
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
+    header('Cache-Control: max-age=0');
+    $prueba = new PHPExcel();
+    $style1 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 11, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)));
+    $style2 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FFFF00')));
+    $style3 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 9, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '00FF00')));
+    $style4 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'FFFF99')));
+    $style5 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 9, 'bold' => true), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)), 'fill' => array('type' => PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => '993366')));
+    $style6 = array('alignment' => array('horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER, 'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER), 'font' => array('size' => 8), 'borders' => array('allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)));
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 1, 5, 1);
+    $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(23);
+    $prueba->getActiveSheet()->getStyle("A1:F1")->applyFromArray($style1);
+    $prueba->getActiveSheet()->getStyle("G1:L1")->applyFromArray($style2);
+    $prueba->getActiveSheet()->getStyle("A2:P2")->applyFromArray($style3);
+    $prueba->getActiveSheet()->getStyle("M1")->applyFromArray($style4);
+    $prueba->getActiveSheet()->getStyle("M2")->applyFromArray($style4);
+    $prueba->getActiveSheet()->getStyle("N2")->applyFromArray($style5);
+    
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(9);
+    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(29);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(14);
+    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(23);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('L')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('M')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('N')->setWidth(7);
+    $prueba->getActiveSheet()->getColumnDimension('O')->setWidth(15);
+    $prueba->getActiveSheet()->getColumnDimension('P')->setWidth(15);
+    
+    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "CONTROL DE RUTAS Y FRECUENCIAS - SEMANA ________________");
+    $prueba->setActiveSheetIndex(0)->setCellValue("G1", "LUNES");
+    $prueba->setActiveSheetIndex(0)->setCellValue("H1", "MARTES");
+    $prueba->setActiveSheetIndex(0)->setCellValue("I1", "MIERCOLES");
+    $prueba->setActiveSheetIndex(0)->setCellValue("J1", "JUEVES");
+    $prueba->setActiveSheetIndex(0)->setCellValue("K1", "VIERNES");
+    $prueba->setActiveSheetIndex(0)->setCellValue("L1", "SABADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("M1", "DOMINGO");
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("A2", "CODIGO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B2", "Estado");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C2", "NOMBRE");
+    $prueba->setActiveSheetIndex(0)->setCellValue("D2", "TIPO DE MERCADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("E2", "DISTRIBUIDOR ENCARGADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("F2", "Ruta");
+    $prueba->setActiveSheetIndex(0)->setCellValue("N2", "TOTAL");
+    $prueba->setActiveSheetIndex(0)->setCellValue("O2", "MERCADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("P2", "DEALER PADRE");
+    
+    $num = 2;
+    foreach ($clientes as $cli) {
+      $num++;
+      $prueba->getActiveSheet()->getStyle("A$num:P$num")->applyFromArray($style6);
+      $prueba->getActiveSheet()->getStyle("M$num")->applyFromArray($style4);
+      $prueba->getActiveSheet()->getStyle("N$num")->applyFromArray($style5);
+      
+      $prueba->setActiveSheetIndex(0)->setCellValue("A$num", $cli['Cliente']['cod_dealer']);
+      //$prueba->setActiveSheetIndex(0)->setCellValue("B$num", "");
+      $prueba->setActiveSheetIndex(0)->setCellValue("C$num", $cli['Cliente']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D$num", "TRADICIONAL");
+      $prueba->setActiveSheetIndex(0)->setCellValue("E$num", $cli['Cliente']['encargado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F$num", $cli['Cliente']['cod_mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("N$num", 0);
+      $prueba->setActiveSheetIndex(0)->setCellValue("O$num", $cli['Cliente']['mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("P$num", "SILVIA SEJAS");
+    }
+
+    $prueba->getActiveSheet()->setTitle("CONTROL DE RUTAS Y FRECUENCIAS");
+    $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
+    $objWriter->save('php://output');
+    exit;
+  }
+
+  public function ajax_mercado($idUser = null) {
+    $rutas = $this->Rutasusuario->find('list', array(
+      'recursive' => -1,
+      'conditions' => array('Rutasusuario.user_id' => $idUser),
+      'fields' => array('Rutasusuario.ruta_id')
+    ));
+    $mercados = $this->Cliente->find('list', array(
+      'recursive' => -1,
+      'conditions' => array('Cliente.ruta_id' => $rutas, 'Cliente.cod_mercado !=' => '', 'Cliente.cod_mercado !=' => null),
+      'fields' => array('Cliente.cod_mercado', 'Cliente.mercado'),
+      'group' => array('Cliente.cod_mercado')
+    ));
+    //debug($mercados);exit;
+    $this->set(compact('mercados'));
   }
 
 }

@@ -41,24 +41,67 @@
                 <?php echo $this->Form->end(); ?>
                 <br>
                 <?php echo $this->Form->create('Informe', array('action' => 'ruteo_diario')); ?>
-                  <fieldset class="fieldset">
-                      <legend class="legend">HOJA DE RUTEO DIARIO DISTRIBUIDORES</legend>
-                      <div class="columns">
-                          <div class="six-columns">
-                              <p class="block-label button-height inline-label">
-                                  <label for="input-1" class="label">Distribuidor</label>
-                                  <?= $this->Form->select('Dato.user_id' ,$distribuidores,['class' => 'select full-width']);?>
-                              </p>
-                          </div>
-                          <div class="new-row twelve-columns">
-                              <p class="inline-label">
-                                  <?php
-                                  echo $this->Form->submit("GENERAR", array  ('class' => 'button anthracite-gradient glossy full-width')); ?>
+                <fieldset class="fieldset">
+                    <legend class="legend">HOJA DE RUTEO DIARIO DISTRIBUIDORES</legend>
+                    <div class="columns">
+                        <div class="six-columns">
+                            <p class="block-label button-height inline-label">
+                                <label for="input-1" class="label">Distribuidor</label>
+                                <?= $this->Form->select('Dato.user_id', $distribuidores, ['class' => 'select full-width']); ?>
+                            </p>
+                        </div>
+                        <div class="new-row twelve-columns">
+                            <p class="inline-label">
+                                <?php echo $this->Form->submit("GENERAR", array('class' => 'button anthracite-gradient glossy full-width')); ?>
                             </p>
                         </div>
                     </div>
                 </fieldset>
-                <?php echo $this->Form->end();?>
+                <?php echo $this->Form->end(); ?>
+                <br>
+                <?php echo $this->Form->create('Informe', array('action' => 'excel_ruteo_diario')); ?>
+                <fieldset class="fieldset">
+                    <legend class="legend">HOJA DE RUTEO DIARIO DISTRIBUIDORES NUEVO</legend>
+                    <div class="columns">
+                        <div class="six-columns">
+                            <p class="block-label button-height inline-label">
+                                <label for="input-1" class="label">Distribuidor</label>
+                                <?= $this->Form->select('Dato.user_id', $distribuidores, ['class' => 'select full-width', 'id' => 'idfdist']); ?>
+                            </p>
+                        </div>
+                        <div class="six-columns">
+                            <p class="block-label button-height inline-label" id="cod_mercado">
+                                <label for="input-1" class="label">Mercado</label>
+                                <?= $this->Form->select('Dato.mercado', array(), ['class' => 'select full-width']); ?>
+                            </p>
+                        </div>
+                        <div class="new-row twelve-columns">
+                            <p class="inline-label">
+                                <?php echo $this->Form->submit("GENERAR", array('class' => 'button anthracite-gradient glossy full-width')); ?>
+                            </p>
+                        </div>
+                    </div>
+                </fieldset>
+                <?php echo $this->Form->end(); ?>
+                <br>
+                <?php echo $this->Form->create('Informe', array('action' => 'excel_rutas_semana')); ?>
+                <fieldset class="fieldset">
+                    <legend class="legend">CONTROL DE RUTAS Y FRECUENCIAS</legend>
+                    <div class="columns">
+                        <div class="six-columns">
+                            <p class="block-label button-height inline-label">
+                                <label for="input-1" class="label">Lugar</label>
+                                <?= $this->Form->select('Dato.lugare_id', $lugares, ['class' => 'select full-width']); ?>
+                            </p>
+                        </div>
+                        <div class="new-row twelve-columns">
+                            <p class="inline-label">
+                                <?php echo $this->Form->submit("GENERAR", array('class' => 'button anthracite-gradient glossy full-width')); ?>
+                            </p>
+                        </div>
+                    </div>
+                </fieldset>
+                <?php echo $this->Form->end(); ?>
             </div>
         </div>
     </div>
@@ -71,3 +114,8 @@ echo $this->Html->script(array(
   ), array('block' => 'js_add'));
 ?>
 
+<script>
+  $('#idfdist').change(function () {
+      $('#cod_mercado').load('<?php echo $this->Html->url(array('action' => 'ajax_mercado')); ?>/'+$(this).val());
+  });
+</script>
