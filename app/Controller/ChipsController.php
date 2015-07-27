@@ -1136,5 +1136,23 @@ class ChipsController extends AppController {
     ));
     $this->set(compact('chip','activacion'));
   }
+  
+  public function excel_asignados($idExcel = null) {
+    $excel = $this->Excel->findByid($idExcel,null,null,-1);
+    $sql = "SELECT CONCAT(p.nombre,' ',p.ap_paterno,' ',p.ap_materno) FROM personas p WHERE p.id = Distribuidor.persona_id";
+    $this->Chip->virtualFields = array(
+      'nombre_dist' => "CONCAT(($sql))"
+    );
+    $entregados = $this->Chip->find('all', array(
+      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist')
+      , 'recursive' => 0
+      , 'conditions' => array('Chip.distribuidor_id !=' => NULL,'Chip.excel_id' => $idExcel)
+      , 'group' => array('Chip.fecha_entrega_d', 'distribuidor_id')
+      , 'order' => 'fecha_entrega_d DESC'
+      , 'LIMIT' => 50
+    ));
+    //debug($entregados);exit;
+    $this->set(compact('entregados','excel'));
+  }
 
 }

@@ -152,7 +152,10 @@
                       <td><?php echo $e['Excel']['created']; ?></td>
                       <td><?php echo $e['Excel']['tipo']; ?></td>                       
                       <td>
-                          <?php echo $this->Html->link("Detalle",array('action' => 'verexcel',$e['Excel']['id']),array('class' => 'button blue-gradient glossy'))?>
+                          <?php if ($e['Excel']['tipo'] == 'asignacion'): ?>
+                            <?php echo $this->Html->link("Detalle", array('action' => 'verexcel', $e['Excel']['id']), array('class' => 'button blue-gradient glossy')) ?>
+                            <?php echo $this->Html->link("Asignados", array('action' => 'excel_asignados', $e['Excel']['id']), array('class' => 'button black-gradient glossy')) ?>
+                          <?php endif; ?>
                       </td>                       
                   </tr>               
                 <?php endforeach; ?>

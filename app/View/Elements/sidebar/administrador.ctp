@@ -203,6 +203,9 @@
                 <li>
                     <a href="<?php echo $this->Html->url(array('controller' => 'Ventas', 'action' => 'distribuidores')); ?>">Ventas</a>
                 </li>
+                <li>
+                    <a href="<?php echo $this->Html->url(array('controller' => 'Cajachicas', 'action' => 'index')); ?>">Caja chica</a>
+                </li>
             </ul>
         </section>
 

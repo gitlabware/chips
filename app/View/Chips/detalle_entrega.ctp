@@ -53,6 +53,8 @@
                     <th>Tipo</th>
                     <th>Sim</th>
                     <th>Imsi</th>
+                    <th>Factura</th>
+                    <th>Caja</th>
                     <th>Telefono</th>
                     <th>Accion</th>
                 </tr>
@@ -65,6 +67,8 @@
                       <td><?php echo $ent['Chip']['tipo_sim'] ?></td>
                       <td><?php echo $ent['Chip']['sim'] ?></td>
                       <td><?php echo $ent['Chip']['imsi'] ?></td>
+                      <td><?php echo $ent['Chip']['factura'] ?></td>
+                      <td><?php echo $ent['Chip']['caja'] ?></td>
                       <td><?php echo $ent['Chip']['telefono'] ?></td>
                       <td>
                           <a href="javascript:" class="" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'cancela_entrega_id', $ent['Chip']['id'])); ?>');">Cancelar</a>
@@ -84,6 +88,8 @@
   }
 
   filtro_c = [
+      {type: "text"},
+      {type: "text"},
       {type: "text"},
       {type: "text"},
       {type: "text"},
