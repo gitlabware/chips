@@ -7,7 +7,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class ChipsController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente');
+  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente','Precio');
   public $layout = 'viva';
   public $components = array('RequestHandler', 'DataTable');
 
@@ -1144,7 +1144,7 @@ class ChipsController extends AppController {
       'nombre_dist' => "CONCAT(($sql))"
     );
     $entregados = $this->Chip->find('all', array(
-      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist')
+      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist','Chip.pagado')
       , 'recursive' => 0
       , 'conditions' => array('Chip.distribuidor_id !=' => NULL,'Chip.excel_id' => $idExcel)
       , 'group' => array('Chip.fecha_entrega_d', 'distribuidor_id')
@@ -1152,7 +1152,28 @@ class ChipsController extends AppController {
       , 'LIMIT' => 50
     ));
     //debug($entregados);exit;
-    $this->set(compact('entregados','excel'));
+    $precio_chip = $this->Precio->findByid(3);
+    /*debug($precio_chip);exit;*/
+    $this->set(compact('entregados','excel','precio_chip'));
+  }
+  
+  public function cambia_pagado($idExcel = null,$fecha = null,$idDistribuidor = null){
+    $chips = $this->Chip->find('all',array(
+      'recursive' => -1,
+      'conditions' => array(
+        'Chip.excel_id' => $idExcel,
+        'Chip.fecha_entrega_d' => $fecha,
+        'Chip.distribuidor_id' => $idDistribuidor
+      ),
+      'fields' => array('Chip.id')
+    ));
+    foreach($chips as $ch){
+      $this->Chip->id = $ch['Chip']['id'];
+      $dchip['pagado'] = 1;
+      $this->Chip->save($dchip);
+    }
+    $this->Session->setFlash('Se registro el cambio!!','msgbueno');
+    $this->redirect($this->referer());
   }
 
 }
