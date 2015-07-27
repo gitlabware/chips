@@ -4,7 +4,8 @@
     <hgroup id="main-title" class="thin">
         <h1>Entregas chip a distribuidor de <?php echo $excel['Excel']['nombre_original'] ?></h1>
     </hgroup>
-    <div class="with-padding">                   
+    <div class="with-padding" align="">   
+        <span class="loader huge refreshing"></span>
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
                 <tr>
@@ -32,7 +33,7 @@
                           ?>
                       </td>
                       <td>
-                          <?php if ($ent['Chip']['precio_d'] == 1): ?>
+                          <?php if ($ent['Chip']['pagado'] == 1): ?>
                           <?php echo $this->Html->link("Pagado",array('action' => 'cambia_nopagado',$excel['Excel']['id'], $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id']),array('class' => 'button green-gradient glossy'))?>
                           <?php else:?>
                           <?php echo $this->Html->link("Pagar",array('action' => 'cambia_pagado',$excel['Excel']['id'], $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id']),array('class' => 'button orange-gradient glossy'))?>

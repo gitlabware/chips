@@ -1175,5 +1175,23 @@ class ChipsController extends AppController {
     $this->Session->setFlash('Se registro el cambio!!','msgbueno');
     $this->redirect($this->referer());
   }
+  public function cambia_nopagado($idExcel = null,$fecha = null,$idDistribuidor = null){
+    $chips = $this->Chip->find('all',array(
+      'recursive' => -1,
+      'conditions' => array(
+        'Chip.excel_id' => $idExcel,
+        'Chip.fecha_entrega_d' => $fecha,
+        'Chip.distribuidor_id' => $idDistribuidor
+      ),
+      'fields' => array('Chip.id')
+    ));
+    foreach($chips as $ch){
+      $this->Chip->id = $ch['Chip']['id'];
+      $dchip['pagado'] = 0;
+      $this->Chip->save($dchip);
+    }
+    $this->Session->setFlash('Se registro el cambio!!','msgbueno');
+    $this->redirect($this->referer());
+  }
 
 }
