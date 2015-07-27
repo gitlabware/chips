@@ -64,7 +64,7 @@ class CajachicasController extends AppController {
         'Cajachica.fecha <=' => $this->request->data['Dato']['fecha_fin'],
         'Cajachica.tipo' => 'Ingreso'
       ),
-      'fields' => array('Cajachica.*','Cajadetalle.*')
+      'fields' => array('Cajachica.*', 'Cajadetalle.*')
     ));
     $cajachica_gas = $this->Cajachica->find('all', array(
       'recursive' => 0,
@@ -73,7 +73,7 @@ class CajachicasController extends AppController {
         'Cajachica.fecha <=' => $this->request->data['Dato']['fecha_fin'],
         'Cajachica.tipo' => 'Gasto'
       ),
-      'fields' => array('Cajachica.*','Cajadetalle.*')
+      'fields' => array('Cajachica.*', 'Cajadetalle.*')
     ));
     $detalles = $this->Cajadetalle->find('list', array('fields' => 'Cajadetalle.nombre'));
     $this->set(compact('cajachica_ing', 'cajachica_gas', 'total', 'detalles'));
@@ -94,6 +94,8 @@ class CajachicasController extends AppController {
           $this->Cajachica->create();
           $dcaja['total'] = $total - $dcaja['monto'];
           $this->Cajachica->save($dcaja);
+          $this->Session->setFlash("Se registro correctamente en cajachica!!", 'msgbueno');
+          $this->redirect(array('action' => 'index'));
         } else {
           $this->Session->setFlash("El gasto no debe exceder al total de $total", 'msgerror');
         }
@@ -125,7 +127,7 @@ class CajachicasController extends AppController {
       $this->set_total(($total + $caja['Cajachica']['monto']));
       $this->Session->setFlash("Se elimino correctamente!!", 'msgbueno');
     }
-    $this->redirect(array('action' => 'index')); 
+    $this->redirect(array('action' => 'index'));
   }
 
 }
