@@ -80,7 +80,6 @@ class CajachicasController extends AppController {
   }
 
   public function registra_caja() {
-
     if (!empty($this->request->data['Cajadetalle']['nombre'])) {
       $this->Cajadetalle->create();
       $this->Cajadetalle->save($this->request->data['Cajadetalle']);

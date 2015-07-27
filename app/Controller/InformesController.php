@@ -466,7 +466,7 @@ class InformesController extends AppController {
       $num++;
       $prueba->getActiveSheet()->getStyle("A$num:Q$num")->applyFromArray($style8);
       $prueba->setActiveSheetIndex(0)->setCellValue("B$num", $user['User']['nombre_persona']);
-      $prueba->setActiveSheetIndex(0)->setCellValue("C$num", $cli['Cliente']['cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C$num", $cli['Cliente']['num_registro']);
       $prueba->setActiveSheetIndex(0)->setCellValue("D$num", $cli['Cliente']['nombre']);
       $prueba->setActiveSheetIndex(0)->setCellValue("E$num", $cli['Cliente']['cod_mercado']);
       $prueba->setActiveSheetIndex(0)->setCellValue("F$num", $cli['Cliente']['mercado']);
