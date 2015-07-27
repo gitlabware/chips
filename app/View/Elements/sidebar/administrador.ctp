@@ -119,7 +119,7 @@
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'subirexcel')); ?>">Subir excel chips</a></li>
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'asigna_distrib')); ?>">Asignar Chips</a></li>	
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'asignados')); ?>">Chips asignados</a></li>                                                
-
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'todos')); ?>">Todos los chips</a></li>
                     </ul>
                 </li>
 
