@@ -5,12 +5,11 @@
         <h1>Entregas chip a distribuidor de <?php echo $excel['Excel']['nombre_original'] ?></h1>
     </hgroup>
     <div class="with-padding" align="">   
-        <span class="loader huge refreshing"></span>
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
                 <tr>
                     <th>Fecha</th>
-                    <th>Cliente</th>
+                    <th>Distribuidor</th>
                     <th>Nro Chips</th>
                     <th>Monto total</th>
                     <th>Estado</th>

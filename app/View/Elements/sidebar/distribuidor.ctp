@@ -43,6 +43,7 @@
                     </ul>
                 </li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'entregados')); ?>">Chips entregados</a></li>
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'asignados')); ?>">Mis chips</a></li>
                 <li class="with-right-arrow">
                     <span>Pedidos</span>
                     <ul class="big-menu">

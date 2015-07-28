@@ -1125,10 +1125,14 @@ class ChipsController extends AppController {
   
   public function info_chip($idChip = null){
     $this->layout = 'ajax';
+    $this->Chip->virtualFields = array(
+      'distribuidor' => "(SELECT CONCAT(pe.nombre,' ',pe.ap_paterno,' ',pe.ap_materno) FROM personas pe WHERE Distribuidor.persona_id = pe.id)"
+    );
     $chip = $this->Chip->find('first',array(
       'recursive' => 0,
       'conditions' => array('Chip.id' => $idChip)
     ));
+    
     $activacion = $this->Activado->find('first',array(
       'recursive' => -1,
       'conditions' => array('Activado.phone_number' => $chip['Chip.telefono']),
@@ -1144,7 +1148,7 @@ class ChipsController extends AppController {
       'nombre_dist' => "CONCAT(($sql))"
     );
     $entregados = $this->Chip->find('all', array(
-      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist','Chip.pagado')
+      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist','Chip.pagado','Chip.precio_d')
       , 'recursive' => 0
       , 'conditions' => array('Chip.distribuidor_id !=' => NULL,'Chip.excel_id' => $idExcel)
       , 'group' => array('Chip.fecha_entrega_d', 'distribuidor_id')

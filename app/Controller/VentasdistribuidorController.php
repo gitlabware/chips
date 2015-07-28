@@ -24,7 +24,7 @@ class VentasdistribuidorController extends AppController {
     'Tiposobservacione',
     'Deposito',
     'Recargado',
-    'Listacliente', 'User', 'Rutasusuario', 'Totale');
+    'Listacliente', 'User', 'Rutasusuario', 'Totale','Precio');
   public $layout = 'vivadistribuidor';
   public $components = array('RequestHandler', 'Session', 'Acl', 'Auth', 'DataTable');
 
@@ -1327,13 +1327,14 @@ class VentasdistribuidorController extends AppController {
 
   public function entregados() {
     $entregados = $this->Chip->find('all', array(
-      'fields' => array('Chip.fecha_entrega_d', 'Cliente.nombre', 'Cliente.id', 'Cliente.num_registro', 'COUNT(*) as num_chips')
+      'fields' => array('Chip.fecha_entrega_d', 'Cliente.nombre', 'Cliente.id', 'Cliente.num_registro', 'COUNT(*) as num_chips','Chip.pagado','Chip.precio_d')
       , 'conditions' => array('Chip.distribuidor_id' => $this->Session->read('Auth.User.id'), 'Chip.cliente_id !=' => NULL)
       , 'group' => array('Chip.fecha_entrega_d', 'cliente_id')
       , 'order' => 'fecha_entrega_d DESC'
       , 'LIMIT' => 50
     ));
-    $this->set(compact('entregados'));
+    $precio_chip = $this->Precio->findByid(3);
+    $this->set(compact('entregados','precio_chip'));
   }
 
   public function modifica_entregas() {
@@ -1562,6 +1563,29 @@ class VentasdistribuidorController extends AppController {
       $this->Session->setFlash("No se pudo registrar!!", 'msgerror');
     }
     $this->redirect(array('action' => 'clientes'));
+  }
+  
+  public function asignados() {
+    $entregados = $this->Chip->find('all', array(
+      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips','Chip.pagado','Chip.precio_d')
+      , 'recursive' => 0
+      , 'conditions' => array('Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
+      , 'group' => array('Chip.fecha_entrega_d')
+      , 'order' => 'fecha_entrega_d DESC'
+      , 'LIMIT' => 50
+    ));
+    //debug($entregados);exit;
+    $precio_chip = $this->Precio->findByid(3);
+    /*debug($precio_chip);exit;*/
+    $this->set(compact('entregados','excel','precio_chip'));
+  }
+  
+  public function detalle_asignados($fecha = null){
+    $entregados = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.fecha_entrega_d' => $fecha,'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
+    ));
+    $this->set(compact('entregados', 'fecha'));
   }
 
 }
