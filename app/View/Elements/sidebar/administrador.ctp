@@ -212,3 +212,7 @@
     </div>
 
 </section>
+
+<script>
+$(".big-menu a[href='"+String(window.location.pathname)+"']").addClass('current navigable-current');
+</script>
