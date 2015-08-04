@@ -76,7 +76,7 @@
       'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
       'bProcessing': true,
       'sAjaxSource': urljsontabla,
-      'sServerMethod': 'POST',
+      //'sServerMethod': 'POST',
       "order": [],
       'fnInitComplete': function (oSettings)
       {

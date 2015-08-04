@@ -67,8 +67,10 @@
       'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
       'bProcessing': true,
       'sAjaxSource': urljsontabla,
-      'sServerMethod': 'POST',
+      //'sServerMethod': 'POST',
       "order": [],
+      "iDisplayLength": 10,
+      "bServerSide": true,
       'fnInitComplete': function (oSettings)
       {
           // Style length select
@@ -76,9 +78,9 @@
           tableStyled = true;
       }
   };
-  
-  function infochip(idchip){
-    cargarmodal('<?php echo $this->Html->url(array('action' => 'info_chip'));?>/'+idchip,'Informacion del Chip');
+
+  function infochip(idchip) {
+      cargarmodal('<?php echo $this->Html->url(array('action' => 'info_chip')); ?>/' + idchip, 'Informacion del Chip');
   }
 </script>
 

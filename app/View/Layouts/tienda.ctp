@@ -100,7 +100,7 @@
 
         <!-- Main content -->
 
-        <?php echo $this->Session->flash(); ?>
+        
         <?php echo $this->fetch('content'); ?>
 
         <!-- End main content -->       
@@ -171,7 +171,7 @@
           table2.dataTable(datos_tabla2);
 
         </script>
-
+        <?php echo $this->Session->flash(); ?>
         <div class="ocultar_impresion" style="text-align: center; color:gray;">
             <p class="f-left">&copy; 2013 <strong class="green">SASEZ SRL.</strong>, Todos Los Derechos Reservados &reg;</p>
             <p class="f-right">Dise&ntilde;ado y Desarrollado por la Consultora <a href="http://www.labware.com.bo/">LabWare</a></p>

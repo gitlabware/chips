@@ -7,7 +7,31 @@
     <div class="with-padding">
         <div class="columns">
             <div class="seven-columns twelve-columns-mobile twelve-columns-tablet">
-                <h4>Productos</h4>
+                <table class="table responsive-table" id="sorting-advanced">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoria</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Accion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($productos as $pro): ?>
+                          <tr>
+                              <td><?php echo $pro['Producto']['nombre'] ?></td>
+                              <td><?php echo $pro['Producto']['tipo_producto'] ?></td>
+                              <td><?php echo $pro['Productosprecio']['precio'] ?></td>
+                              <td><?php echo $pro['Productosprecio']['total'] ?></td>
+                              <td>
+                                  <a href="javascript:" class="button anthracite-gradient glossy" onclick="add_venta(<?php echo $pro['Producto']['id']; ?>, '<?php echo $pro['Producto']['nombre']; ?>',<?php echo $pro['Productosprecio']['precio']; ?>)">ADICIONAR</a>
+                              </td>
+                          </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+<!--
                 <div class="standard-tabs margin-bottom">
                     <ul class="tabs">
                         <?php foreach ($categorias as $llave => $c): ?>
@@ -61,7 +85,7 @@
                           </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
+                </div>-->
             </div>
             <div class="five-columns new-row-mobile new-row-tablet twelve-columns-mobile twelve-columns-tablet">
                 <div class="simpler">                     
@@ -127,7 +151,7 @@
                   + '</tr>';
           $('#sorting-example2 > tbody:last').append(nueva_fila);
           formulario = '<input type="hidden" name="data[productos][' + id_producto + '][cantidad]" value="1" id="idinpprod-' + id_producto + '">'
-                  + '<input type="hidden" name="data[productos][' + id_producto + '][precio]" value="'+precio+'" id="idinpreprod-' + id_producto + '">';
+                  + '<input type="hidden" name="data[productos][' + id_producto + '][precio]" value="' + precio + '" id="idinpreprod-' + id_producto + '">';
           $('#idformventa').append(formulario);
       }
       $('#idcanttotal').html(v_total);

@@ -132,18 +132,21 @@ class TiendasController extends AppController {
   }
 
   public function index() {
+    $idAlmacen = $this->get_id_almacen();
+    $sql = "SELECT tot.total FROM totales tot WHERE tot.almacene_id = $idAlmacen AND tot.producto_id = Productosprecio.producto_id LIMIT 1";
+    $this->Productosprecio->virtualFields = array(
+      'total' => "CONCAT(($sql))"
+    );
     $productos = $this->Productosprecio->find('all', array(
       'recursive' => 0,
       'conditions' => array(
         'Productosprecio.escala' => 'TIENDA',
-        'Productosprecio.tipousuario_id' => 2
-      )
+        'Productosprecio.tipousuario_id' => 2,
+        'Producto.id !=' => null
+      ),
+      'fields' => array('Productosprecio.*','Producto.*')
     ));
-    /* $categorias = $this->Producto->find('all', array(
-      'recursive' => 0,
-      'conditions' => array('Producto.tiposproducto_id !=' => 0),
-      'group' => 'Producto.tiposproducto_id'
-      )); */
+    //debug($productos);exit;
     $categorias = $this->Tiposproducto->find('all', array('recursive' => -1, 'conditions' => array('Tiposproducto.nombre !=' => 'CELULARES')));
     //debug($categorias); exit;       
     $this->set(compact('productos', 'categorias'));
