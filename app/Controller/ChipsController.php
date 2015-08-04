@@ -9,8 +9,7 @@ class ChipsController extends AppController {
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
   public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente','Precio');
   public $layout = 'viva';
-  public $components = array('RequestHandler', 'DataTable');
-
+  public $components = array('RequestHandler', 'DataTable','Montoliteral');
   public function beforeFilter() {
     parent::beforeFilter();
     if ($this->RequestHandler->responseType() == 'json') {
@@ -1169,15 +1168,36 @@ class ChipsController extends AppController {
         'Chip.fecha_entrega_d' => $fecha,
         'Chip.distribuidor_id' => $idDistribuidor
       ),
-      'fields' => array('Chip.id')
+      'fields' => array('Chip.*')
     ));
+    if(empty($chips)){
+      $this->redirect($this->referer());
+    }
+    $primer_chip = current($chips);
+    $ultimo_chip = end($chips);
+    $cantidad = count($chips);
+    $precio = 0.00;
+    $precio_c = $this->Precio->findByid(3,null,null,-1);
+    if(!empty($primer_chip['Chip']['precio_d'])){
+      $precio = $primer_chip['Chip']['precio_d'];
+    }elseif(!empty($precio_c['Precio']['monto'])){
+      $precio = $precio_c['Precio']['monto'];
+    }
+    $total_b = $cantidad*$precio;
+    $literaltotal = $this->Montoliteral->getMontoLiteral($total_b);
     foreach($chips as $ch){
       $this->Chip->id = $ch['Chip']['id'];
       $dchip['pagado'] = 1;
       $this->Chip->save($dchip);
     }
-    $this->Session->setFlash('Se registro el cambio!!','msgbueno');
-    $this->redirect($this->referer());
+    $distribuidor = $this->User->find('first',array(
+      'recursive' => 0,
+      'conditions' => array('User.id' => $idDistribuidor),
+      'fields' => array('Persona.*')
+    ));
+    $this->set(compact('primer_chip','ultimo_chip','cantidad','precio','literaltotal','total_b','distribuidor'));
+    //$this->Session->setFlash('Se registro el cambio!!','msgbueno');
+    //$this->redirect($this->referer());
   }
   public function cambia_nopagado($idExcel = null,$fecha = null,$idDistribuidor = null){
     $chips = $this->Chip->find('all',array(
