@@ -147,7 +147,7 @@ class ProductosController extends AppController {
     //$nombreOriginal = $this->request->data['Producto']['imagen']['name'];
     //debug($archivoImagen);exit;
     if ($archivoImagen['error'] === UPLOAD_ERR_OK) {
-      $nombre = string::uuid();
+      $nombre = String::uuid();
       if (move_uploaded_file($archivoImagen['tmp_name'], WWW_ROOT . 'img_producto' . DS . $nombre . '.jpg')) {
         return 'img_producto' . DS . $nombre . '.jpg';
       } else {
@@ -329,7 +329,7 @@ class ProductosController extends AppController {
     $nombreOriginal = $this->request->data['Excel']['excel']['name'];
 
     if ($archivoExcel['error'] === UPLOAD_ERR_OK) {
-      $nombre = string::uuid();
+      $nombre = String::uuid();
       if (move_uploaded_file($archivoExcel['tmp_name'], WWW_ROOT . 'files' . DS . $nombre . '.xlsx')) {
         $nombreExcel = $nombre . '.xlsx';
         $direccionExcel = WWW_ROOT . 'files';
@@ -376,6 +376,10 @@ class ProductosController extends AppController {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             } elseif ('D' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+              if($array_data[$rowIndex][$cell->getColumn()] == '' || $array_data[$rowIndex][$cell->getColumn()] == NULL){
+                
+                $this->redirect($this->referer());
+              }
             } elseif ('E' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             } elseif ('F' == $cell->getColumn()) {
@@ -389,8 +393,8 @@ class ProductosController extends AppController {
         }
       }
       $i = 0;
-      /* debug($array_data);
-        exit; */
+       debug($array_data);
+        exit; 
       $this->request->data = "";
       foreach ($array_data as $d) {
         // ------ tipos producto -------
@@ -484,7 +488,7 @@ class ProductosController extends AppController {
     $nombreOriginal = $this->request->data['Excel']['excel']['name'];
 
     if ($archivoExcel['error'] === UPLOAD_ERR_OK) {
-      $nombre = string::uuid();
+      $nombre = String::uuid();
       if (move_uploaded_file($archivoExcel['tmp_name'], WWW_ROOT . 'files' . DS . $nombre . '.xlsx')) {
         $nombreExcel = $nombre . '.xlsx';
         $direccionExcel = WWW_ROOT . 'files';

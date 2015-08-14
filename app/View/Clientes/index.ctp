@@ -49,10 +49,19 @@
 
 <script>
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'index.json')); ?>';
-  datos_tabla2 = {};
+  filtro_c = [
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"}
+  ];
+  
+  /*datos_tabla2 = {};
   datos_tabla2 = {
       "oLanguage": {
-          "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+          "sUrl": "<?php //echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
       },
       'sPaginationType': 'full_numbers',
       'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
@@ -70,7 +79,7 @@
           $('td:eq(3)', nRow).addClass('hide-on-mobile');
           $('td:eq(4)', nRow).addClass('hide-on-mobile');
       }
-  };
+  };*/
   function editarc(idcliente) {
       location = '<?php echo $this->Html->url(array('action' => 'insertar')); ?>/' + idcliente;
   }

@@ -213,7 +213,7 @@ class ChipsController extends AppController {
     $nombreOriginal = $this->request->data['Excel']['excel']['name'];
 
     if ($archivoExcel['error'] === UPLOAD_ERR_OK) {
-      $nombre = string::uuid();
+      $nombre = String::uuid();
       if (move_uploaded_file($archivoExcel['tmp_name'], WWW_ROOT . 'files' . DS . $nombre . '.xlsx')) {
         $nombreExcel = $nombre . '.xlsx';
         $direccionExcel = WWW_ROOT . 'files';
@@ -362,9 +362,9 @@ class ChipsController extends AppController {
     //debug($this->request->data);die;
     $archivoExcel = $this->request->data['Excel']['excel'];
     $nombreOriginal = $this->request->data['Excel']['excel']['name'];
-
+    //App::uses('String', 'Utility');
     if ($archivoExcel['error'] === UPLOAD_ERR_OK) {
-      $nombre = string::uuid();
+      $nombre = String::uuid();
       if (move_uploaded_file($archivoExcel['tmp_name'], WWW_ROOT . 'files' . DS . $nombre . '.xlsx')) {
         $nombreExcel = $nombre . '.xlsx';
         $direccionExcel = WWW_ROOT . 'files';

@@ -773,6 +773,9 @@ class AlmacenesController extends AppController {
     );
     $productos = $this->Producto->find('all', array(
       'recursive' => -1,
+      //'conditions' => array('Producto.total_central' => 0),
+      'order' => array('Producto.total_central ASC'),
+      'limit' => 4,
       'fields' => array('Producto.id', 'Producto.nombre', 'Producto.total_central')
     ));
     $meses = $this->get_meses();
