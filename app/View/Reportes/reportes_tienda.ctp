@@ -79,7 +79,7 @@
         <?php echo $this->Form->create(NULL, array('url' => array('controller' => 'Reportes', 'action' => 'reportes_tienda'))); ?>
 
         <div class="columns ocultar_impresion">
-            <div class="three-columns twelve-columns-mobile">
+            <div class="four-columns twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Fecha Inicial</label>
                     <span class="input">
@@ -88,7 +88,7 @@
                     </span>
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns-mobile">
+            <div class="four-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Fecha Final</label>
                     <span class="input">
@@ -97,13 +97,29 @@
                     </span>
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns-mobile">
+            <div class="four-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label class="label">Sucursal</label>
-                    <?php echo $this->Form->select('Dato.sucursal_id',$sucursales,array('class' => 'select full-width'))?>
+                    <?php echo $this->Form->select('Dato.sucursal_id', $sucursales, array('class' => 'select full-width')) ?>
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns-mobile">
+
+        </div>
+        <div class="columns ocultar_impresion">
+            <div class="row four-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <label class="label">Categoria</label>
+                    <?php echo $this->Form->select('Dato.tiposproducto_id', $categorias, array('class' => 'select full-width','onchange' => '$("#campo-productos").load("'.$this->Html->url(array('action' => 'ajax_l_productos')).'/"+$(this).val())')) ?>
+                </p>
+            </div>
+            
+            <div class="row four-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height" id="campo-productos">
+                    <label class="label">Producto</label>
+                    <?php echo $this->Form->select('Dato.producto_id', array(), array('class' => 'select full-width')) ?>
+                </p>
+            </div>
+            <div class="four-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <button class="button green-gradient full-width" type="submit">GENERAR</button>
@@ -127,9 +143,9 @@
                 <td>Total (Bs)</td>
             </tr>
             <?php foreach ($datos as $da): ?>
-            <tr>
-              
-            </tr>
+              <tr>
+
+              </tr>
               <td><?php echo $da['Movimiento']['nombre_sucursal'] ?></td>
               <td><?php echo $da['Producto']['nombre'] ?></td>
               <td><?php echo $da['Movimiento']['total_s'] - $da[0]['entregado'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
@@ -153,11 +169,11 @@ echo $this->Html->script(array('libs/glDatePicker/glDatePicker.min.js?v=1', 'ini
 <!-- Sidebar/drop-down menu -->
 <?php //echo $this->element('sidebar/administrador'); ?>
 <?php //echo $this->element('sidebar/administrador'); ?>
-<?php if($this->Session->read('Auth.User.Group.name')=='Almaceneros'):?>
-<!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/almacenero'); ?>
-<!-- End sidebar/drop-down menu --> 
-<?php elseif($this->Session->read('Auth.User.Group.name')=='Administradores'):?>
-<?php echo $this->element('sidebar/administrador');?>
-<?php endif;?>
+<?php if ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
+  <!-- Sidebar/drop-down menu -->
+  <?php echo $this->element('sidebar/almacenero'); ?>
+  <!-- End sidebar/drop-down menu --> 
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
+<?php endif; ?>
 <!-- End sidebar/drop-down menu --> 
