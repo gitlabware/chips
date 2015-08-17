@@ -948,7 +948,7 @@ class ReportesController extends Controller {
 
   public function reporte_celular_cliente() {
     $datos = array();
-    if (!empty($this->request->data)) {
+    if (!empty($this->request->data)) { 
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
       $sucursal = $this->request->data['Dato']['sucursal'];
