@@ -21,6 +21,7 @@ class ChipsController extends AppController {
   public function subirexcel() {
     $excels = $this->Excel->find('all', array(
       'order' => array('Excel.id DESC'),
+      'conditions' => array('tipo' => array('asignacion','activacion')),
       'limit' => 30));
     $this->set(compact('excels'));
     //debug($chips);exit;
@@ -1215,6 +1216,13 @@ class ChipsController extends AppController {
       $this->Chip->save($dchip);
     }
     $this->Session->setFlash('Se registro el cambio!!','msgbueno');
+    $this->redirect($this->referer());
+  }
+  
+  public function eliminar_ac($idExcel = null){
+    $this->Excel->delete($idExcel);
+    $this->Activado->deleteAll(array('excel_id' => $idExcel));
+    $this->Session->setFlash("Se elimino correctamente el excel!!",'msgbueno');
     $this->redirect($this->referer());
   }
 

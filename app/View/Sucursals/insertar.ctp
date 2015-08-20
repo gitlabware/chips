@@ -18,24 +18,18 @@
             </div>
             <div class="six-columns">                
                 <p class="block-label button-height">
+                    <label for="block-label-2" class="label"> Telefono<small>(requerido)</small></label>
+                    <?php echo $this->Form->text('telefono', array('class' => 'input full-width')); ?>
+                </p>  
+            </div>
+            <div class="new-row twelve-columns">                
+                <p class="block-label button-height">
                     <label for="block-label-2" class="label">Direccion<small>(requerido)</small></label>
                     <?php echo $this->Form->text('direccion', array('class' => 'input full-width')); ?>
                 </p>  
             </div>
 
-            <div class="new-row six-columns">                
-                <p class="block-label button-height">
-                    <label for="block-label-2" class="label"> Telefono<small>(requerido)</small></label>
-                    <?php echo $this->Form->text('telefono', array('class' => 'input full-width')); ?>
-                </p>  
-            </div>
 
-            <div class="six-columns">
-                <p class="block-label button-height">
-                    <label for="block-label-2" class="label"> Numero de Cabinas<small>(requerido)</small></label>
-                    <?php echo $this->Form->text('ncabinas', array('class' => 'input full-width')); ?>
-                </p> 
-            </div>
             <div class="new-row six-columns">
 
                 <button type="submit" class="button glossy mid-margin-right" onClick="javascript:verificar()">
@@ -43,27 +37,28 @@
                     Guardar
                 </button>
 
-                <button type="submit" class="button glossy">
+                <button type="button" class="button glossy">
                     <span class="button-icon red-gradient"><span class="icon-cross-round"></span></span>
                     Cancelar
                 </button>
 
             </div>
         </div>
+        <?php echo $this->Form->end(); ?>
     </div>
 </section>
 
 <script>
-    $(document).ready(function () {
-        $("#formID").validationEngine();
-    });
+  $(document).ready(function () {
+      $("#formID").validationEngine();
+  });
 </script>
 <!-- Sidebar/drop-down menu -->
-<?php if($this->Session->read('Auth.User.Group.name')=='Almaceneros'):?>
-<!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/almacenero'); ?>
-<!-- End sidebar/drop-down menu --> 
-<?php elseif($this->Session->read('Auth.User.Group.name')=='Administradores'):?>
-<?php echo $this->element('sidebar/administrador');?>
-<?php endif;?>
+<?php if ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
+  <!-- Sidebar/drop-down menu -->
+  <?php echo $this->element('sidebar/almacenero'); ?>
+  <!-- End sidebar/drop-down menu --> 
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
+<?php endif; ?>
 <!-- End sidebar/drop-down menu --> 

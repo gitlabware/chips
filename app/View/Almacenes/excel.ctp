@@ -2,20 +2,20 @@
 
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
     <hgroup id="main-title" class="thin">
-        <h1>Registro de Chips</h1>
+        <h1>Distribuicion mediante Excel</h1>
     </hgroup>
     <div class="with-padding">        
-        <a href="javascript:void(0)" class="button orange-gradient glossy" id="btMuestraFormAsignaciones">SUBIR EXCEL ASIGNACIONES</a>
-        <a href="javascript:void(0)" class="button green-gradient glossy" id="btMuestraFormActivaciones">SUBIR EXCEL ACTIVACIONES</a>
+        <a href="javascript:void(0)" class="button orange-gradient glossy" id="btMuestraFormAsignaciones">SUBIR EXCEL DISTRIBUICION</a>
+        <a href="javascript:void(0)" class="button green-gradient glossy" id="btMuestraFormActivaciones">SUBIR EXCEL DISTRIBUICION COMPLETA</a>
         <p>&nbsp;</p>
         <div id="muestraFormAsignaciones">
-            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcel', 'id' => 'formAsig', 'enctype' => 'multipart/form-data')); ?>
+            <?php echo $this->Form->create('Almacene', array('action' => 'guardaexcel', 'id' => 'formAsig', 'enctype' => 'multipart/form-data')); ?>
             <!--        <form method="post" action="" class="columns" onsubmit="return false">                               -->
             <!--<div class="new-row-desktop four-columns six-columns-tablet twelve-columns-mobile">-->
             <div class="new-row twelve-columns">                
                 <!--                <h3 class="thin underline">&nbsp;</h3>                                          -->
                 <fieldset class="fieldset fields-list">
-                    <legend class="legend orange-gradient">Formulario Subida Excel Asignaciones</legend>
+                    <legend class="legend orange-gradient">Formulario Subida Excel Distribuicion</legend>
                     <div class="field-block button-height">							
                         <label for="login" class="label"><b>Seleccionar Excel :</b></label>
                         <?php //echo $this->Form->text('Persona.nombre', array('class' => 'span12', 'required')); ?>
@@ -56,10 +56,10 @@
               $.modal({
                   content: '<div id="idmodal"></div>',
                   title: 'Formato del Archivo',
-                  content: '<?php echo $this->Html->image('iconos/asignados.png'); ?>',
+                  content: '<?php echo $this->Html->image('iconos/formato-distribucion.png'); ?>',
                           center: true,
-                  width: 850,
-                  height: 450,
+                  width: 500,
+                  height: 250,
               });
           }
           ;
@@ -67,13 +67,13 @@
         </script>
 
         <div id="muestraFormActivaciones" style="display: none;">
-            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcelactivados', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
+            <?php echo $this->Form->create('Almacene', array('action' => 'guardaexcelcomp', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
             <!--        <form method="post" action="" class="columns" onsubmit="return false">                               -->
             <!--<div class="new-row-desktop four-columns six-columns-tablet twelve-columns-mobile">-->
             <div class="new-row twelve-columns">                
                 <!--                <h3 class="thin underline">&nbsp;</h3>                                          -->
                 <fieldset class="fieldset fields-list">
-                    <legend class="legend green-gradient">Formulario Subida Excel Activaciones</legend>
+                    <legend class="legend green-gradient">Formulario Subida Excel Distribuicion Completa</legend>
                     <div class="field-block button-height">							
                         <label for="login" class="label"><b>Seleccionar Excel :</b></label>
                         <?php //echo $this->Form->text('Persona.nombre', array('class' => 'span12', 'required'));   ?>
@@ -125,10 +125,10 @@
               //console.log('hizo click');
               $.modal({
                   title: 'Formato del Archivo',
-                  content: '<?php echo $this->Html->image('iconos/activados.png'); ?>',
+                  content: '<?php echo $this->Html->image('iconos/formato-distribucion.png'); ?>',
                   center: true,
-                  width: 1190,
-                  height: 450,
+                  width: 500,
+                  height: 250,
               });
           }
           ;
@@ -152,12 +152,7 @@
                       <td><?php echo $e['Excel']['created']; ?></td>
                       <td><?php echo $e['Excel']['tipo']; ?></td>                       
                       <td>
-                          <?php if ($e['Excel']['tipo'] == 'asignacion'): ?>
-                            <?php echo $this->Html->link("Detalle", array('action' => 'verexcel', $e['Excel']['id']), array('class' => 'button blue-gradient glossy')) ?>
-                            <?php echo $this->Html->link("Asignados", array('action' => 'excel_asignados', $e['Excel']['id']), array('class' => 'button black-gradient glossy')) ?>
-                          <?php elseif ($e['Excel']['tipo'] == 'activacion'): ?>
-                          <?php echo $this->Html->link("Eliminar", array('action' => 'eliminar_ac', $e['Excel']['id']), array('class' => 'button red-gradient glossy','confirm' => 'Esta seguro de eliminar el excel??')) ?>
-                          <?php endif; ?>
+                          <?php echo $this->Html->link("Detalle", array('action' => 'verexcel', $e['Excel']['id']), array('class' => 'button blue-gradient glossy')) ?>
                       </td>                       
                   </tr>               
                 <?php endforeach; ?>

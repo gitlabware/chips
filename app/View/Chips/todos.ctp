@@ -51,7 +51,7 @@
       {type: "text"}
   ];
 
-  datos_tabla2 = {
+  /*datos_tabla2 = {
       "oLanguage": {
           "oPaginate": {
               "sPrevious": "Anterior",
@@ -77,7 +77,7 @@
           table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
           tableStyled = true;
       }
-  };
+  };*/
 
   function infochip(idchip) {
       cargarmodal('<?php echo $this->Html->url(array('action' => 'info_chip')); ?>/' + idchip, 'Informacion del Chip');

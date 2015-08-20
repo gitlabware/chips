@@ -9,6 +9,7 @@ class SucursalsController extends AppController {
     'Recargascabina',
     'Tiposproducto',
     'Producto',
+    'Almacene',
     'User'
   );
   public $layout = 'viva';
@@ -33,19 +34,13 @@ class SucursalsController extends AppController {
   public function insertar() {
     if (!empty($this->request->data)) {
       $this->Sucursal->create();
-      //debug($this->request->data);exit;
-      $nro = $this->request->data['Sucursal']['ncabinas'];
-
       if ($this->Sucursal->save($this->request->data)) {
         $id = $this->Sucursal->getLastInsertID();
-
-        for ($i = 1; $i <= $nro; $i++) {
-          $this->Cabina->create();
-          $this->request->data['Cabina']['nombre'] = 'Cabina ' . $i;
-          $this->request->data['Cabina']['sucursal_id'] = $id;
-          $this->Cabina->save($this->request->data['Cabina']);
-        }
-
+        $d_alma['nombre'] = $this->request->data['Sucursal']['nombre'];
+        $d_alma['sucursal_id'] = $id;
+        $d_alma['central'] = 0;
+        $this->Almacene->create();
+        $this->Almacene->save($d_alma);
         $this->Session->setFlash('Tienda registrada con Exito...!!!', 'msgbueno');
         $this->redirect(array('action' => 'index'));
       } else {
@@ -116,6 +111,17 @@ class SucursalsController extends AppController {
       $this->request->data = $this->Sucursal->read(); //find(array('id' => $id));
     } else {
       if ($this->Sucursal->save($this->request->data)) {
+        $almacen = $this->Almacene->findBysucursal_id($id,null,null,-1);
+        $d_alma['nombre'] = $this->request->data['Sucursal']['nombre'];
+        if(!empty($almacen)){
+          $this->Almacene->id = $almacen['Almacene']['id'];
+          $this->Almacene->save($d_alma);
+        }else{
+          $d_alma['sucursal_id'] = $id;
+          $d_alma['central'] = 0;
+          $this->Almacene->create();
+          $this->Almacene->save($d_alma);
+        }
         $this->Session->setFlash('Los datos fueron modificados', 'msgbueno');
         $this->redirect(array('action' => 'index'), null, true);
       } else {

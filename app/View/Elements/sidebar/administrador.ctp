@@ -81,13 +81,13 @@
                             </ul>
                         </li> 
 
-                        <li class="with-right-arrow">
+                        <!--<li class="with-right-arrow">
                             <span>Almacenes</span>
                             <ul class="big-menu">
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'add')); ?>">Insertar Almacen</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'index')); ?>">Listado de Almacenes</a></li>                                                                        
                             </ul>
-                        </li>
+                        </li>-->
                         <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'ajaxprecios')) ?>', 'Precios chip/4g');">Precios Chip/4g</a></li>
 
                     </ul>
@@ -109,7 +109,7 @@
 
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listadistribuidores')); ?>">Personal</a></li>
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listaalmacenes')) ?>">Almacen</a></li>                                                
-
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'excel')) ?>">Excel Almacen</a></li> 
                     </ul>
                 </li>
 
