@@ -980,7 +980,7 @@ class ReportesController extends Controller {
     $sucursales = $this->Sucursal->find('list', array('fields' => 'nombre'));
     $this->set(compact('datos', 'sucursales'));
   }
-
+  
 }
 ?>
 

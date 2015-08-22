@@ -100,7 +100,7 @@
                           <div class="three-columns">
                               <label class="label">Tipo pago</label>
                               <select name="data[][]" class="select blue-gradient full-width" id="tipopago-<?php echo $key; ?>">
-                                  <option value="Boucher">Boucher</option>
+                                  <option value="Voucher">Voucher</option>
                                   <option value="Ticket">Ticket</option>
                                   <option value="Efectivo">Efectivo</option>
                                   <option value="Tarjeta">Tarjeta</option>
@@ -146,13 +146,13 @@
       var codigo = $('#idcodigo-' + key).val();
       var monto = $('#idmonto-' + key).val();
       var monto_bol = $('#idmonto-bol-' + key).val();
-      var optboucher = '     <option value="Boucher">Boucher</option>';
+      var optvoucher = '     <option value="Voucher">Voucher</option>';
       var optticket = '     <option value="Ticket">Ticket</option>';
       var optefectivo = '     <option value="Efectivo">Efectivo</option>';
       var opttarjeta = '     <option value="Tarjeta">Tarjeta</option>';
       switch (tipopago) {
-          case "Boucher":
-              optboucher = '     <option value="Boucher" selected>Boucher</option>';
+          case "Voucher":
+              optvoucher = '     <option value="Voucher" selected>Voucher</option>';
               break;
           case "Ticket":
               optticket = '     <option value="Ticket" selected>Ticket</option>';
@@ -171,7 +171,7 @@
               + ' <div class="three-columns">'
               + '   <label class="label">Tipo pago</label>'
               + '   <select name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][tipo]" class="select blue-gradient full-width" id="select-tipo-' + key + '-' + numero_p[key] + '">'
-              + optboucher
+              + optvoucher
               + optticket
               + optefectivo
               + opttarjeta

@@ -49,6 +49,9 @@
                         <li>
                             <a href="<?php echo $this->Html->url(array('controller' => 'Tiendas','action' => 'reporte_pagos'));?>">Reporte Celular x pagos</a>
                         </li>
+                        <li>
+                            <a href="<?php echo $this->Html->url(array('controller' => 'Tiendas','action' => 'report_control_ven'));?>">Control ventas equipos</a>
+                        </li>
                     </ul>
                 </li> 
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'ventas')); ?>">Ventas x Mayor</a></li>

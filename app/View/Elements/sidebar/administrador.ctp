@@ -13,7 +13,7 @@
                 <b><?php echo $this->Session->read('Auth.User.Persona.ap_paterno'); ?></b>
             </span>
         </div>
-
+        
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
             <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'principal')) ?>" title="Estadisticas"><span class="icon-line-graph"></span></span></a></li>
@@ -21,7 +21,7 @@
             <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Productos"><span class="icon-clipboard"></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'users', 'action' => 'salir')) ?>" title="Salir"><span class="icon-extract"></span></a></li>            
         </ul>
-
+        
         <section class="navigable">            
             <ul class="big-menu">
 

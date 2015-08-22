@@ -1,5 +1,4 @@
 <style>
-
     .CSSTableGenerator {
         margin:0px;padding:0px;
         width:100%;
@@ -73,11 +72,10 @@
 <div id="main" class="contenedor">
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
     <hgroup id="main-title" class="thin">
-        <h1>REPORTE DE TIENDA <?php echo strtoupper($this->Session->read('Auth.User.Sucursal.nombre')); ?></h1>
+        <h1>CONTROL DE VENTAS EN <?php echo strtoupper($this->Session->read('Auth.User.Sucursal.nombre')); ?></h1>
     </hgroup>
     <div class="with-padding">
-        <?php echo $this->Form->create(NULL, array('url' => array('controller' => 'Tiendas', 'action' => 'reportes_tienda'))); ?>
-
+        <?php echo $this->Form->create(NULL, array('url' => array('controller' => 'Tiendas', 'action' => 'report_control_ven'))); ?>
         <div class="columns ocultar_impresion">
             <div class="three-columns twelve-columns-mobile">
                 <p class="block-label button-height">
@@ -106,34 +104,48 @@
         </div>
         <br>
         <?php echo $this->Form->end(); ?>
-        <table class="CSSTableGenerator" >
+        <table class="CSSTableGenerator">
             <tr>
-                <td>Producto</td>
-                <td>Saldo</td>
-                <td>Entregado</td>
-                <td>Venta</td>
-                <td>Venta x May</td>
-                <td>Total ventas</td>
-                <td>Saldo Total</td>
-                <td>Total venta (Bs)</td>
-                <td>Total mayor (Bs)</td>
-                <td>Total (Bs)</td>
+                <td>Cliente</td>
+                <td>Marca</td>
+                <td>Modelo</td>
+                <td>c/Voucher</td>
+                <td>c/Ticket</td>
+                <td>Efectivo</td>
+                <td>c/T de credito</td>
             </tr>
-            <?php foreach ($datos as $da): ?>
-            <tr>
-              <td><?php echo $da['Producto']['nombre'] ?></td>
-              <td><?php echo $da['Movimiento']['total_s'] - $da[0]['entregado'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
-              <td><?php echo $da[0]['entregado'] ?></td>
-              <td><?php echo $da['Movimiento']['ventas'] ?></td>
-              <td><?php echo $da['Movimiento']['ventas_mayor'] ?></td>
-              <td><?php echo $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
-              <td><?php echo $da['Movimiento']['total_s'] ?></td>
-              <td><?php echo $da['Movimiento']['precio_v_t'] ?></td>
-              <td><?php echo $da['Movimiento']['precio_v_mayor'] ?></td>
-              <td><?php echo $da['Movimiento']['precio_v_t'] + $da['Movimiento']['precio_v_mayor'] ?></td>
-            </tr>
-              
+            <?php 
+            $t_coucher = 0.00;
+            $t_ticket = 0.00;
+            $t_efectivo = 0.00;
+            $t_tarjeta = 0.00;
+            ?>
+            <?php foreach ($datos_array as $pc): ?>
+            <?php
+            $t_voucher = $t_voucher + $pc['Ventascelulare']['voucher'];
+            $t_ticket = $t_ticket + $pc['Ventascelulare']['ticket'];
+            $t_efectivo = $t_efectivo + $pc['Ventascelulare']['efectivo'];
+            $t_tarjeta = $t_tarjeta + $pc['Ventascelulare']['tarjeta'];
+            ?>
+              <tr>
+                  <td><?= $pc['Ventascelulare']['cliente']; ?></td>
+                  <td><?= $pc['Ventascelulare']['prod_marca'] ?></td>
+                  <td><?= $pc['Producto']['nombre'] ?></td>
+                  <td><?= $pc['Ventascelulare']['voucher'] ?></td>
+                  <td><?= $pc['Ventascelulare']['ticket'] ?></td>
+                  <td><?= $pc['Ventascelulare']['efectivo'] ?></td>
+                  <td><?= $pc['Ventascelulare']['tarjeta'] ?></td>
+              </tr>
             <?php endforeach; ?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><?= $t_voucher ?></td>
+                <td><?= $t_ticket ?></td>
+                <td><?= $t_efectivo ?></td>
+                <td><?= $t_tarjeta ?></td>
+            </tr>
         </table> 
     </div>
 </div>

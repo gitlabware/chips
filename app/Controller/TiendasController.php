@@ -144,7 +144,7 @@ class TiendasController extends AppController {
         'Productosprecio.tipousuario_id' => 2,
         'Producto.id !=' => null
       ),
-      'fields' => array('Productosprecio.*','Producto.*')
+      'fields' => array('Productosprecio.*', 'Producto.*')
     ));
     //debug($productos);exit;
     $categorias = $this->Tiposproducto->find('all', array('recursive' => -1, 'conditions' => array('Tiposproducto.nombre !=' => 'CELULARES')));
@@ -1049,6 +1049,30 @@ class TiendasController extends AppController {
     ));
     //debug($ventas);exit;
     $this->set(compact('ventas'));
+  }
+
+  public function report_control_ven() {
+    $datos_array = array();
+    if (!empty($this->request->data)) {
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $this->Ventascelulare->virtualFields = array(
+        'prod_marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)",
+        'voucher' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Voucher" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'ticket' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Ticket" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'efectivo' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Efectivo" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'tarjeta' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Tarjeta" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)'
+      );
+      $datos_array = $this->Ventascelulare->find('all',array(
+        'recursive' => 0,
+        'conditions' => array(
+          'DATE(Ventascelulare.modified) >=' => $fecha_ini,
+          'DATE(Ventascelulare.modified) <=' => $fecha_fin
+        ),
+        'fields' => array('Producto.nombre','Ventascelulare.prod_marca','Ventascelulare.voucher','Ventascelulare.ticket','Ventascelulare.efectivo','Ventascelulare.tarjeta','Ventascelulare.cliente')
+      ));
+    }
+    $this->set(compact('datos_array'));
   }
 
 }
