@@ -70,6 +70,17 @@
 </section>
 <script>
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'index.json')); ?>';
+  
+  filtro_c = [
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"}
+  ];
+  
   $(document).ready(function () {
       $("#formID").validationEngine();
   });

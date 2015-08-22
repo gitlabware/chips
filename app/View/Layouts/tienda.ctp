@@ -178,9 +178,17 @@
           //console.log(datos_tabla2);
           if (datos_tabla2 == null) {
               datos_tabla2 = {
-                  "oLanguage": {
-                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                "oLanguage": {
+                  "oPaginate": {
+                      "sPrevious": "Anterior",
+                      "sNext": "Siguiente",
+                      "sFirst": "Primero",
+                      "sLast": "Ultimo"
                   },
+                  "sSearch": "Buscar",
+                  "sLengthMenu": "Mostrar _MENU_ registros",
+                  "sInfo": "Tiene un total de _TOTAL_ registros para mostrar (_START_ to _END_)"
+              },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,
@@ -195,7 +203,10 @@
                   }
               };
           }
-          table2.dataTable(datos_tabla2);
+          table2.dataTable(datos_tabla2).columnFilter({
+              sPlaceHolder: "head:before",
+              aoColumns: filtro_c
+          });;
 
         </script>
         <?php echo $this->Session->flash(); ?>

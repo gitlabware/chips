@@ -63,6 +63,13 @@
 <script>
   urljsontabla = '<?php echo $this->Html->url(array('action' => "lista_celulares.json")); ?>';
 
+  filtro_c = [
+      {type: "text"},
+      {type: "text"},
+      {type: "text"},
+      {type: "text"}
+  ];
+
   var productos = [];
   var v_total = 0.00;
   function add_venta(id_producto, nombre_producto, precio) {
