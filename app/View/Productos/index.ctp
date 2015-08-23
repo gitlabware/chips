@@ -45,6 +45,7 @@
                         <span class="button-icon"><span class="icon-search"></span></span>
                         Ver Formato Productos
                     </button>
+                    <a href="">Descargar Formato</a>
                 </div> 
                 <?php echo $this->Form->end(); ?>
             </div>
