@@ -45,7 +45,7 @@
                         <span class="button-icon"><span class="icon-search"></span></span>
                         Ver Formato Productos
                     </button>
-                    <a href="">Descargar Formato</a>
+                    <a href="<?= $this->webroot; ?>formatos/productos.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
                 </div> 
                 <?php echo $this->Form->end(); ?>
             </div>
@@ -63,6 +63,7 @@
                         <span class="button-icon"><span class="icon-search"></span></span>
                         Ver Formato Celulares
                     </button>
+                    <a href="<?= $this->webroot; ?>formatos/celulares.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
                 </div> 
                 <?php echo $this->Form->end(); ?>
             </div>
@@ -71,7 +72,7 @@
 </section>
 <script>
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'index.json')); ?>';
-  
+
   filtro_c = [
       {type: "text"},
       {type: "text"},
@@ -81,7 +82,7 @@
       {type: "text"},
       {type: "text"}
   ];
-  
+
   $(document).ready(function () {
       $("#formID").validationEngine();
   });
@@ -117,13 +118,13 @@
 
 </script>
 
-<?php if($this->Session->read('Auth.User.Group.name')=='Almaceneros'):?>
-<!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/almacenero'); ?>
-<!-- End sidebar/drop-down menu --> 
-<?php elseif($this->Session->read('Auth.User.Group.name')=='Administradores'):?>
-<?php echo $this->element('sidebar/administrador');?>
-<?php endif;?>
+<?php if ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
+  <!-- Sidebar/drop-down menu -->
+  <?php echo $this->element('sidebar/almacenero'); ?>
+  <!-- End sidebar/drop-down menu --> 
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
+<?php endif; ?>
 <!-- End sidebar/drop-down menu --> 
 <script>
   function mensaje_nota(titulo, texto) {

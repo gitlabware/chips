@@ -40,6 +40,7 @@
                         <span class="button-icon"><span class="icon-search"></span></span>
                         Ver Formato Clientes
                     </button>
+                    <a href="<?= $this->webroot; ?>formatos/clientes.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
                 </div> 
                 <?php echo $this->Form->end(); ?>
             </div>

@@ -9,6 +9,10 @@
                 <tr>                      
                     <th>Id</th>
                     <th>Producto</th>
+                    <?php if ($excel['Excel']['tipo'] == 'distribucion celulares' || $excel['Excel']['tipo'] == 'distribucion celulares completa'): ?>
+                      <th>Marca</th>
+                      <th>Color</th>
+                    <?php endif; ?>
                     <th>Tienda</th>
                     <th>Cantidad</th>
                     <th>Estado</th>
@@ -26,6 +30,10 @@
                   <tr <?php echo $estilo; ?>>
                       <td><?php echo $dis['Distribucione']['id']; ?></td>
                       <td><?php echo $dis['Distribucione']['nombre_producto']; ?></td>
+                      <?php if ($excel['Excel']['tipo'] == 'distribucion celulares' || $excel['Excel']['tipo'] == 'distribucion celulares completa'): ?>
+                        <td><?php echo $dis['Distribucione']['marca']; ?></td>
+                        <td><?php echo $dis['Distribucione']['color']; ?></td>
+                      <?php endif; ?>
                       <td><?php echo $dis['Distribucione']['nombre_tienda']; ?></td>
                       <td><?php echo $dis['Distribucione']['cantidad']; ?></td>
                       <td><?php echo $dis['Distribucione']['estado']; ?></td>

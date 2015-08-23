@@ -133,7 +133,6 @@ class ProductosController extends AppController {
       $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
       $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
       $this->request->data['Ventascelulare']['entrada'] = $this->request->data['Producto']['cantidad_cen'];
-      $this->request->data['Ventascelulare']['total'] = $total;
       $this->request->data['Ventascelulare']['almacene_id'] = $almacen['Almacene']['id'];
       $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
       $this->request->data['Ventascelulare']['transaccion'] = $this->get_num_trans_cel();
@@ -475,22 +474,22 @@ class ProductosController extends AppController {
             $this->Movimiento->create();
             $this->Movimiento->save($this->request->data['Movimiento']);
           }
-        }else{
-          if(empty($duplicados)){
+        } else {
+          if (empty($duplicados)) {
             $duplicados = $d['D'];
-          }else{
-            $duplicados = $duplicados.', '.$d['D'];
+          } else {
+            $duplicados = $duplicados . ', ' . $d['D'];
           }
         }
         //-------------- Termina valida -------------//
         //------- termina Marca -----
       }
-      if(empty($duplicados)){
+      if (empty($duplicados)) {
         $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
-      }else{
-        $this->Session->setFlash("Estos productos no fueron registrados por ser duplicados: $duplicados",'msginfo');
+      } else {
+        $this->Session->setFlash("Estos productos no fueron registrados por ser duplicados: $duplicados", 'msginfo');
       }
-      
+
       $this->redirect($this->referer());
 
       //fin funciones del excel
@@ -564,6 +563,7 @@ class ProductosController extends AppController {
       /* debug($array_data);
         exit; */
       $this->request->data = "";
+      $duplicados = '';
       foreach ($array_data as $d) {
 
         // ------ Marca -------
@@ -594,44 +594,61 @@ class ProductosController extends AppController {
           $idColor = $this->Colore->getLastInsertID();
         }
         //------- termina Color -----
+        $veri_prod = $this->Producto->find('first', array(
+          'recursive' => -1,
+          'conditions' => array('nombre' => $d['A'], 'marca_id' => $idMarca, 'colore_id' => $idColor),
+          'fields' => array('id')
+        ));
+        if (empty($veri_prod)) {
 
-        $this->request->data['Producto']['tiposproducto_id'] = 5;
-        $this->request->data['Producto']['tipo_producto'] = 'CELULARES';
-        $this->request->data['Producto']['marca_id'] = $idMarca;
-        $this->request->data['Producto']['colore_id'] = $idColor;
-        $this->request->data['Producto']['nombre'] = $d['A'];
-        $this->request->data['Producto']['proveedor'] = 'VIVA';
-        $this->request->data['Producto']['precio_compra'] = $d['B'];
-        $this->request->data['Producto']['fecha_ingreso'] = date("Y-m-d");
-        $this->Producto->create();
-        $this->Producto->save($this->request->data['Producto']);
-        $idProducto = $this->Producto->getLastInsertID();
+          $this->request->data['Producto']['tiposproducto_id'] = 5;
+          $this->request->data['Producto']['tipo_producto'] = 'CELULARES';
+          $this->request->data['Producto']['marca_id'] = $idMarca;
+          $this->request->data['Producto']['colore_id'] = $idColor;
+          $this->request->data['Producto']['nombre'] = $d['A'];
+          $this->request->data['Producto']['proveedor'] = 'VIVA';
+          $this->request->data['Producto']['precio_compra'] = $d['B'];
+          $this->request->data['Producto']['fecha_ingreso'] = date("Y-m-d");
+          $this->Producto->create();
+          $this->Producto->save($this->request->data['Producto']);
+          $idProducto = $this->Producto->getLastInsertID();
 
-        if (!empty($d['E'])) {
-          $this->request->data['Productosprecio']['producto_id'] = $idProducto;
-          $this->request->data['Productosprecio']['escala_id'] = 3;
-          $this->request->data['Productosprecio']['escala'] = 'TIENDA';
-          $this->request->data['Productosprecio']['tipousuario_id'] = 2;
-          $this->request->data['Productosprecio']['precio'] = $d['E'];
-          $this->request->data['Productosprecio']['fecha'] = date('Y-m-d');
-          $this->Productosprecio->create();
-          $this->Productosprecio->save($this->request->data['Productosprecio']);
-        }
-        if (!empty($d['F'])) {
-          $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
-          $this->set_total($idProducto, 1, $almacen['Almacene']['id'], $d['F']);
-          $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
-          $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
-          $this->request->data['Ventascelulare']['entrada'] = $d['F'];
-          //$this->request->data['Ventascelulare']['total'] = $total;
-          $this->request->data['Ventascelulare']['almacene_id'] = $almacen['Almacene']['id'];
-          $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
-          $this->request->data['Ventascelulare']['transaccion'] = $this->get_num_trans_cel();
-          $this->Ventascelulare->create();
-          $this->Ventascelulare->save($this->request->data['Ventascelulare']);
+          if (!empty($d['E'])) {
+            $this->request->data['Productosprecio']['producto_id'] = $idProducto;
+            $this->request->data['Productosprecio']['escala_id'] = 3;
+            $this->request->data['Productosprecio']['escala'] = 'TIENDA';
+            $this->request->data['Productosprecio']['tipousuario_id'] = 2;
+            $this->request->data['Productosprecio']['precio'] = $d['E'];
+            $this->request->data['Productosprecio']['fecha'] = date('Y-m-d');
+            $this->Productosprecio->create();
+            $this->Productosprecio->save($this->request->data['Productosprecio']);
+          }
+          if (!empty($d['F'])) {
+            $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id', 'Almacene.sucursal_id')));
+            $this->set_total($idProducto, 1, $almacen['Almacene']['id'], $d['F']);
+            $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
+            $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
+            $this->request->data['Ventascelulare']['entrada'] = $d['F'];
+            //$this->request->data['Ventascelulare']['total'] = $total;
+            $this->request->data['Ventascelulare']['almacene_id'] = $almacen['Almacene']['id'];
+            $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+            $this->request->data['Ventascelulare']['transaccion'] = $this->get_num_trans_cel();
+            $this->Ventascelulare->create();
+            $this->Ventascelulare->save($this->request->data['Ventascelulare']);
+          }
+        }else{
+          if (empty($duplicados)) {
+            $duplicados = $d['A'];
+          } else {
+            $duplicados = $duplicados . ', ' . $d['A'];
+          }
         }
       }
-      $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
+      if (empty($duplicados)) {
+        $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
+      } else {
+        $this->Session->setFlash("Estos productos no fueron registrados por ser duplicados: $duplicados", 'msginfo');
+      }
       $this->redirect($this->referer());
 
       //fin funciones del excel

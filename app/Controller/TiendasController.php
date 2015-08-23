@@ -1054,6 +1054,7 @@ class TiendasController extends AppController {
   public function report_control_ven() {
     $datos_array = array();
     if (!empty($this->request->data)) {
+      $idSucursal = $this->Session->read('Auth.User.sucursal_id');
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
       $this->Ventascelulare->virtualFields = array(
@@ -1067,7 +1068,10 @@ class TiendasController extends AppController {
         'recursive' => 0,
         'conditions' => array(
           'DATE(Ventascelulare.modified) >=' => $fecha_ini,
-          'DATE(Ventascelulare.modified) <=' => $fecha_fin
+          'DATE(Ventascelulare.modified) <=' => $fecha_fin,
+          'Producto.tipo_producto' => 'CELULARES',
+          'Almacene.sucursal_id' => $idSucursal,
+          'Ventascelulare.salida >' => 0
         ),
         'fields' => array('Producto.nombre','Ventascelulare.prod_marca','Ventascelulare.voucher','Ventascelulare.ticket','Ventascelulare.efectivo','Ventascelulare.tarjeta','Ventascelulare.cliente')
       ));

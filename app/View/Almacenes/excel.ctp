@@ -37,6 +37,7 @@
                             <span class="button-icon"><span class="icon-search"></span></span>
                             Ver Formato
                         </button>
+                        <a href="<?= $this->webroot; ?>formatos/distribucion.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
                     </div>                                        
 
                 </fieldset>
@@ -95,6 +96,7 @@
                             <span class="button-icon"><span class="icon-search"></span></span>
                             Ver Formato
                         </button>
+                        <a href="<?= $this->webroot; ?>formatos/distribucion.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
                     </div>                                       
 
                 </fieldset>

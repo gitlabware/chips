@@ -109,7 +109,8 @@
 
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listadistribuidores')); ?>">Personal</a></li>
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listaalmacenes')) ?>">Almacen</a></li>                                                
-                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'excel')) ?>">Excel Almacen</a></li> 
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'excel')) ?>">Excel Almacen</a></li>
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'excel_cel')) ?>">Excel Almacen Celulares</a></li>
                     </ul>
                 </li>
 
@@ -182,6 +183,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_celular')); ?>">General</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_celular_cliente')); ?>">Clientes</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_pagos')); ?>">Pagos</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'report_control_ven_cel')); ?>">Control de ventas</a></li>
                             </ul>
                         </li>
                     </ul>

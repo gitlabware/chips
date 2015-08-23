@@ -879,7 +879,7 @@ class ReportesController extends Controller {
     );
     $categorias = $this->Tiposproducto->find('list', array('fields' => 'nombre'));
     $distribuidores = $this->User->find('list', array('recursive' => 0, 'conditions' => array('User.group_id' => 2), 'fields' => array('User.persona_id', 'User.nombre_completo')));
-    $this->set(compact('datos', 'distribuidores','categorias'));
+    $this->set(compact('datos', 'distribuidores', 'categorias'));
   }
 
   public function reporte_pagos() {
@@ -980,7 +980,38 @@ class ReportesController extends Controller {
     $sucursales = $this->Sucursal->find('list', array('fields' => 'nombre'));
     $this->set(compact('datos', 'sucursales'));
   }
-  
+
+  public function report_control_ven_cel() {
+    $datos_array = array();
+    if (!empty($this->request->data)) {
+      $idSucursal = $this->Session->read('Auth.User.sucursal_id');
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $condiciones = array();
+      if(!empty($idSucursal)){
+        $condiciones['Almacene.sucursal_id'] = $idSucursal;
+      }
+      $condiciones['Ventascelulare.almacene_id !='] = 1;
+      $condiciones['Ventascelulare.salida >'] = 0;
+      $condiciones['Producto.tipo_producto'] = 'CELULARES';
+      $condiciones['DATE(Ventascelulare.modified) >='] = $fecha_ini;
+      $condiciones['DATE(Ventascelulare.modified) <='] = $fecha_fin;
+      $this->Ventascelulare->virtualFields = array(
+        'prod_marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)",
+        'voucher' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Voucher" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'ticket' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Ticket" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'efectivo' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Efectivo" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'tarjeta' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Tarjeta" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)'
+      );
+      $datos_array = $this->Ventascelulare->find('all', array(
+        'recursive' => 0,
+        'conditions' => $condiciones,
+        'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente','Almacene.nombre')
+      ));
+    }
+    $this->set(compact('datos_array'));
+  }
+
 }
 ?>
 
