@@ -45,19 +45,25 @@
                     <?php echo $this->Form->text('zona', array('class' => 'input full-width')); ?>                       
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns">
+            <div class="four-columns new-row-mobile twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Mercado<small>(requerido)</small></label>
                     <?php echo $this->Form->text('mercado', array('class' => 'input full-width')); ?>
                 </p>
             </div>
-            <div class="six-columns">
+            <div class="four-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Ruta<small>(Requerido)</small></label>
                     <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select full-width', 'style' => 'width: 222px', 'required')); ?>
                 </p>
             </div>
-            <div class="six-columns">
+            <div class="four-columns">
+                <p class="block-label button-height">
+                    <label for="validation-select" class="label">Estado<small>(Requerido)</small></label>
+                    <?php echo $this->Form->select('estado', array(0 => 'No activo',1 => 'Activo',2 => 'Revisado'), array('class' => 'select full-width', 'style' => 'width: 222px', 'required')); ?>
+                </p>
+            </div>
+            <div class="three-columns">
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Lugar<small>(Requerido)</small></label>
                     <?php echo $this->Form->select('lugare_id', $lugares, array('class' => 'select full-width')); ?>
@@ -103,16 +109,25 @@
 </script>
 <script type="text/javascript">
   var map;
+  var lat = -16.49;
+  var lng = -68.12;
+<?php if (!empty($this->request->data['Cliente']['lat'])): ?>
+    lat = <?= $this->request->data['Cliente']['lat'] ?>;
+<?php endif; ?>
+  <?php if (!empty($this->request->data['Cliente']['lng'])): ?>
+    lng = <?= $this->request->data['Cliente']['lng'] ?>;
+<?php endif; ?>
 
   function initialize() {
       var mapOptions = {
           zoom: 14,
-          center: new google.maps.LatLng(-16.49, -68.12),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          center: new google.maps.LatLng(lat, lng),
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          scrollwheel: false
       };
       map = new google.maps.Map(document.getElementById('mapa'), mapOptions);
 
-      var pos = new google.maps.LatLng(-16.49, -68.12);
+      var pos = new google.maps.LatLng(lat, lng);
 
       var marker = new google.maps.Marker({
           position: pos,

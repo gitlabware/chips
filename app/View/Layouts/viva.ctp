@@ -186,7 +186,7 @@
           if (datos_tabla2 == null) {
               datos_tabla2 = {
                   /*"oLanguage": {
-                   "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                   "sUrl": "<?php //echo $this->webroot;  ?>js/libs/DataTables/Spanish.json"
                    },*/
                   "oLanguage": {
                       "oPaginate": {
@@ -203,7 +203,7 @@
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,
                   'sAjaxSource': urljsontabla,
-                  //'sServerMethod': 'POST',
+                  "bServerSide": true,
                   "order": [],
                   'fnInitComplete': function (oSettings)
                   {
@@ -213,6 +213,7 @@
                   }
               };
           }
+          //table2.dataTable(datos_tabla2);
           table2.dataTable(datos_tabla2).columnFilter({
               sPlaceHolder: "head:before",
               aoColumns: filtro_c

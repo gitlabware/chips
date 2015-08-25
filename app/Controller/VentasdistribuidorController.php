@@ -1201,7 +1201,8 @@ class VentasdistribuidorController extends AppController {
       $asignar = '<button class="button blue-gradient compact icon-list" type="button" onclick="asignar(' . "',Cliente.id,'" . ')">Asignar</button>';
       $venta = '<button class="button green-gradient compact icon-list" type="button" onclick="venta(' . "',Cliente.id,'" . ')">Venta</button>';
       $editar = '<button class="button orange-gradient compact icon-list" type="button" onclick="editar(' . "',Cliente.id,'" . ')">Editar</button>';
-      $acciones = "$asignar $venta $editar";
+      $editar2 = "',IF((Cliente.estado = 1),CONCAT('$editar'),''),'";
+      $acciones = "$asignar $venta $editar2";
       $rutas_usuario = $this->Rutasusuario->find('list', array(
         'conditions' => array('Rutasusuario.user_id' => $this->Session->read('Auth.User.id')),
         'fields' => array('Rutasusuario.ruta_id')

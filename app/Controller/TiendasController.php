@@ -617,6 +617,18 @@ class TiendasController extends AppController {
     ));
     $idAlmacen = $almacen['Almacene']['id'];
     if (!empty($this->request->data['Dato'])) {
+      $condiciones = array();
+      $condiciones['Movimiento.almacene_id'] = $idAlmacen;
+      $condiciones['Movimiento.created >='] = $fecha_ini;
+      $condiciones['Movimiento.created <='] = $fecha_fin;
+      $condiciones['Movimiento.salida !='] = NULL;
+      if (!empty($this->request->data['Dato']['tiposproducto_id'])) {
+        $condiciones['Producto.tiposproducto_id'] = $this->request->data['Dato']['tiposproducto_id'];
+      }
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Producto.id'] = $this->request->data['Dato']['producto_id'];
+      }
+
       $sql1 = "(SELECT IF(ISNULL(SUM(mo.salida)),0,SUM(mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id)";
       $sql2 = "(SELECT IF(ISNULL(SUM(mo.salida)),0,SUM(mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'MAYOR' AND Producto.id = mo.producto_id)";
       $sql3 = "(SELECT IF(ISNULL(SUM(mo.precio_uni*mo.salida)),0,SUM(mo.precio_uni*mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id)";
@@ -633,14 +645,23 @@ class TiendasController extends AppController {
       );
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
-        'conditions' => array('Movimiento.almacene_id' => $idAlmacen, 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.salida !=' => NULL),
+        'conditions' => $condiciones,
         'group' => array('Movimiento.producto_id'),
         'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.ventas', 'Movimiento.ventas_mayor', 'Movimiento.precio_v_t', 'Movimiento.precio_v_mayor', 'Movimiento.total_s')
       ));
       /* debug($datos);
         exit; */
     }
-    $this->set(compact('datos'));
+    $categorias = $this->Tiposproducto->find('list', array('fields' => 'nombre'));
+    $this->set(compact('datos', 'categorias'));
+  }
+
+  public function ajax_l_productos($idTipoprod = null) {
+    $this->layout = 'ajax';
+    /* debug($idTipoprod);
+      exit; */
+    $productos = $this->Producto->find('list', array('fields' => 'nombre', 'conditions' => array('Producto.tiposproducto_id' => $idTipoprod)));
+    $this->set(compact('productos'));
   }
 
   public function reporte_detallado_precio() {
@@ -656,6 +677,17 @@ class TiendasController extends AppController {
     $idAlmacen = $almacen['Almacene']['id'];
     $datos = array();
     if (!empty($this->request->data['Dato'])) {
+      $condiciones = array();
+      $condiciones['Movimiento.almacene_id'] = $idAlmacen;
+      $condiciones['Movimiento.created >='] = $fecha_ini;
+      $condiciones['Movimiento.created <='] = $fecha_fin;
+      $condiciones['Movimiento.salida !='] = NULL;
+      if (!empty($this->request->data['Dato']['tiposproducto_id'])) {
+        $condiciones['Producto.tiposproducto_id'] = $this->request->data['Dato']['tiposproducto_id'];
+      }
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Producto.id'] = $this->request->data['Dato']['producto_id'];
+      }
       $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.almacene_id = $idAlmacen AND Producto.id = mo.producto_id LIMIT 1)";
       $sql2 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE mov.almacene_id = $idAlmacen AND mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
       $this->Movimiento->virtualFields = array(
@@ -663,7 +695,7 @@ class TiendasController extends AppController {
       );
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
-        'conditions' => array('Movimiento.almacene_id' => $idAlmacen, 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.salida !=' => NULL),
+        'conditions' => $condiciones,
         'group' => array('Movimiento.producto_id'),
         'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s')
       ));
@@ -678,7 +710,8 @@ class TiendasController extends AppController {
         //debug($datos);exit;
       }
     }
-    $this->set(compact('datos'));
+    $categorias = $this->Tiposproducto->find('list', array('fields' => 'nombre'));
+    $this->set(compact('datos','categorias'));
   }
 
   public function reporte_cliente() {
@@ -693,9 +726,20 @@ class TiendasController extends AppController {
     $idAlmacen = $almacen['Almacene']['id'];
     $datos = array();
     if (!empty($this->request->data['Dato'])) {
+      $condiciones = array();
+      $condiciones['Movimiento.almacene_id'] = $idAlmacen;
+      $condiciones['Movimiento.created >='] = $fecha_ini;
+      $condiciones['Movimiento.created <='] = $fecha_fin;
+      $condiciones['Movimiento.cliente_id !='] = NULL;
+      if (!empty($this->request->data['Dato']['tiposproducto_id'])) {
+        $condiciones['Producto.tiposproducto_id'] = $this->request->data['Dato']['tiposproducto_id'];
+      }
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Producto.id'] = $this->request->data['Dato']['producto_id'];
+      }
       $datos = $this->Movimiento->find('all', array(
         'recursive' => 0, 'order' => 'Movimiento.producto_id',
-        'conditions' => array('Movimiento.almacene_id' => $idAlmacen, 'Movimiento.created >=' => $fecha_ini, 'Movimiento.created <=' => $fecha_fin, 'Movimiento.cliente_id'),
+        'conditions' => $condiciones,
         'group' => array('Movimiento.cliente_id'),
         'fields' => array('Cliente.nombre', 'Cliente.num_registro', 'Movimiento.cliente_id', 'SUM(Movimiento.salida) ventas', 'SUM(Movimiento.precio_uni*Movimiento.salida)')
       ));
@@ -710,7 +754,8 @@ class TiendasController extends AppController {
       }
       //($datos);exit;
     }
-    $this->set(compact('datos'));
+    $categorias = $this->Tiposproducto->find('list', array('fields' => 'nombre'));
+    $this->set(compact('datos','categorias'));
   }
 
   public function chips($idCliente = null) {
@@ -881,6 +926,10 @@ class TiendasController extends AppController {
       if ($tipo != 'Todos') {
         $condiciones['Pago.tipo'] = $tipo;
       }
+      
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Ventascelulare.producto_id'] = $this->request->data['Dato']['producto_id'];
+      }
       $sql = "SELECT p.nombre FROM productos p WHERE p.id = Ventascelulare.producto_id";
       $this->Pago->virtualFields = array(
         'producto' => "CONCAT(($sql))"
@@ -893,7 +942,11 @@ class TiendasController extends AppController {
       /* debug($datos);
         exit; */
     }
-    $this->set(compact('datos'));
+    $productos = $this->Producto->find('list',array(
+      'fields' => array('id','nombre'),
+      'conditions' => array('tipo_producto' => 'CELULARES')
+    ));
+    $this->set(compact('datos','productos'));
   }
 
   public function reporte_celular() {
@@ -908,6 +961,14 @@ class TiendasController extends AppController {
         'fields' => array('Almacene.id')
       ));
       $idAlmacen = $almacen['Almacene']['id'];
+      
+      $condiciones = array();
+      $condiciones['Ventascelulare.almacene_id'] = $idAlmacen;
+      $condiciones['DATE(Ventascelulare.created) >='] = $fecha_ini;
+      $condiciones['DATE(Ventascelulare.created) <='] = $fecha_fin;
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Producto.id'] = $this->request->data['Dato']['producto_id'];
+      }
       $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.almacene_id = $idAlmacen AND Producto.id = mo.producto_id LIMIT 1)";
       $sql2 = "(SELECT CONCAT(SUM(mov.entrada)+SUM(mov.salida)) FROM ventascelulares mov WHERE mov.almacene_id = $idAlmacen AND DATE(mov.created) > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
       $this->Ventascelulare->virtualFields = array(
@@ -915,12 +976,16 @@ class TiendasController extends AppController {
       );
       $datos = $this->Ventascelulare->find('all', array(
         'recursive' => 0, 'order' => 'Ventascelulare.producto_id',
-        'conditions' => array('Ventascelulare.almacene_id' => $idAlmacen, 'DATE(Ventascelulare.created) >=' => $fecha_ini, 'DATE(Ventascelulare.created) <=' => $fecha_fin),
+        'conditions' => $condiciones,
         'group' => array('Ventascelulare.producto_id'),
         'fields' => array('Producto.nombre', 'SUM(Ventascelulare.entrada) entregado', 'SUM(Ventascelulare.salida) vendido', 'Producto.id', 'Ventascelulare.total_s', 'Ventascelulare.precio', 'Ventascelulare.id')
       ));
     }
-    $this->set(compact('datos'));
+    $productos = $this->Producto->find('list',array(
+      'fields' => array('id','nombre'),
+      'conditions' => array('tipo_producto' => 'CELULARES')
+    ));
+    $this->set(compact('datos','productos'));
   }
 
   public function reporte_celular_cliente() {
@@ -935,6 +1000,15 @@ class TiendasController extends AppController {
         'fields' => array('Almacene.id')
       ));
       $idAlmacen = $almacen['Almacene']['id'];
+      
+      $condiciones = array();
+      $condiciones['Ventascelulare.almacene_id'] = $idAlmacen;
+      $condiciones['DATE(Ventascelulare.created) >='] = $fecha_ini;
+      $condiciones['DATE(Ventascelulare.created) <='] = $fecha_fin;
+      $condiciones['Ventascelulare.salida !='] = 0;
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Producto.id'] = $this->request->data['Dato']['producto_id'];
+      }
       $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.almacene_id = $idAlmacen AND Producto.id = mo.producto_id LIMIT 1)";
       $sql2 = "(SELECT CONCAT(SUM(mov.entrada)+SUM(mov.salida)) FROM ventascelulares mov WHERE mov.almacene_id = $idAlmacen AND DATE(mov.created) > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
       $this->Ventascelulare->virtualFields = array(
@@ -943,7 +1017,7 @@ class TiendasController extends AppController {
 
       $datos = $this->Ventascelulare->find('all', array(
         'recursive' => 0, 'order' => 'Ventascelulare.producto_id',
-        'conditions' => array('Ventascelulare.almacene_id' => $idAlmacen, 'DATE(Ventascelulare.created) >=' => $fecha_ini, 'DATE(Ventascelulare.created) <=' => $fecha_fin, 'Ventascelulare.salida !=' => 0),
+        'conditions' => $condiciones,
         'fields' => array('Producto.nombre', 'Producto.id', 'Ventascelulare.created', 'Ventascelulare.precio', 'Ventascelulare.id', 'Ventascelulare.cliente')
       ));
       foreach ($datos as $key => $da) {
@@ -954,7 +1028,11 @@ class TiendasController extends AppController {
         ));
       }
     }
-    $this->set(compact('datos'));
+    $productos = $this->Producto->find('list',array(
+      'fields' => array('id','nombre'),
+      'conditions' => array('tipo_producto' => 'CELULARES')
+    ));
+    $this->set(compact('datos','productos'));
   }
 
   public function get_num_trans() {
@@ -1064,7 +1142,16 @@ class TiendasController extends AppController {
         'efectivo' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Efectivo" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
         'tarjeta' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Tarjeta" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)'
       );
-      $datos_array = $this->Ventascelulare->find('all',array(
+      $condiciones = array();
+      $condiciones['DATE(Ventascelulare.modified) >='] = $fecha_ini;
+      $condiciones['DATE(Ventascelulare.modified) <='] = $fecha_fin;
+      $condiciones['DATE(Ventascelulare.modified) <='] = 'CELULARES';
+      $condiciones['Almacene.sucursal_id'] = $idSucursal;
+      $condiciones['Ventascelulare.salida >'] = 0;
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Ventascelulare.producto_id'] = $this->request->data['Dato']['producto_id'];
+      }
+      $datos_array = $this->Ventascelulare->find('all', array(
         'recursive' => 0,
         'conditions' => array(
           'DATE(Ventascelulare.modified) >=' => $fecha_ini,
@@ -1073,10 +1160,24 @@ class TiendasController extends AppController {
           'Almacene.sucursal_id' => $idSucursal,
           'Ventascelulare.salida >' => 0
         ),
-        'fields' => array('Producto.nombre','Ventascelulare.prod_marca','Ventascelulare.voucher','Ventascelulare.ticket','Ventascelulare.efectivo','Ventascelulare.tarjeta','Ventascelulare.cliente')
+        'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente')
       ));
     }
-    $this->set(compact('datos_array'));
+    $productos = $this->Producto->find('list',array(
+      'fields' => array('id','nombre'),
+      'conditions' => array('tipo_producto' => 'CELULARES')
+    ));
+    $this->set(compact('datos_array','productos'));
+  }
+
+  public function ajax_img_prod($idProducto = null) {
+    $this->layout = 'ajax';
+    $producto = $this->Producto->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('id' => $idProducto),
+      'fields' => array('nombre', 'url_imagen', 'observaciones')
+    ));
+    $this->set(compact('producto'));
   }
 
 }

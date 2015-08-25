@@ -15,6 +15,7 @@
                     <th style="width: 30%;" class="hide-on-mobile">direccion</th>  
                     <th class="hide-on-mobile">celular</th>
                     <th class="hide-on-mobile">Ruta</th>
+                    <th class="hide-on-mobile">Distribuidor</th>
                     <th class="hide-on-mobile">zona</th>
                     <th >Acciones</th>
                 </tr>
@@ -51,6 +52,7 @@
 <script>
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'index.json')); ?>';
   filtro_c = [
+      {type: "text"},
       {type: "text"},
       {type: "text"},
       {type: "text"},

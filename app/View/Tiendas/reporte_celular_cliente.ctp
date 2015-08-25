@@ -99,6 +99,12 @@
             </div>
             <div class="three-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
+                    <label class="label">Producto</label>
+                    <?php echo $this->Form->select('Dato.producto_id', $productos, array('class' => 'select full-width')) ?>
+                </p>
+            </div>
+            <div class="three-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <button class="button green-gradient full-width" type="submit">GENERAR</button>
                 </p>

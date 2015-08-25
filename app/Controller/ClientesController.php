@@ -25,10 +25,14 @@ class ClientesController extends AppController {
     //$this->set('clientes', $this->paginate());
     //debug($clientes);exit;
     if ($this->RequestHandler->responseType() == 'json') {
+      $sql2 = "(SELECT ru.user_id FROM rutasusuarios ru WHERE ru.ruta_id = Cliente.ruta_id LIMIT 1)";
+      $sql = "(SELECT us.persona_id FROM users us WHERE us.id = $sql2)";
+      $sql3 = "(SELECT CONCAT(pe.nombre,' ',pe.ap_paterno,' ',pe.ap_materno) FROM personas pe WHERE pe.id = $sql)";
       $editar = '<button class="button orange-gradient compact icon-pencil" type="button" onclick="editarc(' . "',Cliente.id,'" . ')">Editar</button>';
       $elimina = '<button class="button red-gradient compact icon-cross-round" type="button" onclick="eliminarc(' . "',Cliente.id,'" . ')">Eliminar</button>';
       $acciones = "$editar $elimina";
       $this->Cliente->virtualFields = array(
+        'distribuidor' => "$sql3",
         'acciones' => "CONCAT('$acciones')"
       );
       $condiciones = array();
@@ -40,12 +44,12 @@ class ClientesController extends AppController {
         $condiciones['Cliente.ruta_id'] = $rutas_usuario;
       }
       $this->paginate = array(
-        'fields' => array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Ruta.nombre', 'Cliente.zona', 'Cliente.acciones'),
+        'fields' => array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Ruta.nombre', 'Cliente.distribuidor', 'Cliente.zona', 'Cliente.acciones'),
         'recursive' => 0,
         'order' => 'Cliente.id DESC',
         'conditions' => $condiciones
       );
-      $this->DataTable->fields = array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Ruta.nombre', 'Cliente.zona', 'Cliente.acciones');
+      $this->DataTable->fields = array('Cliente.num_registro', 'Cliente.nombre', 'Cliente.direccion', 'Cliente.celular', 'Ruta.nombre', 'Cliente.distribuidor', 'Cliente.zona', 'Cliente.acciones');
 
       $this->set('clientes', $this->DataTable->getResponse());
       $this->set('_serialize', 'clientes');

@@ -97,10 +97,18 @@
                     </span>
                 </p>
             </div>
+        </div>
+        <div class="columns ocultar_impresion">
             <div class="three-columns twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Tipo pago</label>
                     <?php echo $this->Form->select('Dato.tipo', array('Boucher' => 'Boucher', 'Ticket' => 'Ticket', 'Efectivo' => 'Efectivo', 'Tarjeta' => 'Tarjeta', 'Todos' => 'Todos'), array('class' => 'select full-width','value' => 'Todos','required')); ?>
+                </p>
+            </div>
+            <div class="three-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <label class="label">Producto</label>
+                    <?php echo $this->Form->select('Dato.producto_id', $productos, array('class' => 'select full-width')) ?>
                 </p>
             </div>
             <div class="three-columns new-row-mobile twelve-columns-mobile">

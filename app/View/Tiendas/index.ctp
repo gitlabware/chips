@@ -14,6 +14,7 @@
                             <th>Categoria</th>
                             <th>Precio</th>
                             <th>Cantidad</th>
+                            <th></th>
                             <th>Accion</th>
                         </tr>
                     </thead>
@@ -25,67 +26,72 @@
                               <td><?php echo $pro['Productosprecio']['precio'] ?></td>
                               <td><?php echo $pro['Productosprecio']['total'] ?></td>
                               <td>
+                                  <?php if (!empty($pro['Producto']['url_imagen'])): ?>
+                                    <a href="javascript:" onclick="openModal(<?= $pro['Producto']['id'] ?>,'<?= $pro['Producto']['nombre'] ?>');"><img src="<?php echo $this->webroot . '' . $pro['Producto']['url_imagen'] ?>" height="51" width="51"></a>
+                                  <?php endif; ?>
+                              </td>
+                              <td>
                                   <a href="javascript:" class="button anthracite-gradient glossy" onclick="add_venta(<?php echo $pro['Producto']['id']; ?>, '<?php echo $pro['Producto']['nombre']; ?>',<?php echo $pro['Productosprecio']['precio']; ?>)">ADICIONAR</a>
                               </td>
                           </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
-<!--
-                <div class="standard-tabs margin-bottom">
-                    <ul class="tabs">
-                        <?php foreach ($categorias as $llave => $c): ?>
-                          <?php
-                          $t_activo = '';
-                          if ($llave == 0) {
-                            $t_activo = 'active';
-                          }
-                          ?>
-                          <li class="<?php echo $t_activo; ?>">
-                              <a href="#tab-<?php echo $llave + 1; ?>">
-                                  <?php echo $c['Tiposproducto']['nombre']; ?>
-                              </a>
-                          </li>
-                        <?php endforeach; ?>
-                    </ul>
+                <!--
+                                <div class="standard-tabs margin-bottom">
+                                    <ul class="tabs">
+                <?php foreach ($categorias as $llave => $c): ?>
+                  <?php
+                  $t_activo = '';
+                  if ($llave == 0) {
+                    $t_activo = 'active';
+                  }
+                  ?>
+                                                        <li class="<?php echo $t_activo; ?>">
+                                                            <a href="#tab-<?php echo $llave + 1; ?>">
+                  <?php echo $c['Tiposproducto']['nombre']; ?>
+                                                            </a>
+                                                        </li>
+                <?php endforeach; ?>
+                                    </ul>
+                
+                                    <div class="tabs-content">
+                <?php foreach ($categorias as $llave => $c): ?>
+                  <?php
+                  $color = 'white';
+                  if (!empty($c['Tiposproducto']['desc'])) {
+                    $color = $c['Tiposproducto']['desc'];
+                  }
+                  $tab_activo = '';
 
-                    <div class="tabs-content">
-                        <?php foreach ($categorias as $llave => $c): ?>
-                          <?php
-                          $color = 'white';
-                          if (!empty($c['Tiposproducto']['desc'])) {
-                            $color = $c['Tiposproducto']['desc'];
-                          }
-                          $tab_activo = '';
-
-                          if ($llave == 0) {
-                            $tab_activo = 'tab-active';
-                            //debug($tab_activo);
-                          }
-                          ?>
-                          <div id="tab-<?php echo $llave + 1; ?>" class="with-padding <?php echo $tab_activo; ?>">
-                              <?php foreach ($productos as $p): ?>
-                                <?php if ($c['Tiposproducto']['id'] == $p['Producto']['tiposproducto_id']): ?> 
-                                  <a href="javascript:" class="<?php echo "button $color-gradient glossy"; ?>" onclick="add_venta(<?php echo $p['Producto']['id']; ?>, '<?php echo $p['Producto']['nombre']; ?>',<?php echo $p['Productosprecio']['precio']; ?>)" style="margin-bottom: 10px; text-transform: uppercase; font-size: 150%; padding: 10px 15px 10px 15px"><?php echo $p['Producto']['nombre']; ?></a>
-                                  <?php
-                                  /* $nombre = $p['Producto']['nombre'];
-                                    echo $this->Ajax->link(
-                                    $nombre, array(
-                                    'controller' => 'Tiendas',
-                                    'action' => 'ajaxpidetienda', $p['Productosprecio']['id'], $p['Producto']['id'], $p['Productosprecio']['precio']), array(
-                                    'update' => 'cargaDatos',
-                                    'escape' => false,
-                                    'class' => "button $color-gradient glossy",
-                                    'style' => 'margin-bottom: 10px; text-transform: uppercase; font-size: 150%; padding: 10px 15px 10px 15px'
-                                    )
-                                    ); */
-                                  ?>
-                                <?php endif; ?>
-                              <?php endforeach; ?>
-                          </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>-->
+                  if ($llave == 0) {
+                    $tab_activo = 'tab-active';
+                    //debug($tab_activo);
+                  }
+                  ?>
+                                                        <div id="tab-<?php echo $llave + 1; ?>" class="with-padding <?php echo $tab_activo; ?>">
+                  <?php foreach ($productos as $p): ?>
+                    <?php if ($c['Tiposproducto']['id'] == $p['Producto']['tiposproducto_id']): ?> 
+                                                                                            <a href="javascript:" class="<?php echo "button $color-gradient glossy"; ?>" onclick="add_venta(<?php echo $p['Producto']['id']; ?>, '<?php echo $p['Producto']['nombre']; ?>',<?php echo $p['Productosprecio']['precio']; ?>)" style="margin-bottom: 10px; text-transform: uppercase; font-size: 150%; padding: 10px 15px 10px 15px"><?php echo $p['Producto']['nombre']; ?></a>
+                      <?php
+                      /* $nombre = $p['Producto']['nombre'];
+                        echo $this->Ajax->link(
+                        $nombre, array(
+                        'controller' => 'Tiendas',
+                        'action' => 'ajaxpidetienda', $p['Productosprecio']['id'], $p['Producto']['id'], $p['Productosprecio']['precio']), array(
+                        'update' => 'cargaDatos',
+                        'escape' => false,
+                        'class' => "button $color-gradient glossy",
+                        'style' => 'margin-bottom: 10px; text-transform: uppercase; font-size: 150%; padding: 10px 15px 10px 15px'
+                        )
+                        ); */
+                      ?>
+                    <?php endif; ?>
+                  <?php endforeach; ?>
+                                                        </div>
+                <?php endforeach; ?>
+                                    </div>
+                                </div>-->
             </div>
             <div class="five-columns new-row-mobile new-row-tablet twelve-columns-mobile twelve-columns-tablet">
                 <div class="simpler">                     
@@ -127,7 +133,20 @@
 <!-- Sidebar/drop-down menu -->
 <?php echo $this->element('sidebar/tienda'); ?>
 <!-- End sidebar/drop-down menu --> 
+<?php echo $this->Html->script(array('developr.modal'), array('block' => 'js_add')) ?>
+<?php echo $this->Html->css(array('styles/modal.css?v=1'), array('css')); ?>
 <script>
+  function openModal(idProducto,nombre)
+  {
+      $.modal({
+          title: nombre,
+          content: '<div id="idmodal"></div>',
+          center: true,
+          width: 450,
+          height: 450,
+      });
+      $('#idmodal').load('<?php echo $this->Html->url(array('action' => 'ajax_img_prod')); ?>/'+idProducto);
+  }
   filtro_c = [
       {type: "text"},
       {type: "text"},

@@ -37,8 +37,8 @@
                     <span>Clientes</span>
                     <ul class="big-menu">
                          <!--<li><a href="<?php //echo $this->Html->url(array('action'=>'clientes'));  ?>">Clientes</a></li>-->
-                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Clientes', 'action' => 'index')); ?>">Listado de Clientes</a></li>
-                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Clientes', 'action' => 'insertar')); ?>">Nuevo Cliente</a></li>                                                                        
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'clientes')); ?>">Listado de Clientes</a></li>
+                        <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'cliente')); ?>">Nuevo Cliente</a></li>                                                                        
 
                     </ul>
                 </li>

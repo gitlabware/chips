@@ -97,7 +97,21 @@
                     </span>
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns-mobile">
+        </div>
+        <div class="columns ocultar_impresion">
+            <div class="row four-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <label class="label">Categoria</label>
+                    <?php echo $this->Form->select('Dato.tiposproducto_id', $categorias, array('class' => 'select full-width','onchange' => '$("#campo-productos").load("'.$this->Html->url(array('action' => 'ajax_l_productos')).'/"+$(this).val())')) ?>
+                </p>
+            </div>
+            <div class="row four-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height" id="campo-productos">
+                    <label class="label">Producto</label>
+                    <?php echo $this->Form->select('Dato.producto_id', array(), array('class' => 'select full-width')) ?>
+                </p>
+            </div>
+            <div class="four-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <button class="button green-gradient full-width" type="submit">GENERAR</button>

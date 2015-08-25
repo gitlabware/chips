@@ -137,7 +137,7 @@
         <script src="<?php echo $this->webroot; ?>js/libs/jquery.tablesorter.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/jquery.dataTables.columnFilter.js"></script>
-
+        
         <script>
           // Call template init (optional, but faster if called manually)
           $.template.init();
