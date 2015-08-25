@@ -1009,13 +1009,16 @@ class AlmacenesController extends AppController {
           $array_data[$rowIndex] = array(
             'A' => '',
             'B' => '',
-            'C' => '');
+            'C' => '',
+            'D' => '');
           foreach ($cellIterator as $cell) {
             if ('A' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             } elseif ('B' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             } elseif ('C' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            } elseif ('D' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             }
           }
@@ -1027,19 +1030,20 @@ class AlmacenesController extends AppController {
         $d_dis = array();
         $producto = $this->Producto->find('first', array(
           'recursive' => -1,
-          'conditions' => array('nombre' => $da['A']),
+          'conditions' => array('nombre' => $da['A'],'tipo_producto' => $da['B']),
           'fields' => array('Producto.id')
         ));
         $tienda = $this->Almacene->find('first', array(
           'recursive' => 0,
-          'conditions' => array('Sucursal.nombre' => $da['B']),
+          'conditions' => array('Sucursal.nombre' => $da['C']),
           'fields' => array('Almacene.id', 'Sucursal.id', 'Almacene.central')
         ));
         $d_dis['nombre_producto'] = $da['A'];
-        $d_dis['nombre_tienda'] = $da['B'];
-        $d_dis['cantidad'] = $da['C'];
+        $d_dis['tipo_producto'] = $da['B'];
+        $d_dis['nombre_tienda'] = $da['C'];
+        $d_dis['cantidad'] = $da['D'];
         $d_dis['excel_id'] = $ultimoExcel;
-        if (!empty($producto) && !empty($tienda) && !empty($da['C'])) {
+        if (!empty($producto) && !empty($tienda) && !empty($da['D'])) {
           $d_dis['almacene_id'] = $tienda['Almacene']['id'];
           $d_dis['sucursal_id'] = $tienda['Sucursal']['id'];
           $d_dis['producto_id'] = $producto['Producto']['id'];
@@ -1050,31 +1054,31 @@ class AlmacenesController extends AppController {
             $d_mov['producto_id'] = $d_dis['producto_id'];
             $d_mov['user_id'] = $idUser;
             $d_mov['almacene_id'] = $d_dis['almacene_id'];
-            $d_mov['ingreso'] = $da['C'];
+            $d_mov['ingreso'] = $da['D'];
             $this->Movimiento->create();
             $this->Movimiento->save($d_mov);
-            $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_c + $da['C']));
+            $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_c + $da['D']));
           } else {
             $total_c = $this->get_total($d_dis['producto_id'], 1, $idCentral);
-            if ($total_c >= $da['C']) {
+            if ($total_c >= $da['D']) {
               $d_dis['estado'] = 'Correcto';
               $d_mov = array();
               $d_mov['producto_id'] = $d_dis['producto_id'];
               $d_mov['user_id'] = $idUser;
               $d_mov['almacene_id'] = $idCentral;
-              $d_mov['salida'] = $da['C'];
+              $d_mov['salida'] = $da['D'];
               $this->Movimiento->create();
               $this->Movimiento->save($d_mov);
-              $this->set_total($d_dis['producto_id'], 1, $idCentral, ($total_c - $da['C']));
+              $this->set_total($d_dis['producto_id'], 1, $idCentral, ($total_c - $da['D']));
               $d_mov = array();
               $d_mov['producto_id'] = $d_dis['producto_id'];
               $d_mov['user_id'] = $idUser;
               $d_mov['almacene_id'] = $d_dis['almacene_id'];
-              $d_mov['ingreso'] = $da['C'];
+              $d_mov['ingreso'] = $da['D'];
               $this->Movimiento->create();
               $this->Movimiento->save($d_mov);
               $total_p = $this->get_total($d_dis['producto_id'], 1, $d_dis['almacene_id']);
-              $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_p + $da['C']));
+              $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_p + $da['D']));
             } else {
               $d_dis['estado'] = 'No Correcto';
             }
@@ -1270,13 +1274,16 @@ class AlmacenesController extends AppController {
           $array_data[$rowIndex] = array(
             'A' => '',
             'B' => '',
-            'C' => '');
+            'C' => '',
+            'D' => '');
           foreach ($cellIterator as $cell) {
             if ('A' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             } elseif ('B' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             } elseif ('C' == $cell->getColumn()) {
+              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
+            }elseif ('D' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             }
           }
@@ -1288,19 +1295,20 @@ class AlmacenesController extends AppController {
         $d_dis = array();
         $producto = $this->Producto->find('first', array(
           'recursive' => -1,
-          'conditions' => array('nombre' => $da['A']),
+          'conditions' => array('nombre' => $da['A'],'tipo_producto' => $da['B']),
           'fields' => array('Producto.id')
         ));
         $tienda = $this->Almacene->find('first', array(
           'recursive' => 0,
-          'conditions' => array('Sucursal.nombre' => $da['B']),
+          'conditions' => array('Sucursal.nombre' => $da['C']),
           'fields' => array('Almacene.id', 'Sucursal.id', 'Almacene.central')
         ));
         $d_dis['nombre_producto'] = $da['A'];
-        $d_dis['nombre_tienda'] = $da['B'];
-        $d_dis['cantidad'] = $da['C'];
+        $d_dis['nombre_producto'] = $da['B'];
+        $d_dis['nombre_tienda'] = $da['C'];
+        $d_dis['cantidad'] = $da['D'];
         $d_dis['excel_id'] = $ultimoExcel;
-        if (!empty($producto) && !empty($tienda) && !empty($da['C'])) {
+        if (!empty($producto) && !empty($tienda) && !empty($da['D'])) {
           $d_dis['almacene_id'] = $tienda['Almacene']['id'];
           $d_dis['sucursal_id'] = $tienda['Sucursal']['id'];
           $d_dis['producto_id'] = $producto['Producto']['id'];
@@ -1311,10 +1319,10 @@ class AlmacenesController extends AppController {
             $d_mov['producto_id'] = $d_dis['producto_id'];
             $d_mov['user_id'] = $idUser;
             $d_mov['almacene_id'] = $d_dis['almacene_id'];
-            $d_mov['ingreso'] = $da['C'];
+            $d_mov['ingreso'] = $da['D'];
             $this->Movimiento->create();
             $this->Movimiento->save($d_mov);
-            $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_c + $da['C']));
+            $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_c + $da['D']));
           } else {
             $total_c = $this->get_total($d_dis['producto_id'], 1, $idCentral);
             $d_dis['estado'] = 'Correcto';
@@ -1322,28 +1330,28 @@ class AlmacenesController extends AppController {
             $d_mov['producto_id'] = $d_dis['producto_id'];
             $d_mov['user_id'] = $idUser;
             $d_mov['almacene_id'] = $idCentral;
-            $d_mov['ingreso'] = $da['C'];
+            $d_mov['ingreso'] = $da['D'];
             $this->Movimiento->create();
             $this->Movimiento->save($d_mov);
-            $this->set_total($d_dis['producto_id'], 1, $idCentral, ($total_c + $da['C']));
+            $this->set_total($d_dis['producto_id'], 1, $idCentral, ($total_c + $da['D']));
             $total_c = $this->get_total($d_dis['producto_id'], 1, $idCentral);
             $d_mov = array();
             $d_mov['producto_id'] = $d_dis['producto_id'];
             $d_mov['user_id'] = $idUser;
             $d_mov['almacene_id'] = $idCentral;
-            $d_mov['salida'] = $da['C'];
+            $d_mov['salida'] = $da['D'];
             $this->Movimiento->create();
             $this->Movimiento->save($d_mov);
-            $this->set_total($d_dis['producto_id'], 1, $idCentral, ($total_c - $da['C']));
+            $this->set_total($d_dis['producto_id'], 1, $idCentral, ($total_c - $da['D']));
             $d_mov = array();
             $d_mov['producto_id'] = $d_dis['producto_id'];
             $d_mov['user_id'] = $idUser;
             $d_mov['almacene_id'] = $d_dis['almacene_id'];
-            $d_mov['ingreso'] = $da['C'];
+            $d_mov['ingreso'] = $da['D'];
             $this->Movimiento->create();
             $this->Movimiento->save($d_mov);
             $total_p = $this->get_total($d_dis['producto_id'], 1, $d_dis['almacene_id']);
-            $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_p + $da['C']));
+            $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_p + $da['D']));
           }
         } else {
           $d_dis['estado'] = 'No Correcto';
@@ -1490,10 +1498,10 @@ class AlmacenesController extends AppController {
             $this->set_total($d_dis['producto_id'], 1, $d_dis['almacene_id'], ($total_p + $da['E']));
           }
         } else {
-          /*debug($producto);
-          debug($tienda);
-          debug($da['E']);
-          exit;*/
+          /* debug($producto);
+            debug($tienda);
+            debug($da['E']);
+            exit; */
           $d_dis['estado'] = 'No Correcto';
         }
         $this->Distribucione->create();

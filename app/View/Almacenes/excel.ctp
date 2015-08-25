@@ -37,7 +37,7 @@
                             <span class="button-icon"><span class="icon-search"></span></span>
                             Ver Formato
                         </button>
-                        <a href="<?= $this->webroot; ?>formatos/distribucion.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
+                        <a href="<?= $this->webroot; ?>formatos/distribucion-p.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
                     </div>                                        
 
                 </fieldset>
@@ -57,9 +57,9 @@
               $.modal({
                   content: '<div id="idmodal"></div>',
                   title: 'Formato del Archivo',
-                  content: '<?php echo $this->Html->image('iconos/formato-distribucion.png'); ?>',
+                  content: '<?php echo $this->Html->image('iconos/formato-distribucion-p.png'); ?>',
                           center: true,
-                  width: 500,
+                  width: 580,
                   height: 250,
               });
           }
@@ -96,7 +96,7 @@
                             <span class="button-icon"><span class="icon-search"></span></span>
                             Ver Formato
                         </button>
-                        <a href="<?= $this->webroot; ?>formatos/distribucion.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
+                        <a href="<?= $this->webroot; ?>formatos/distribucion-p.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
                     </div>                                       
 
                 </fieldset>
@@ -127,9 +127,9 @@
               //console.log('hizo click');
               $.modal({
                   title: 'Formato del Archivo',
-                  content: '<?php echo $this->Html->image('iconos/formato-distribucion.png'); ?>',
+                  content: '<?php echo $this->Html->image('iconos/formato-distribucion-p.png'); ?>',
                   center: true,
-                  width: 500,
+                  width: 580,
                   height: 250,
               });
           }
