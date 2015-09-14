@@ -139,7 +139,8 @@
         <table class="table responsive-table" id="sorting-advanced">
 
             <thead>
-                <tr>                      
+                <tr> 
+                    <th scope="col" width="5%" class="align-center hide-on-mobile">ID</th>
                     <th scope="col" width="15%" class="align-center hide-on-mobile">Nombre</th>
                     <th scope="col" width="15%" class="align-center hide-on-mobile">Fecha</th>
                     <th scope="col" width="15%" class="align-center hide-on-mobile-portrait">Tipo</th>                                         
@@ -150,6 +151,7 @@
             <tbody>
                 <?php foreach ($excels as $e): ?>
                   <tr>                      
+                      <td><?php echo $e['Excel']['id']; ?></td>                        
                       <td><?php echo $e['Excel']['nombre_original']; ?></td>                        
                       <td><?php echo $e['Excel']['created']; ?></td>
                       <td><?php echo $e['Excel']['tipo']; ?></td>                       

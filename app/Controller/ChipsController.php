@@ -931,7 +931,8 @@ class ChipsController extends AppController {
     $chips = $this->Chip->find('all', array(
       'recursive' => 0,
       'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega),
-      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist')
+      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist'),
+      'order'=>array('Chip.id')
     ));
     //debug($chips);exit;
     $cont = 1;
