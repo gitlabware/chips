@@ -186,7 +186,7 @@
           if (datos_tabla2 == null) {
               datos_tabla2 = {
                   /*"oLanguage": {
-                   "sUrl": "<?php //echo $this->webroot;  ?>js/libs/DataTables/Spanish.json"
+                   "sUrl": "<?php //echo $this->webroot;    ?>js/libs/DataTables/Spanish.json"
                    },*/
                   "oLanguage": {
                       "oPaginate": {
@@ -201,6 +201,7 @@
                   },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
+                  "iDisplayLength": 10,
                   'bProcessing': true,
                   'sAjaxSource': urljsontabla,
                   "bServerSide": true,

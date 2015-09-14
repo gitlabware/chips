@@ -1112,11 +1112,11 @@ class ChipsController extends AppController {
         'ver' => "CONCAT('$ver')"
       );
       $this->paginate = array(
-        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver'),
+        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver'),
         'recursive' => 0,
         'order' => 'Chip.created'
       );
-      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver');
+      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('chips', $this->DataTable->getResponse());
       $this->set('_serialize', 'chips');
