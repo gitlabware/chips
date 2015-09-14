@@ -73,6 +73,7 @@ class TiendasController extends AppController {
         $this->redirect(array('action' => 'index'));
       }
     }
+    $numerot = $this->get_num_trans();
     foreach ($this->request->data['productos'] as $key => $ped) {
       $total = $this->get_total($key, 1, $idAlmacen);
       $this->Movimiento->create();
@@ -84,7 +85,7 @@ class TiendasController extends AppController {
       $this->request->data['Movimiento']['salida'] = $ped['cantidad'];
       $this->request->data['Movimiento']['precio_uni'] = $ped['precio'];
       $this->request->data['Movimiento']['ingreso'] = 0;
-      $this->request->data['Movimiento']['transaccion'] = $this->get_num_trans();
+      $this->request->data['Movimiento']['transaccion'] = $numerot;
       $this->Movimiento->save($this->request->data['Movimiento']);
       $this->set_total($key, 1, $idAlmacen, ($total - $ped['cantidad']));
     }
@@ -135,7 +136,8 @@ class TiendasController extends AppController {
     $idAlmacen = $this->get_id_almacen();
     $sql = "SELECT tot.total FROM totales tot WHERE tot.almacene_id = $idAlmacen AND tot.producto_id = Productosprecio.producto_id LIMIT 1";
     $this->Productosprecio->virtualFields = array(
-      'total' => "CONCAT(($sql))"
+      'total' => "CONCAT(($sql))",
+      'marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)"
     );
     $productos = $this->Productosprecio->find('all', array(
       'recursive' => 0,
@@ -711,7 +713,7 @@ class TiendasController extends AppController {
       }
     }
     $categorias = $this->Tiposproducto->find('list', array('fields' => 'nombre'));
-    $this->set(compact('datos','categorias'));
+    $this->set(compact('datos', 'categorias'));
   }
 
   public function reporte_cliente() {
@@ -755,7 +757,7 @@ class TiendasController extends AppController {
       //($datos);exit;
     }
     $categorias = $this->Tiposproducto->find('list', array('fields' => 'nombre'));
-    $this->set(compact('datos','categorias'));
+    $this->set(compact('datos', 'categorias'));
   }
 
   public function chips($idCliente = null) {
@@ -926,7 +928,7 @@ class TiendasController extends AppController {
       if ($tipo != 'Todos') {
         $condiciones['Pago.tipo'] = $tipo;
       }
-      
+
       if (!empty($this->request->data['Dato']['producto_id'])) {
         $condiciones['Ventascelulare.producto_id'] = $this->request->data['Dato']['producto_id'];
       }
@@ -942,11 +944,11 @@ class TiendasController extends AppController {
       /* debug($datos);
         exit; */
     }
-    $productos = $this->Producto->find('list',array(
-      'fields' => array('id','nombre'),
+    $productos = $this->Producto->find('list', array(
+      'fields' => array('id', 'nombre'),
       'conditions' => array('tipo_producto' => 'CELULARES')
     ));
-    $this->set(compact('datos','productos'));
+    $this->set(compact('datos', 'productos'));
   }
 
   public function reporte_celular() {
@@ -961,7 +963,7 @@ class TiendasController extends AppController {
         'fields' => array('Almacene.id')
       ));
       $idAlmacen = $almacen['Almacene']['id'];
-      
+
       $condiciones = array();
       $condiciones['Ventascelulare.almacene_id'] = $idAlmacen;
       $condiciones['DATE(Ventascelulare.created) >='] = $fecha_ini;
@@ -981,11 +983,11 @@ class TiendasController extends AppController {
         'fields' => array('Producto.nombre', 'SUM(Ventascelulare.entrada) entregado', 'SUM(Ventascelulare.salida) vendido', 'Producto.id', 'Ventascelulare.total_s', 'Ventascelulare.precio', 'Ventascelulare.id')
       ));
     }
-    $productos = $this->Producto->find('list',array(
-      'fields' => array('id','nombre'),
+    $productos = $this->Producto->find('list', array(
+      'fields' => array('id', 'nombre'),
       'conditions' => array('tipo_producto' => 'CELULARES')
     ));
-    $this->set(compact('datos','productos'));
+    $this->set(compact('datos', 'productos'));
   }
 
   public function reporte_celular_cliente() {
@@ -1000,7 +1002,7 @@ class TiendasController extends AppController {
         'fields' => array('Almacene.id')
       ));
       $idAlmacen = $almacen['Almacene']['id'];
-      
+
       $condiciones = array();
       $condiciones['Ventascelulare.almacene_id'] = $idAlmacen;
       $condiciones['DATE(Ventascelulare.created) >='] = $fecha_ini;
@@ -1028,11 +1030,11 @@ class TiendasController extends AppController {
         ));
       }
     }
-    $productos = $this->Producto->find('list',array(
-      'fields' => array('id','nombre'),
+    $productos = $this->Producto->find('list', array(
+      'fields' => array('id', 'nombre'),
       'conditions' => array('tipo_producto' => 'CELULARES')
     ));
-    $this->set(compact('datos','productos'));
+    $this->set(compact('datos', 'productos'));
   }
 
   public function get_num_trans() {
@@ -1129,6 +1131,28 @@ class TiendasController extends AppController {
     $this->set(compact('ventas'));
   }
 
+  public function ventastienda() {
+    $ventas = $this->Movimiento->find('all', array(
+      'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.sucursal_id' => $this->Session->read('Auth.User.sucursal_id'), 'Movimiento.escala' => 'TIENDA'),
+      'group' => array('Movimiento.transaccion'),
+      'fields' => array('Movimiento.created', 'SUM(Movimiento.precio_uni*Movimiento.salida) as monto_total', 'Movimiento.transaccion'),
+      'order' => array('Movimiento.transaccion DESC')
+    ));
+    //debug($ventas);exit;
+    $this->set(compact('ventas'));
+  }
+
+  public function detalle_venta_t($transaccion = null) {
+    $this->Movimiento->virtualFields = array(
+      'marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)"
+    );
+    $items = $this->Movimiento->find('all', array(
+      'conditions' => array('Movimiento.sucursal_id' => $this->Session->read('Auth.User.sucursal_id'), 'Movimiento.escala' => 'TIENDA', 'Movimiento.transaccion' => $transaccion),
+      'fields' => array('Movimiento.id', 'Producto.nombre', 'Producto.tipo_producto', 'Movimiento.marca', 'Movimiento.salida', '(Movimiento.precio_uni*Movimiento.salida) as mon_total', 'Movimiento.salida', 'Movimiento.precio_uni', 'Movimiento.marca')
+    ));
+    $this->set(compact('items','transaccion'));
+  }
+
   public function report_control_ven() {
     $datos_array = array();
     if (!empty($this->request->data)) {
@@ -1163,11 +1187,11 @@ class TiendasController extends AppController {
         'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente')
       ));
     }
-    $productos = $this->Producto->find('list',array(
-      'fields' => array('id','nombre'),
+    $productos = $this->Producto->find('list', array(
+      'fields' => array('id', 'nombre'),
       'conditions' => array('tipo_producto' => 'CELULARES')
     ));
-    $this->set(compact('datos_array','productos'));
+    $this->set(compact('datos_array', 'productos'));
   }
 
   public function ajax_img_prod($idProducto = null) {
@@ -1178,6 +1202,20 @@ class TiendasController extends AppController {
       'fields' => array('nombre', 'url_imagen', 'observaciones')
     ));
     $this->set(compact('producto'));
+  }
+
+  public function elimina_venta_t($idMovimiento = null) {
+    $movimiento = $this->Movimiento->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('id' => $idMovimiento),
+      'fields' => array('salida', 'producto_id')
+    ));
+    $idAlmacen = $this->get_id_almacen();
+    $total = $this->get_total($movimiento['Movimiento']['producto_id'], 1, $idAlmacen);
+    $this->Movimiento->delete($idMovimiento);
+    $this->set_total($movimiento['Movimiento']['producto_id'], 1, $idAlmacen, ($total + $movimiento['Movimiento']['salida']));
+    $this->Session->setFlash("Se elimino correctamente las venta!!", 'msgbueno');
+    $this->redirect($this->referer());
   }
 
 }

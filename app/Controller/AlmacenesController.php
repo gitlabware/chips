@@ -153,10 +153,13 @@ class AlmacenesController extends AppController {
     } else {
       $condiciones['Totale.persona_id'] = $idPersona;
     }
+    $this->Totale->virtualFields = array(
+      'marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)"
+    );
     $entregas = $this->Totale->find('all', array(
       'recursive' => 0,
       'conditions' => $condiciones,
-      'fields' => array('Producto.nombre', 'Producto.proveedor', 'Totale.total', 'Totale.producto_id')
+      'fields' => array('Producto.nombre', 'Producto.tipo_producto','Totale.marca', 'Totale.total', 'Totale.producto_id','Producto.marca_id')
     ));
     $idDistribuidor = $this->User->find('first', array('fields' => array('User.id'), 'conditions' => array('User.persona_id' => $idPersona)));
     $ultima = $this->Pedido->find('first', array(

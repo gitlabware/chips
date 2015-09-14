@@ -11,6 +11,7 @@
                     <thead>
                         <tr>
                             <th>Producto</th>
+                            <th>Marca</th>
                             <th>Categoria</th>
                             <th>Precio</th>
                             <th>Cantidad</th>
@@ -22,6 +23,7 @@
                         <?php foreach ($productos as $pro): ?>
                           <tr>
                               <td><?php echo $pro['Producto']['nombre'] ?></td>
+                              <td><?php echo $pro['Productosprecio']['marca']?></td>
                               <td><?php echo $pro['Producto']['tipo_producto'] ?></td>
                               <td><?php echo $pro['Productosprecio']['precio'] ?></td>
                               <td><?php echo $pro['Productosprecio']['total'] ?></td>
@@ -31,7 +33,7 @@
                                   <?php endif; ?>
                               </td>
                               <td>
-                                  <a href="javascript:" class="button anthracite-gradient glossy" onclick="add_venta(<?php echo $pro['Producto']['id']; ?>, '<?php echo $pro['Producto']['nombre']; ?>',<?php echo $pro['Productosprecio']['precio']; ?>)">ADICIONAR</a>
+                                  <a href="javascript:" class="button anthracite-gradient glossy" onclick="add_venta(<?php echo $pro['Producto']['id']; ?>, '<?php echo $pro['Producto']['nombre']; ?>',<?php echo $pro['Productosprecio']['precio']; ?>)" title="Adicionar"><span class="icon-cart"></span></a>
                               </td>
                           </tr>
                         <?php endforeach; ?>
