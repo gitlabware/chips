@@ -55,6 +55,7 @@
                     </ul>
                 </li> 
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'ventas')); ?>">Ventas x Mayor</a></li>
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'ventastienda')); ?>">Ventas Tienda</a></li>
             </ul>
         </section>
     </div>

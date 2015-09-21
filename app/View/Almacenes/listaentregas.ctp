@@ -44,7 +44,10 @@
                                 Producto
                             </th>
                             <th>
-                                Proveedor
+                                Categoria
+                            </th>
+                            <th>
+                                Marca
                             </th>
                             <th>
                                 Cantidad
@@ -61,7 +64,10 @@
                                   <?php echo $entrega['Producto']['nombre']; ?>
                               </td>
                               <td>
-                                  <?php echo $entrega['Producto']['proveedor']; ?>
+                                  <?php echo $entrega['Producto']['tipo_producto']; ?>
+                              </td>
+                              <td>
+                                  <?php echo $entrega['Totale']['marca']; ?>
                               </td>
                               <td>
                                   <?php echo $entrega['Totale']['total']; ?>
@@ -69,12 +75,12 @@
                               <td>
                                   <?php
                                   $idProducto = $entrega['Totale']['producto_id'];
-                                  /*if ($entrega['Producto']['tiposproducto_id'] == 1):
+                                  /* if ($entrega['Producto']['tiposproducto_id'] == 1):
                                     echo
                                     $this->Html->link('Rango&lote', array('action' => 'verdetalle', $idPersona, $almacen, $idProducto));
-                                  endif;*/
+                                    endif; */
                                   ?>
-                                  <a href="javascript:" class="button anthracite-gradient" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'detalle_mov',$idProducto,$idPersona,$almacen));?>','Detalle de <?php echo $entrega['Producto']['nombre']; ?>')">Detalle</a>
+                                  <a href="javascript:" class="button anthracite-gradient" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'detalle_mov', $idProducto, $idPersona, $almacen)); ?>', 'Detalle de <?php echo $entrega['Producto']['nombre']; ?>')">Detalle</a>
                                   <?php //echo $this->Html->link('Entregas', array('action' => 'verentregas', $idPersona, $almacen, $idProducto));?>
                               </td>
                           </tr>
@@ -100,7 +106,7 @@
         </div>
         <div class="columns">
             <div class="twelve-columns">
-                
+
             </div>
         </div>
     </div>
