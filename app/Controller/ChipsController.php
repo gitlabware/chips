@@ -776,7 +776,7 @@ class ChipsController extends AppController {
       $this->set('_serialize', 'chips');
     }
     $cajas = array();
-    for ($i = 1; $i <= 10; $i++) {
+    for ($i = 1; $i <= 20; $i++) {
       $cajas["Caja $i"] = "Caja $i";
     }
     $this->set(compact('idExcel', 'cajas'));
