@@ -37,7 +37,7 @@
                     <label for="login" class="label"><b>Seleccionar Excel:</b></label>
                     <span class="input file">
                         <span class="file-text"></span>
-                        <span class="button compact green-gradient">Seleccione</span>
+                        <span class="button compact blue-gradient">Seleccione</span>
                         <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
                     </span>
                     <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
@@ -58,12 +58,12 @@
                         <span class="button compact green-gradient">Seleccione</span>
                         <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
                     </span>
-                    <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
+                    <button type="submit" class="button green-gradient glossy">SUBIR EXCEL</button> 
                     <button type="button" class="button glossy mid-margin-right" onclick="openModal3();">
-                        <span class="button-icon"><span class="icon-search"></span></span>
+                        <span class="button-icon green-gradient"><span class="icon-search"></span></span>
                         Ver Formato Celulares
                     </button>
-                    <a href="<?= $this->webroot; ?>formatos/celulares.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
+                    <a href="<?= $this->webroot; ?>formatos/celulares.xlsx" class="button"><span class="button-icon green-gradient"><span class="icon-download"></span></span> Formato</a>
                 </div> 
                 <?php echo $this->Form->end(); ?>
             </div>
