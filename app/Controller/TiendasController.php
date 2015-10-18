@@ -810,7 +810,7 @@ class TiendasController extends AppController {
     if ($this->RequestHandler->responseType() == 'json') {
       $tipo_pro_cel = $this->Tiposproducto->findBynombre('CELULARES', null, null, -1);
       $comillas = '"' . "'" . '"';
-      $add = '<button class="button green-gradient compact icon-plus" type="button" onclick="add_venta(' . "',Producto.id,',',$comillas ,Producto.nombre,$comillas ,' " . ",',Productosprecio.precio,'" . ')">Add Compra</button>';
+      $add = '<button class="button green-gradient compact icon-plus" type="button" onclick="add_venta(' . "',Producto.id,',',$comillas ,Producto.nombre,$comillas ,' " . ",',Productosprecio.precio,'" . ')"><span class="icon-cart"></span></button>';
       $acciones = "$add";
       $sql = "SELECT t.total FROM totales t WHERE t.producto_id = Producto.id AND t.almacene_id = $idAlmacen LIMIT 1";
       $sql1 = "SELECT nombre FROM marcas WHERE id = Producto.marca_id";
@@ -1131,6 +1131,21 @@ class TiendasController extends AppController {
     $this->set(compact('ventas'));
   }
 
+  public function ventascelulares() {
+    $this->Ventascelulare->virtualFields = array(
+      'marca' => "(SELECT marcas.nombre FROM marcas WHERE marcas.id = Producto.marca_id)",
+      'color' => "(SELECT colores.nombre FROM colores WHERE colores.id = Producto.colore_id)"
+    );
+    $ventas = $this->Ventascelulare->find('all', array(
+      'conditions' => array('Ventascelulare.sucursal_id' => $this->Session->read('Auth.User.sucursal_id')),
+      //'group' => array('Ventascelulare.transaccion'),
+      'fields' => array('Producto.nombre', 'Ventascelulare.id', 'Ventascelulare.marca', 'Ventascelulare.color', 'Ventascelulare.created', 'Ventascelulare.cliente', 'Ventascelulare.precio', 'Ventascelulare.transaccion'),
+      'order' => array('Ventascelulare.created DESC')
+    ));
+    //debug($ventas);exit;
+    $this->set(compact('ventas'));
+  }
+
   public function ventastienda() {
     $ventas = $this->Movimiento->find('all', array(
       'conditions' => array('Movimiento.created' => date("Y-m-d"), 'Movimiento.sucursal_id' => $this->Session->read('Auth.User.sucursal_id'), 'Movimiento.escala' => 'TIENDA'),
@@ -1150,7 +1165,7 @@ class TiendasController extends AppController {
       'conditions' => array('Movimiento.sucursal_id' => $this->Session->read('Auth.User.sucursal_id'), 'Movimiento.escala' => 'TIENDA', 'Movimiento.transaccion' => $transaccion),
       'fields' => array('Movimiento.id', 'Producto.nombre', 'Producto.tipo_producto', 'Movimiento.marca', 'Movimiento.salida', '(Movimiento.precio_uni*Movimiento.salida) as mon_total', 'Movimiento.salida', 'Movimiento.precio_uni', 'Movimiento.marca')
     ));
-    $this->set(compact('items','transaccion'));
+    $this->set(compact('items', 'transaccion'));
   }
 
   public function report_control_ven() {
@@ -1218,6 +1233,41 @@ class TiendasController extends AppController {
     $this->redirect($this->referer());
   }
 
+  public function ventacelular($idVentacelular = null) {
+    
+    if(!empty($this->request->data['Ventascelulare'])){
+      $this->Ventascelulare->id = $idVentacelular;
+      $this->Ventascelulare->save($this->request->data['Ventascelulare']);
+      $this->Session->setFlash("Se ha modificado correctamente!!",'msgbueno');
+      $this->redirect(array('action' => 'ventascelulares'));
+    }
+    $this->request->data = $venta = $this->Ventascelulare->findByid($idVentacelular);
+    $sucursal = $this->Sucursal->findByid($this->Session->read('Auth.User.sucursal_id'),null,null,-1);
+    //debug($sucursal);exit;
+    $tipo_cambio = $sucursal['Sucursal']['tipo_cambio'];
+    $pagos = $this->Pago->findAllByventascelulare_id($idVentacelular,null,null,null,null,-1);
+    $this->set(compact('venta','tipo_cambio','pagos'));
+  }
+  
+  public function registra_pago_v(){
+    $this->Pago->create();
+    $this->Pago->save($this->request->data['Pago']);
+    $this->Session->setFlash('Se ha registrado el pago!!','msgbueno');
+    $this->redirect($this->referer());
+  }
+  
+  public function eliminar_pago_v($idPago = null){
+    $this->Pago->delete($idPago);
+    $this->Session->setFlash("Se ha eliminado correctamente el pago!!",'msgbueno');
+    $this->redirect($this->referer());
+  }
+  
+  public function elimina_venta_cel($idVentacelular = null){
+    $venta = $this->Ventascelulare->findByid($idVentacelular,null,null,-1);
+    
+    $total_c = $this->get_total_cel_almacen($venta['Ventascelulare']['producto_id']);
+    //$this->set_
+  }
 }
 
 ?>

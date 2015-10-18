@@ -104,11 +104,14 @@
           v_total = v_total - precio;
           $('#idrow-' + id_producto).remove();
           productos[id_producto] = null;
+          $('#idinpprod-' + id_producto).remove();
+          $('#idinpreprod-' + id_producto).remove();
       } else {
           v_total = v_total - precio;
           $('#idrcant-' + id_producto).html(productos[id_producto]['cantidad']);
+          $('#idinpprod-' + id_producto).val(productos[id_producto]['cantidad']);
       }
-      $('#idinpprod-' + id_producto).val(productos[id_producto]['cantidad']);
+      
       $('#idcanttotal').html(v_total);
   }
 </script>

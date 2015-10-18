@@ -5,7 +5,7 @@
           vPos: 'top',
           hPos: 'right',
           autoClose: true,
-          icon: true ? "<?php echo $this->webroot; ?>/img/mal.png" : '',
+          icon: true ? "<?php echo $this->webroot; ?>img/mal.png" : '',
           iconOutside: true,
           closeButton: true,
           showCloseOnHover: true,

@@ -18,6 +18,40 @@ App::uses('AppModel', 'Model');
  * @property Ventasdistribuidore $Ventasdistribuidore
  */
 class User extends AppModel {
+  
+  
+  public $validate = array(
+        'username' => array(
+            'limitDuplicateusername' => array(
+                'rule' => array('limitDuplicateusername', 1),
+                'message' => 'El usuario ya fue registrado'
+            )
+        )
+    );
+    
+    public function limitDuplicateusername($check, $limit) {
+        // $check will have value: array('promotion_code' => 'some-value')
+        // $limit will have value: 25
+        if(!empty($check['username']))
+        {
+            if(!empty($this->data['User']['id']))
+            {
+                $check['User.id !='] = $this->data['User']['id'];
+            }
+            if(!empty($this->getID())){
+              $check['User.id !='] = $this->getID();
+            }
+            $existingPromoCount = $this->find('count', array(
+                'conditions' => $check,
+                'recursive' => -1
+            ));
+            return $existingPromoCount < $limit;
+        }
+        else{
+            return TRUE;
+        }
+        
+    }
 
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed

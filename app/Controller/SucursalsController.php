@@ -10,7 +10,9 @@ class SucursalsController extends AppController {
     'Tiposproducto',
     'Producto',
     'Almacene',
-    'User'
+    'User',
+    'Totale',
+    'Movimiento'
   );
   public $layout = 'viva';
 
@@ -154,6 +156,12 @@ class SucursalsController extends AppController {
       $this->redirect(array('action' => 'index'));
     } else {
       if ($this->Sucursal->delete($id)) {
+        $almacen = $this->Almacene->findBysucursal_id($id,null,null,-1);
+        if(!empty($almacen)){
+          $this->Totale->deleteAll(array('Totale.almacene_id' => $almacen['Almacene']['id']));
+          $this->Movimiento->deleteAll(array('Movimiento.almacene_id' => $almacen['Almacene']['id']));
+          $this->Almacene->delete($almacen['Almacene']['id']);
+        }
         $this->Session->setFlash('Se elimino la tienda ' . $this->request->data['Tienda']['nombre'], 'msgbueno');
         $this->redirect(array('action' => 'index'));
       } else {

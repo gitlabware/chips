@@ -121,36 +121,36 @@ class UsersController extends AppController {
       $ruta = $this->request->data['User']['ruta_id'];
       $this->User->create();
       $this->Persona->create();
+      $valida = $this->validar('User');
+      if (empty($valida)) {
+        if ($this->Persona->save($this->request->data['Persona'])) {
+          //debug($this->request->data);
+          $iduser = $this->Persona->getLastInsertID();
+          $this->request->data['User']['persona_id'] = $iduser;
+          /* if ($this->request->data['User']['group_id'] == null){
+            $this->Session->setFlash('Debe llenar el tipo de usuario..!!!!');
+            $this->redirect(array('action' => 'add'));
+            $this->Session->setFlash('Debe llenar el tipo de usuario..!!!!');
+            } */
+          $this->request->data['User']['estado'] = 'Activo';
+          if ($this->User->save($this->request->data['User'])) {
 
-      if ($this->Persona->save($this->request->data['Persona'])) {
-        //debug($this->request->data);
-        $iduser = $this->Persona->getLastInsertID();
-        $this->request->data['User']['persona_id'] = $iduser;
-        /* if ($this->request->data['User']['group_id'] == null){
-          $this->Session->setFlash('Debe llenar el tipo de usuario..!!!!');
-          $this->redirect(array('action' => 'add'));
-          $this->Session->setFlash('Debe llenar el tipo de usuario..!!!!');
-          } */
-        $this->request->data['User']['estado'] = 'Activo';
-        if ($this->User->save($this->request->data['User'])) {
+            if ($this->request->data['User']['group_id'] == 2) {
 
-          if ($this->request->data['User']['group_id'] == 2) {
-
-            $idUser = $this->User->getLastInsertID();
-            $this->Rutasusuario->create();
-            $this->request->data['Rutasusuario']['user_id'] = $idUser;
-            $this->request->data['Rutasusuario']['ruta_id'] = $ruta;
-            if ($this->Rutasusuario->save($this->request->data['Rutasusuario'])) {
-              $this->Session->setFlash(__('The user has been saved'));
-              $this->redirect(array('action' => 'index'));
+              $idUser = $this->User->getLastInsertID();
+              $this->Rutasusuario->create();
+              $this->request->data['Rutasusuario']['user_id'] = $idUser;
+              $this->request->data['Rutasusuario']['ruta_id'] = $ruta;
+              $this->Rutasusuario->save($this->request->data['Rutasusuario']);
             }
+            $this->Session->setFlash('El ususario de ha guardado correctamente!!!', 'msgbueno');
+            $this->redirect(array('action' => 'index'));
+          } else {
+            $this->Session->setFlash('No se ha guardado al usuario intente nuevamente!!', 'msgerror');
           }
-
-          $this->Session->setFlash(__('The user has been saved'));
-          $this->redirect(array('action' => 'index'));
-        } else {
-          $this->Session->setFlash(__('The user could not be saved. Please, try again.'));
         }
+      } else {
+        $this->Session->setFlash($valida, 'msgerror');
       }
     }
     $tiendas = $this->Sucursal->find('all', array('recursive' => -1));
@@ -280,26 +280,31 @@ class UsersController extends AppController {
       $this->data = $this->Persona->read();
       $this->data = $this->User->read();
     } else {
-      //debug($this->request->data);die;
-      if ($this->Persona->save($this->request->data['Persona'])) {
-        //$this->Session->setFlash('Los datos fueron modificados', 'msgbueno');
-        if (!empty($this->request->data['User']['password2'])) {
-          $this->request->data['User']['password'] = $this->request->data['User']['password2'];
-        }
-        if ($this->User->save($this->request->data['User'])) {
-          $this->Session->setFlash('Los datos fueron modificados', 'msgbueno');
-          if ($this->Session->read('Auth.User.group_id') == 1) {
-            $this->redirect(array('action' => 'index'), null, true);
-          } else {
-            $this->redirect($this->referer());
+      $valida = $this->validar('User');
+      if (empty($valida)) {
+        if ($this->Persona->save($this->request->data['Persona'])) {
+          //$this->Session->setFlash('Los datos fueron modificados', 'msgbueno');
+          if (!empty($this->request->data['User']['password2'])) {
+            $this->request->data['User']['password'] = $this->request->data['User']['password2'];
           }
+          if ($this->User->save($this->request->data['User'])) {
+            $this->Session->setFlash('Los datos fueron modificados', 'msgbueno');
+            if ($this->Session->read('Auth.User.group_id') == 1) {
+              $this->redirect(array('action' => 'index'), null, true);
+            } else {
+              $this->redirect($this->referer());
+            }
+          } else {
+            $this->Session->setFlash('no se pudo modificar!!', 'msgerror');
+          }
+          //$this->redirect(array('action' => 'index'), null, true);
         } else {
           $this->Session->setFlash('no se pudo modificar!!', 'msgerror');
         }
-        //$this->redirect(array('action' => 'index'), null, true);
-      } else {
-        $this->Session->setFlash('no se pudo modificar!!', 'msgerror');
+      }else{
+        $this->Session->setFlash($valida,'msgerror');
       }
+      //debug($this->request->data);die;
     }
     $groups = $this->User->Group->find('list', array('recursive' => -1, 'fields' => 'name'));
     $tiendas = $this->Sucursal->find('list', array('recursive' => -1, 'fields' => 'nombre'));
