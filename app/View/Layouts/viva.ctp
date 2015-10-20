@@ -219,12 +219,16 @@
               sPlaceHolder: "head:before",
               aoColumns: filtro_c
           });
-          function cargarmodal(url, titulo) {
+          function cargarmodal(url, titulo,alto) {
+          if(alto === undefined){
+            alto = 400;
+          }
+          
               $.modal({
                   content: '<div id="idmodal"></div>',
                   title: titulo,
                   width: 600,
-                  height: 400,
+                  height: alto,
                   actions: {
                       'Cerrar': {
                           color: 'red',

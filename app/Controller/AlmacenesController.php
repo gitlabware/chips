@@ -159,7 +159,7 @@ class AlmacenesController extends AppController {
     $entregas = $this->Totale->find('all', array(
       'recursive' => 0,
       'conditions' => $condiciones,
-      'fields' => array('Producto.nombre', 'Producto.tipo_producto','Totale.marca', 'Totale.total', 'Totale.producto_id','Producto.marca_id')
+      'fields' => array('Producto.nombre', 'Producto.tipo_producto', 'Totale.marca', 'Totale.total', 'Totale.producto_id', 'Producto.marca_id')
     ));
     $idDistribuidor = $this->User->find('first', array('fields' => array('User.id'), 'conditions' => array('User.persona_id' => $idPersona)));
     $ultima = $this->Pedido->find('first', array(
@@ -473,7 +473,7 @@ class AlmacenesController extends AppController {
       /* debug($id_a);
         exit; */
       $this->paginate = array(
-        'fields' => array('Producto.imagen', 'Producto.nombre', 'Marca.nombre', 'Producto.cantidad', 'Producto.acciones'),
+        'fields' => array('Producto.imagen', 'Producto.nombre', 'Marca.nombre','Colore.nombre', 'Producto.cantidad', 'Producto.acciones'),
         'recursive' => 0,
         'order' => 'Producto.nombre DESC',
         'conditions' => array('Tiposproducto.nombre' => 'CELULARES')
@@ -486,14 +486,15 @@ class AlmacenesController extends AppController {
 
   public function ajax_entrega_cel($id_a = null, $es_alamacen = null, $idProducto = null) {
     $this->layout = 'ajax';
-    $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.id' => $id_a)));
-    $movimientos = $this->Ventascelulare->find('all', array('order' => 'Ventascelulare.id DESC', 'limit' => 10,
-      'conditions' => array('Ventascelulare.producto_id' => $idProducto, 'Ventascelulare.almacene_id' => $id_a)
-    ));
     $producto = $this->Producto->find('first', array(
       'fields' => array('Producto.nombre'),
       'conditions' => array('Producto.id' => $idProducto)
     ));
+    $almacen = $this->Almacene->find('first', array('conditions' => array('Almacene.id' => $id_a)));
+    $movimientos = $this->Ventascelulare->find('all', array('order' => 'Ventascelulare.id DESC', 'limit' => 10,
+      'conditions' => array('Ventascelulare.producto_id' => $idProducto, 'Ventascelulare.almacene_id' => $id_a)
+    ));
+    
     if ($almacen['Almacene']['central'] != 1) {
       $Almacen_central = $this->Almacene->find('first', array('recursive' => -1, 'ALmacene.central' => 1));
       $ultimo_total = $this->get_total($idProducto, 1, $Almacen_central['Almacene']['id']);
@@ -563,7 +564,7 @@ class AlmacenesController extends AppController {
         $this->Session->setFlash('No hay sudiciente en almacen central!!', 'msgerror');
       }
     }
-    $this->redirect(array('action' => 'entrega_celulares', $idAlmacen, 1));
+    $this->redirect($this->referer());
   }
 
   public function devuelto($idPersona = null) {
@@ -1033,7 +1034,7 @@ class AlmacenesController extends AppController {
         $d_dis = array();
         $producto = $this->Producto->find('first', array(
           'recursive' => -1,
-          'conditions' => array('nombre' => $da['A'],'tipo_producto' => $da['B']),
+          'conditions' => array('nombre' => $da['A'], 'tipo_producto' => $da['B']),
           'fields' => array('Producto.id')
         ));
         $tienda = $this->Almacene->find('first', array(
@@ -1286,7 +1287,7 @@ class AlmacenesController extends AppController {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             } elseif ('C' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-            }elseif ('D' == $cell->getColumn()) {
+            } elseif ('D' == $cell->getColumn()) {
               $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
             }
           }
@@ -1298,7 +1299,7 @@ class AlmacenesController extends AppController {
         $d_dis = array();
         $producto = $this->Producto->find('first', array(
           'recursive' => -1,
-          'conditions' => array('nombre' => $da['A'],'tipo_producto' => $da['B']),
+          'conditions' => array('nombre' => $da['A'], 'tipo_producto' => $da['B']),
           'fields' => array('Producto.id')
         ));
         $tienda = $this->Almacene->find('first', array(

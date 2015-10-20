@@ -11,6 +11,7 @@
                             <th>Imagen</th>
                             <th>Nombre</th>
                             <th>Marca</th>
+                            <th>Color</th>
                             <th>Cantidad</th>
                             <th>Precio</th>
                             <th>Acciones</th>
@@ -59,7 +60,8 @@
 
     </div>
 </section>	
-
+<?php echo $this->Html->script(array('developr.modal'), array('block' => 'js_add')) ?>
+<?php echo $this->Html->css(array('styles/modal.css?v=1'), array('css')); ?>
 <script>
   urljsontabla = '<?php echo $this->Html->url(array('action' => "lista_celulares.json")); ?>';
 
@@ -67,9 +69,21 @@
       {type: "text"},
       {type: "text"},
       {type: "text"},
+      {type: "text"},
+      {type: "text"},
       {type: "text"}
   ];
-
+  function openModal(idProducto,nombre)
+  {
+      $.modal({
+          title: nombre,
+          content: '<div id="idmodal"></div>',
+          center: true,
+          width: 450,
+          height: 450,
+      });
+      $('#idmodal').load('<?php echo $this->Html->url(array('action' => 'ajax_img_prod')); ?>/'+idProducto);
+  }
   var productos = [];
   var v_total = 0.00;
   function add_venta(id_producto, nombre_producto, precio) {

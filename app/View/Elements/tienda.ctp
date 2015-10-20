@@ -4,11 +4,9 @@
         <header>
             TIENDAS
         </header>
-
         <div id="profile">
             <img src="<?php echo $this->webroot; ?>img/user.png" width="64" height="64" alt="User name" class="user-icon">
             Bienvenido
-
             <span class="name"><?php echo $this->Session->read('Auth.User.Persona.nombre'); ?>
                 <b><?php echo $this->Session->read('Auth.User.Persona.ap_paterno'); ?></b><br/>
                 <small><?php echo $this->Session->read("Auth.User.Sucursal.nombre") ?></small>

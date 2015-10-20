@@ -144,7 +144,8 @@ class TiendasController extends AppController {
       'conditions' => array(
         'Productosprecio.escala' => 'TIENDA',
         'Productosprecio.tipousuario_id' => 2,
-        'Producto.id !=' => null
+        'Producto.id !=' => null,
+        'Producto.tipo_producto !=' => 'CELULARES'
       ),
       'fields' => array('Productosprecio.*', 'Producto.*')
     ));
@@ -814,16 +815,18 @@ class TiendasController extends AppController {
       $acciones = "$add";
       $sql = "SELECT t.total FROM totales t WHERE t.producto_id = Producto.id AND t.almacene_id = $idAlmacen LIMIT 1";
       $sql1 = "SELECT nombre FROM marcas WHERE id = Producto.marca_id";
+      $sql2 = "SELECT colores.nombre FROM colores WHERE colores.id = Producto.colore_id";
       $this->Productosprecio->virtualFields = array(
-        'imagen' => "CONCAT(IF(ISNULL(Producto.url_imagen),'',CONCAT('" . '<img src="../' . "',Producto.url_imagen,'" . '" height="51" width="51">' . "')))",
+        'imagen' => "CONCAT(IF(ISNULL(Producto.url_imagen),'',CONCAT('" . '<a href="javascript:" onclick="openModal('."',Producto.id,'".','."'$comillas,Producto.nombre,$comillas'".' )"><img src="../' . "',Producto.url_imagen,'" . '" height="51" width="51"></a>' . "')))",
         'cantidad' => "$sql",
         'marca' => "$sql1",
+        'color' => "$sql2",
         'acciones' => "CONCAT('$acciones')"
       );
       /* debug($id_a);
         exit; */
       $this->paginate = array(
-        'fields' => array('Productosprecio.imagen', 'Producto.nombre', 'Productosprecio.marca', 'Productosprecio.cantidad', 'Productosprecio.precio', 'Productosprecio.acciones'),
+        'fields' => array('Productosprecio.imagen', 'Producto.nombre', 'Productosprecio.marca','Productosprecio.color', 'Productosprecio.cantidad', 'Productosprecio.precio', 'Productosprecio.acciones'),
         'recursive' => 0,
         'order' => 'Producto.nombre DESC',
         'conditions' => array('Productosprecio.escala' => 'TIENDA', 'Producto.tiposproducto_id' => $tipo_pro_cel['Tiposproducto']['id'])
@@ -1208,6 +1211,47 @@ class TiendasController extends AppController {
     ));
     $this->set(compact('datos_array', 'productos'));
   }
+  public function reporte_total() {
+    $datos_array = array();
+    if (!empty($this->request->data)) {
+      $idSucursal = $this->Session->read('Auth.User.sucursal_id');
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $this->Ventascelulare->virtualFields = array(
+        'prod_marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)",
+        'voucher' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Voucher" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'ticket' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Ticket" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'efectivo' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Efectivo" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
+        'tarjeta' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Tarjeta" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)'
+      );
+      $condiciones = array();
+      $condiciones['DATE(Ventascelulare.modified) >='] = $fecha_ini;
+      $condiciones['DATE(Ventascelulare.modified) <='] = $fecha_fin;
+      $condiciones['DATE(Ventascelulare.modified) <='] = 'CELULARES';
+      $condiciones['Almacene.sucursal_id'] = $idSucursal;
+      $condiciones['Ventascelulare.salida >'] = 0;
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Ventascelulare.producto_id'] = $this->request->data['Dato']['producto_id'];
+      }
+      $datos_array = $this->Ventascelulare->find('all', array(
+        'recursive' => 0,
+        'conditions' => array(
+          'DATE(Ventascelulare.modified) >=' => $fecha_ini,
+          'DATE(Ventascelulare.modified) <=' => $fecha_fin,
+          'Producto.tipo_producto' => 'CELULARES',
+          'Almacene.sucursal_id' => $idSucursal,
+          'Ventascelulare.salida >' => 0
+        ),
+        'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente')
+      ));
+    }
+    $productos = $this->Producto->find('list', array(
+      'fields' => array('id', 'nombre'),
+      'conditions' => array('tipo_producto' => 'CELULARES')
+    ));
+    $this->set(compact('datos_array', 'productos'));
+  }
+  
 
   public function ajax_img_prod($idProducto = null) {
     $this->layout = 'ajax';
@@ -1264,8 +1308,12 @@ class TiendasController extends AppController {
   
   public function elimina_venta_cel($idVentacelular = null){
     $venta = $this->Ventascelulare->findByid($idVentacelular,null,null,-1);
-    
-    $total_c = $this->get_total_cel_almacen($venta['Ventascelulare']['producto_id']);
+    $total_c = $this->get_total($venta['Ventascelulare']['producto_id'], 1, $this->get_id_almacen());
+    $this->set_total($venta['Ventascelulare']['producto_id'], 1, $this->get_id_almacen(), ($total_c+$venta['Ventascelulare']['salida']));
+    $this->Pago->deleteAll(array('Pago.ventascelulare_id' => $idVentacelular));
+    $this->Ventascelulare->delete($idVentacelular);
+    $this->Session->setFlash("Se ha eliminado correctamente la venta!!",'msgbueno');
+    $this->redirect($this->referer());
     //$this->set_
   }
 }

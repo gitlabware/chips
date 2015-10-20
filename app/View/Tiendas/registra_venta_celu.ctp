@@ -42,20 +42,20 @@
     </hgroup>
     <div class="with-padding"> 
         <div class="columns">
-            <div class="ten-columns">
+            <div class="twelve-columns">
                 <?php echo $this->Form->create('Tienda', array('action' => 'registra_venta_celu_2')); ?>
                 <div class="columns">
                     <div class="three-columns">
                         <p class="button-height inline-label">
                             <label  class="label">Tipo de Cambio</label>
                             <?php echo $this->Form->text('Sucursal.tipo_cambio2', array('class' => 'input', 'required', 'type' => 'number', 'step' => 'any', 'value' => $tipo_cambio, 'id' => 'tipocambio', 'onkeyup' => 'calcula_tipo_cambio();')); ?>
-                            <?php echo $this->Form->hidden("Sucursal.tipo_cambio",array('id' => 'tipocambio2'));?>
+                            <?php echo $this->Form->hidden("Sucursal.tipo_cambio", array('id' => 'tipocambio2')); ?>
                         </p>
                     </div>
                 </div>
                 <?php foreach ($celulares as $key => $cel): ?>
                   <script>
-                      numero_p[<?php echo $key ?>] = 0;</script>
+                    numero_p[<?php echo $key ?>] = 0;</script>
                   <?php echo $this->Form->hidden("Ventascelulare.$key.producto_id", array('value' => $cel['Producto']['id'])); ?>
                   <?php echo $this->Form->hidden("Ventascelulare.$key.cliente", array('value' => $this->request->data['Tienda']['cliente'])); ?>
                   <?php //echo $this->Form->hidden("Ventascelulare.$key.precio", array('value' => $cel['precio'])); ?>
@@ -64,7 +64,7 @@
                       <p class="block-label button-height">
                       <div class="columns">
                           <div class="six-columns" align="center">
-                              <img src="<?php echo $this->webroot  . $cel['Producto']['url_imagen'] ?>" alt="Smiley face" height="200" width="200">
+                              <img src="<?php echo $this->webroot . $cel['Producto']['url_imagen'] ?>" alt="Smiley face" height="200" width="200">
                           </div>
                           <div class="six-columns">
                               <p class="button-height inline-label">
@@ -97,7 +97,7 @@
                       </p>
                       <p class="block-label button-height">
                       <div class="columns"   id="block-<?php echo $key; ?>-0">
-                          <div class="three-columns">
+                          <div class="two-columns">
                               <label class="label">Tipo pago</label>
                               <select name="data[][]" class="select blue-gradient full-width" id="tipopago-<?php echo $key; ?>">
                                   <option value="Voucher">Voucher</option>
@@ -110,17 +110,27 @@
                               <label class="label">Codigo</label>
                               <input type="text" name="data[][]" class="input full-width" id="idcodigo-<?php echo $key; ?>">
                           </div>
-                          <div class="two-columns">
-                              <label class="label">Monto Dolares</label>
+                          <div class="one-column">
+                              <label class="label" id="l-monto-d" onclick="$('#l-monto-b').removeClass('green');
+                                    $('#l-monto-d').addClass('green');">Monto $</label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-<?php echo $key; ?>" onkeyup="calc_pag_bol(<?php echo $key; ?>);">
                           </div>
-                          <div class="two-columns">
-                              <label class="label">Monto Bolivianos</label>
+                          <div class="one-column">
+                              <label class="label green" id="l-monto-b" onclick="$('#l-monto-d').removeClass('green');
+                                    $('#l-monto-b').addClass('green');">Monto Bs</label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-bol-<?php echo $key; ?>" onkeyup="calc_pag_dol(<?php echo $key; ?>);">
                           </div>
-                          <div class="three-columns"><br>
-                              <button type="button" class="button green-gradient glossy" onclick="add_pago(<?php echo $key; ?>);">ADD</button> 
-                              <button type="button" class="button red-gradient glossy" onclick="quita(<?php echo $key; ?>);">QUITA</button>
+                          <div class="two-columns">
+                              <label class="label">Nombre</label>
+                              <input type="text" name="data[][]" class="input full-width" id="id-nombre-<?php echo $key; ?>">
+                          </div>
+                          <div class="two-columns">
+                              <label class="label">Celular</label>
+                              <input type="text" name="data[][]" class="input full-width" id="id-celular-<?php echo $key; ?>">
+                          </div>
+                          <div class="two-columns"><br>
+                              <button type="button" class="button green-gradient glossy icon-plus" onclick="add_pago(<?php echo $key; ?>);">Add</button> 
+                              <button type="button" class="button red-gradient glossy icon-minus" onclick="quita(<?php echo $key; ?>);">Quitar</button>
                           </div>
                       </div>
                       </p>
@@ -142,6 +152,7 @@
 <script>
   var nuevo_pago = '';
   function add_pago(key) {
+
       var tipopago = $('#tipopago-' + key).val();
       var codigo = $('#idcodigo-' + key).val();
       var monto = $('#idmonto-' + key).val();
@@ -165,10 +176,20 @@
               break;
       }
       numero_p[key]++;
+      var clase_b = '';
+      var clase_d = '';
+      var inputpago = '';
+      if ($('#l-monto-b').hasClass('green')) {
+          clase_b = 'green';
+          inputpago = '   <input type="hidden" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][moneda]" class="input full-width" value="Bolivianos">';
+      } else {
+          inputpago = '   <input type="hidden" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][moneda]" class="input full-width" value="Dolares">';
+          clase_d = 'green';
+      }
       nuevo_pago = ''
               //+ '<p class="block-label button-height" id="block-' + key + '-' + numero_p + '">'
               + '<div class="columns" id="block-' + key + '-' + numero_p[key] + '">'
-              + ' <div class="three-columns">'
+              + ' <div class="two-columns">'
               + '   <label class="label">Tipo pago</label>'
               + '   <select name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][tipo]" class="select blue-gradient full-width" id="select-tipo-' + key + '-' + numero_p[key] + '">'
               + optvoucher
@@ -177,24 +198,30 @@
               + opttarjeta
               + '   </select>'
               + ' </div>'
-              + ' <div class="three-columns">'
+              + ' <div class="two-columns">'
               + '   <label class="label">Codigo</label>'
-              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][codigo]" class="input" value="' + codigo + '">'
+              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][codigo]" class="input full-width" value="' + codigo + '">'
               + ' </div>'
-              + ' <div class="three-columns">'
-              + '   <label class="label">Monto Dolares</label>'
-              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto]" class="input" value="' + monto + '">'
+              + ' <div class="two-columns">'
+              + '   <label class="label '+clase_d+'">Monto Dolares</label>'
+              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto]" class="input full-width" value="' + monto + '">'
               + ' </div>'
-              + ' <div class="three-columns">'
-              + '   <label class="label">Monto Bolivianos</label>'
-              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto_bol]" class="input" value="' + monto_bol + '">'
+              + ' <div class="two-columns">'
+              + '   <label class="label '+clase_b+'">Monto Bolivianos</label>'
+              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto_bol]" class="input full-width" value="' + monto_bol + '">'
               + '   <input type="hidden" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][tipo_cambio]" class="input" value="' + tipo_cambio + '">'
               + ' </div>'
-              + ' <div class="three-columns">'
-              + '   <label class="label">&nbsp;</label>'
+              + ' <div class="two-columns">'
+              + '   <label class="label">Nombre</label>'
+              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][nombre]" class="input full-width" value="' + $('#id-nombre-' + key).val() + '">'
+              + ' </div>'
+              + ' <div class="two-columns">'
+              + '   <label class="label">Celular</label>'
+              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][celular]" class="input full-width" value="' + $('#id-celular-' + key).val() + '">'
               + ' </div>'
               + '</div>'
               //+ '</p>'
+              + inputpago
               + '';
       $('#block-' + key + '-' + (numero_p[key] - 1)).after(nuevo_pago);
       //alert(tipopago);
@@ -203,8 +230,10 @@
       //$('#tipopago-' + key).val('');
       $('#idcodigo-' + key).val('');
       $('#idmonto-' + key).val('');
-      $('#idmonto-bol-'+key).val('');
-      $('#tipocambio').attr('disabled',true);
+      $('#idmonto-bol-' + key).val('');
+      $('#id-nombre-' + key).val('');
+      $('#id-celular-' + key).val('');
+      $('#tipocambio').attr('disabled', true);
   }
   function quita(key) {
       if (numero_p[key] > 0) {

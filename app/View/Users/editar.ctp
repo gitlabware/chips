@@ -155,7 +155,7 @@
   $(document).ready(function () {
 
       $("#validation-select1").change(function () {
-          if (this.value == 5) {
+          if (this.value == 5 || this.value == 6) {
               $('#mostrartienda').show();
           } else {
               $('#mostrartienda').hide();
@@ -164,7 +164,7 @@
 
   });
 
-  if (<?php echo $this->request->data['User']['group_id'] ?> == 5) {
+  if (<?php echo $this->request->data['User']['group_id'] ?> == 5 || <?php echo $this->request->data['User']['group_id'] ?> == 6) {
       $('#mostrartienda').show();
   } else {
       $('#mostrartienda').hide();

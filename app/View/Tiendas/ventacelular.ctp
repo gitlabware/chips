@@ -40,7 +40,7 @@
     </hgroup>
     <div class="with-padding"> 
         <div class="columns">
-            <div class="ten-columns">
+            <div class="twelve-columns">
                 <?php echo $this->Form->create('Tienda'); ?>
                 <?php echo $this->Form->hidden("Ventascelulare.id"); ?>
                 <div class="columns">
@@ -86,7 +86,7 @@
                                 <?php echo $this->Form->text("Ventascelulare.precio_bol", array('class' => 'input', 'id' => "precio-bol", 'onkeyup' => "calcula_dol();")); ?>
                             </p>
                             <script>
-                              //calcula_tipo_cambio_bol(<?php //echo $key;           ?>);
+                              //calcula_tipo_cambio_bol(<?php //echo $key;            ?>);
                             </script>
                             <p class="button-height inline-label">
                                 <label class="label">Numero Serie</label>
@@ -106,8 +106,9 @@
                     <p class="block-label button-height">
                         <?php echo $this->Form->create('Tienda', array('action' => 'registra_pago_v')); ?>
                         <?php echo $this->Form->hidden('Pago.ventascelulare_id', array('value' => $venta['Ventascelulare']['id'])) ?>
+                        <?php echo $this->Form->hidden('Pago.moneda', array('value' => "Bolivianos", 'id' => 'idtipomoneda')) ?>
                     <div class="columns"   id="block-0">
-                        <div class="three-columns">
+                        <div class="two-columns">
                             <label class="label">Tipo pago</label>
                             <select name="data[Pago][tipo]" class="select blue-gradient full-width" id="tipopago">
                                 <option value="Voucher">Voucher</option>
@@ -120,19 +121,31 @@
                             <label class="label">Codigo</label>
                             <input type="text" name="data[Pago][codigo]" class="input full-width" id="idcodigo">
                         </div>
-                        <div class="two-columns">
-                            <label class="label">Monto Dolares</label>
+                        <div class="one-column">
+                            <label class="label" id="l-monto-d" onclick="$('#l-monto-b').removeClass('green');
+                                  $('#l-monto-d').addClass('green');
+                                $('#idtipomoneda').val('Dolares');">Monto $</label>
                             <input type="text" name="data[Pago][monto]" required="true" class="input full-width" id="idmonto" onkeyup="calc_pag_bol();">
                         </div>
-                        <div class="two-columns">
-                            <label class="label">Monto Bolivianos</label>
+                        <div class="one-column">
+                            <label class="label green" id="l-monto-b" onclick="$('#l-monto-d').removeClass('green');
+                                  $('#l-monto-b').addClass('green');
+                                $('#idtipomoneda').val('Bolivianos');">Monto Bs</label>
                             <input type="text" name="data[Pago][]" class="input full-width" id="idmonto-bol" onkeyup="calc_pag_dol();">
                         </div>
-                        <div class="three-columns"><br>
+                        <div class="two-columns">
+                            <label class="label">Nombre</label>
+                            <input type="text" name="data[Pago][nombre]" class="input full-width" id="id-nombre">
+                        </div>
+                        <div class="two-columns">
+                            <label class="label">Celular</label>
+                            <input type="text" name="data[Pago][celular]" class="input full-width" id="id-celular">
+                        </div>
+                        <div class="two-columns"><br>
                             <button type="submit" class="button green-gradient glossy" >ADICIONAR</button> 
                         </div>
                     </div>
-                    <?php echo $this->Form->end() ?>
+<?php echo $this->Form->end() ?>
                     </p>
                 </fieldset>
                 <table class="table">
@@ -142,6 +155,8 @@
                             <th>Codigo</th>
                             <th>Monto $</th>
                             <th>Monto Bs</th>
+                            <th>Nombre</th>
+                            <th>Celular</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -151,16 +166,27 @@
                         <?php foreach ($pagos as $pa): ?>
                           <?php $total_d += $pa['Pago']['monto']; ?>
                           <?php $total_b += ($pa['Pago']['monto'] * $tipo_cambio); ?>
+                          <?php
+                          $clase_b = '';
+                          $clase_d = '';
+                          if ($pa['Pago']['moneda'] == 'Bolivianos') {
+                            $clase_b = 'style="color: green; font-weight: bold;"';
+                          } else {
+                            $clase_d = 'style="color: green; font-weight: bold;"';
+                          }
+                          ?>
                           <tr>
                               <td><?= $pa['Pago']['tipo'] ?></td>
                               <td><?= $pa['Pago']['codigo'] ?></td>
-                              <td><?= $pa['Pago']['monto'] ?></td>
-                              <td><?= $pa['Pago']['monto'] * $tipo_cambio; ?></td>
+                              <td <?= $clase_d ?>><?= $pa['Pago']['monto'] ?></td>
+                              <td <?= $clase_b ?>><?= $pa['Pago']['monto'] * $tipo_cambio; ?></td>
+                              <td><?= $pa['Pago']['nombre'] ?></td>
+                              <td><?= $pa['Pago']['celular'] ?></td>
                               <td>
-                                  <?php echo $this->Html->link('Eliminar', array('action' => 'eliminar_pago_v', $pa['Pago']['id']), array('class' => 'button red-gradient', 'confirm' => 'Esta seguro de eliminar el pago?')); ?>
+                          <?php echo $this->Html->link('Eliminar', array('action' => 'eliminar_pago_v', $pa['Pago']['id']), array('class' => 'button red-gradient', 'confirm' => 'Esta seguro de eliminar el pago?')); ?>
                               </td>
                           </tr>
-                        <?php endforeach; ?>
+<?php endforeach; ?>
                         <tr>
                             <td></td>
                             <td></td>
@@ -180,3 +206,6 @@
 <script>
   calcula_bol();
 </script>
+<!-- Sidebar/drop-down menu -->
+<?php echo $this->element('sidebar/tienda'); ?>
+<!-- End sidebar/drop-down menu --> 

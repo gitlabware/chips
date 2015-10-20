@@ -15,7 +15,7 @@
                             <th>Categoria</th>
                             <th>Precio</th>
                             <th>Cantidad</th>
-                            <th></th>
+                            <th>Imagen</th>
                             <th>Accion</th>
                         </tr>
                     </thead>

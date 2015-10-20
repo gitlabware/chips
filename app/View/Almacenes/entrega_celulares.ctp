@@ -14,6 +14,7 @@
                     <th>Imagen</th>
                     <th>Nombre</th>
                     <th>Marca</th>
+                    <th>Color</th>
                     <th>Cantidad</th>
                     <th>Acciones</th>
                 </tr>

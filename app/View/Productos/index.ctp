@@ -15,14 +15,15 @@
 
             <thead>
                 <tr>
-                    <th scope="col" width="4%">Precios</th>
-                    <th scope="col" width="5%">Imagen</th>
+                    <th scope="col" width="3%">Precios</th>
+                    <th scope="col" width="6%">Imagen</th>
                     <th scope="col" width="10%">Categoria</th>
                     <th scope="col" width="15%" class="align-center hide-on-mobile">Nombre</th>
+                    <th scope="col" class="align-center hide-on-mobile">Marca</th>
+                    <th scope="col" class="align-center hide-on-mobile">Color</th>
                     <th scope="col" width="5%" class="align-center hide-on-mobile">Precio compra</th>
                     <th scope="col" width="10%" class="align-center hide-on-mobile-portrait">proveedor</th>  
-                    <th scope="col" width="8%" class="align-center hide-on-mobile-portrait">Fecha Ingreso</th>  
-                    <th scope="col" width="15%" class="align-center">Acciones</th>
+                    <th scope="col" width="17%" class="align-center">Acciones</th>
                 </tr>
             </thead>          
 
@@ -74,6 +75,7 @@
   urljsontabla = '<?php echo $this->Html->url(array('action' => 'index.json')); ?>';
 
   filtro_c = [
+      {type: "text"},
       {type: "text"},
       {type: "text"},
       {type: "text"},
@@ -169,5 +171,11 @@
           width: 570,
           height: 160,
       });
+  }
+  function ingresar_ap(idProducto) {
+      cargarmodal('<?= $this->Html->url(array('controller' => 'Productos','action' => 'ajax_ing_alm_p')); ?>/'+idProducto,'Ingreso A Almacen Principal',300);
+  }
+  function ingresar_a(idProducto) {
+      cargarmodal('<?= $this->Html->url(array('controller' => 'Productos','action' => 'ajax_ing_alm')); ?>/'+idProducto,'Ingreso A Almacen',300);
   }
 </script>

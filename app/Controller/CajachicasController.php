@@ -13,9 +13,10 @@ class CajachicasController extends AppController {
   public $uses = array('Cajachica', 'Cajadetalle');
   public $layout = 'viva';
 
-  public function get_total() {
+  public function get_total($idSucursal = null) {
     $caja = $this->Cajachica->find('first', array(
       'recursive' => -1,
+      'conditions' => array('Cajachica.sucursal_id' => $idSucursal),
       'order' => 'id DESC'
     ));
     if (empty($caja)) {
@@ -25,8 +26,9 @@ class CajachicasController extends AppController {
     }
   }
 
-  public function set_total($total = null) {
+  public function set_total($total = null, $idSucursal = null) {
     $caja = $this->Cajachica->find('first', array(
+      'conditions' => array('Cajachica.sucursal_id' => $idSucursal),
       'recursive' => -1,
       'order' => 'id DESC'
     ));
@@ -60,28 +62,32 @@ class CajachicasController extends AppController {
     $cajachica_ing = $this->Cajachica->find('all', array(
       'recursive' => 0,
       'conditions' => array(
+        'Cajachica.sucursal_id' => NULL,
         'Cajachica.fecha >=' => $this->request->data['Dato']['fecha_ini'],
         'Cajachica.fecha <=' => $this->request->data['Dato']['fecha_fin'],
         'Cajachica.tipo' => 'Ingreso'
       ),
       'fields' => array('Cajachica.*', 'Cajadetalle.*')
     ));
+    //debug($cajachica_ing);exit;
     $cajachica_gas = $this->Cajachica->find('all', array(
       'recursive' => 0,
       'conditions' => array(
+        'Cajachica.sucursal_id' => NULL,
         'Cajachica.fecha >=' => $this->request->data['Dato']['fecha_ini'],
         'Cajachica.fecha <=' => $this->request->data['Dato']['fecha_fin'],
         'Cajachica.tipo' => 'Gasto'
       ),
       'fields' => array('Cajachica.*', 'Cajadetalle.*')
     ));
-    $detalles = $this->Cajadetalle->find('list', array('fields' => 'Cajadetalle.nombre'));
+    $detalles = $this->Cajadetalle->find('list', array('conditions' => array('Cajadetalle.sucursal_id' => NULL), 'fields' => 'Cajadetalle.nombre'));
     $this->set(compact('cajachica_ing', 'cajachica_gas', 'total', 'detalles'));
   }
 
   public function registra_caja() {
     if (!empty($this->request->data['Cajadetalle']['nombre'])) {
       $this->Cajadetalle->create();
+      $this->request->data['Cajadetalle']['sucursal_id'] = $this->Session->read('Auth.User.sucursal_id');
       $this->Cajadetalle->save($this->request->data['Cajadetalle']);
       $this->request->data['Cajachica']['cajadetalle_id'] = $this->Cajadetalle->getLastInsertID();
     }
@@ -94,7 +100,7 @@ class CajachicasController extends AppController {
           $dcaja['total'] = $total - $dcaja['monto'];
           $this->Cajachica->save($dcaja);
           $this->Session->setFlash("Se registro correctamente en cajachica!!", 'msgbueno');
-          $this->redirect(array('action' => 'index'));
+          $this->redirect($this->referer());
         } else {
           $this->Session->setFlash("El gasto no debe exceder al total de $total", 'msgerror');
         }
@@ -103,7 +109,7 @@ class CajachicasController extends AppController {
         $dcaja['total'] = $total + $dcaja['monto'];
         $this->Cajachica->save($dcaja);
         $this->Session->setFlash("Se registro correctamente en cajachica!!", 'msgbueno');
-        $this->redirect(array('action' => 'index'));
+        $this->redirect($this->referer());
       }
     } else {
       $this->Session->setFlash("No se pudo registrar intente nuevamente!!", 'msgerror');
@@ -128,5 +134,45 @@ class CajachicasController extends AppController {
     }
     $this->redirect(array('action' => 'index'));
   }
+
+  public function micajachica() {
+    $idSucursal = $this->Session->read('Auth.User.sucursal_id');
+    $total = $this->get_total($idSucursal);
+    if ($this->request->data['Cajachica']) {
+      $this->registra_caja();
+    }
+    if (empty($this->request->data['Dato']['fecha_ini'])) {
+      $this->request->data['Dato']['fecha_ini'] = date('Y-m-d');
+    }
+    if (empty($this->request->data['Dato']['fecha_fin'])) {
+      $this->request->data['Dato']['fecha_fin'] = date('Y-m-d');
+    }
+
+    $cajachica_ing = $this->Cajachica->find('all', array(
+      'recursive' => 0,
+      'conditions' => array(
+        'Cajachica.sucursal_id' => $idSucursal,
+        'Cajachica.fecha >=' => $this->request->data['Dato']['fecha_ini'],
+        'Cajachica.fecha <=' => $this->request->data['Dato']['fecha_fin'],
+        'Cajachica.tipo' => 'Ingreso'
+      ),
+      'fields' => array('Cajachica.*', 'Cajadetalle.*')
+    ));
+    //debug($cajachica_ing);exit;
+    $cajachica_gas = $this->Cajachica->find('all', array(
+      'recursive' => 0,
+      'conditions' => array(
+        'Cajachica.sucursal_id' => $idSucursal,
+        'Cajachica.fecha >=' => $this->request->data['Dato']['fecha_ini'],
+        'Cajachica.fecha <=' => $this->request->data['Dato']['fecha_fin'],
+        'Cajachica.tipo' => 'Gasto'
+      ),
+      'fields' => array('Cajachica.*', 'Cajadetalle.*')
+    ));
+    //debug($idSucursal);exit;
+    $detalles = $this->Cajadetalle->find('list', array('conditions' => array('Cajadetalle.sucursal_id' => $idSucursal), 'fields' => 'Cajadetalle.nombre'));
+    $this->set(compact('cajachica_ing', 'cajachica_gas', 'total', 'detalles'));
+  }
+  
 
 }

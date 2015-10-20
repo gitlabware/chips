@@ -23,10 +23,12 @@ class ProductosController extends AppController {
   function index() {
     if ($this->RequestHandler->responseType() == 'json') {
       $sql = '(SELECT COUNT(id) FROM productosprecios WHERE (productosprecios.producto_id = Producto.id))';
-      $editar = '<a href="javascript:" class="button orange-gradient compact icon-pencil" onclick="editar_p(' . "',Producto.id,'" . ')">Editar</a>';
-      $precios = '<a href="javascript:" class="button anthracite-gradient compact icon-page-list" onclick="precios_productos(' . "',Producto.id,'" . ')">Precios</a>';
-      $elimina = '<button class="button red-gradient compact icon-cross-round" type="button" onclick="elimina_p(' . "',Producto.id,'" . ')">Eliminar</button>';
-      $acciones = "$editar $precios $elimina";
+      $editar = '<a href="javascript:" class="button orange-gradient compact icon-pencil" title="Editar" onclick="editar_p(' . "',Producto.id,'" . ')"></a>';
+      $precios = '<a href="javascript:" class="button anthracite-gradient compact icon-page-list" title="Precios" onclick="precios_productos(' . "',Producto.id,'" . ')"></a>';
+      $ingresar_ap = '<a href="javascript:" class="button green-gradient compact icon-down-fat" title="Ingresar a almacen principal" onclick="ingresar_ap(' . "',Producto.id,'" . ')"></a>';
+      $ingresar_a = '<a href="javascript:" class="button blue-gradient compact icon-down-fat" title="Ingresar a almacen" onclick="ingresar_a(' . "',Producto.id,'" . ')"></a>';
+      $elimina = '<button class="button red-gradient compact icon-cross-round" type="button" title="eliminar" onclick="elimina_p(' . "',Producto.id,'" . ')"></button>';
+      $acciones = "$editar $precios $elimina $ingresar_ap $ingresar_a";
       $small_r = '<small class="tag red-bg" id="idproducto-' . "',Producto.id,'" . '"> ' . "',$sql,'" . ' </small></td>';
       $small_n = '<small class="tag " id="idproducto-' . "',Producto.id,'" . '"> ' . "',$sql,'" . ' </small></td>';
       $this->Producto->virtualFields = array(
@@ -35,11 +37,11 @@ class ProductosController extends AppController {
         'acciones' => "CONCAT('$acciones')"
       );
       $this->paginate = array(
-        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.fecha_ingreso', 'Producto.acciones'),
-        'recursive' => -1,
+        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre','Colore.nombre','Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones'),
+        'recursive' => 0,
         'order' => 'Producto.id DESC'
       );
-      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.fecha_ingreso', 'Producto.acciones');
+      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre','Colore.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('productos', $this->DataTable->getResponse());
       $this->set('_serialize', 'productos');
@@ -565,7 +567,7 @@ class ProductosController extends AppController {
       $this->request->data = "";
       $duplicados = '';
       foreach ($array_data as $d) {
-        if($d['A'] == '' || $d['B'] == '' || $d['C'] == '' || $d['D'] == '' || $d['E'] == '' || $d['F'] == ''){
+        if ($d['A'] == '' || $d['B'] == '' || $d['C'] == '' || $d['D'] == '' || $d['E'] == '' || $d['F'] == '') {
           break;
         }
         // ------ Marca -------
@@ -638,7 +640,7 @@ class ProductosController extends AppController {
             $this->Ventascelulare->create();
             $this->Ventascelulare->save($this->request->data['Ventascelulare']);
           }
-        }else{
+        } else {
           if (empty($duplicados)) {
             $duplicados = $d['A'];
           } else {
@@ -657,6 +659,130 @@ class ProductosController extends AppController {
     } else {
       $this->redirect($this->referer());
       //echo 'no';
+    }
+  }
+
+  public function ajax_ing_alm_p($idProducto = null) {
+    $this->layout = 'ajax';
+    $producto = $this->Producto->findByid($idProducto, null, null, -1);
+    $idAlmacenCentral = $this->get_id_alm_cent();
+    if (!empty($this->request->data)) {
+
+      if ($producto['Producto']['tipo_producto'] == 'CELULARES') {
+        $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
+        $idAlmacen = $this->request->data['Ventascelulare']['almacene_id'] = $idAlmacenCentral;
+        $almacen = $this->Almacene->findByid($idAlmacen, null, null, -1);
+        $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+        $this->request->data['Ventascelulare']['entrada'] = $this->request->data['Producto']['ingreso'];
+        $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
+        $total = $this->get_total($idProducto, 1, $idAlmacen) + $this->request->data['Ventascelulare']['entrada'];
+        $num_transaccion = $this->get_num_trans_cel();
+        $this->request->data['Ventascelulare']['transaccion'] = $num_transaccion;
+        $this->Ventascelulare->create();
+        $this->Ventascelulare->save($this->request->data['Ventascelulare']);
+        $this->set_total($idProducto, 1, $idAlmacen, $total);
+        $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
+      } else {
+        $totalProducto = $this->get_total($idProducto, 1, $idAlmacenCentral);
+        $num_transaccion = $this->get_num_trans();
+        $datos = array();
+        $datos['producto_id'] = $idProducto;
+        $datos['user_id'] = $this->Session->read('Auth.User.id');
+        $datos['almacene_id'] = $idAlmacenCentral;
+        $datos['ingreso'] = $this->request->data['Producto']['ingreso'];
+        $datos['salida'] = 0;
+        $datos['transaccion'] = $num_transaccion;
+        $this->Movimiento->create();
+        $this->Movimiento->save($datos);
+        $this->set_total($idProducto, 1, $idAlmacenCentral, ($totalProducto + $this->request->data['Producto']['ingreso']));
+        $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
+      }
+      $this->redirect($this->referer());
+    }
+    $totalProducto = $this->get_total($idProducto, 1, $idAlmacenCentral);
+    $this->set(compact('producto', 'totalProducto'));
+  }
+
+  public function ajax_ing_alm($idProducto = null) {
+    $this->layout = 'ajax';
+    $producto = $this->Producto->findByid($idProducto, null, null, -1);
+    $idAlmacenCentral = $this->get_id_alm_cent();
+    if (!empty($this->request->data)) {
+      if ($producto['Producto']['tipo_producto'] == 'CELULARES') {
+        $almacenCentral = $this->Almacene->findByid($idAlmacenCentral, null, null, -1);
+        $almacen = $this->Almacene->findByid($this->request->data['Producto']['almacene_id'], null, null, -1);
+        $num_transaccion = $this->get_num_trans_cel();
+        $total_ultimo_c = $this->get_total($idProducto, 1, $idAlmacenCentral);
+        $this->request->data['Ventascelulare']['producto_id'] = $idProducto;
+        $this->request->data['Ventascelulare']['user_id'] = $this->Session->read('Auth.User.id');
+        $this->request->data['Ventascelulare']['entrada'] = $this->request->data['Producto']['ingreso'];
+        $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
+        $this->request->data['Ventascelulare']['almacene_id'] = $this->request->data['Producto']['almacene_id'];
+        if ($total_ultimo_c >= $this->request->data['Ventascelulare']['entrega']) {
+          $total = $this->get_total($idProducto, 1, $this->request->data['Producto']['almacene_id']) + $this->request->data['Ventascelulare']['entrada'];
+          $this->request->data['Ventascelulare']['transaccion'] = $num_transaccion;
+          $this->Ventascelulare->create();
+          $this->Ventascelulare->save($this->request->data['Ventascelulare']);
+          $this->set_total($idProducto, 1, $this->request->data['Producto']['almacene_id'], $total);
+          $this->request->data['Ventascelulare']['salida'] = $this->request->data['Ventascelulare']['entrada'];
+          //$this->request->data['Ventascelulare']['total'] = $total_ultimo_c - $this->request->data['Ventascelulare']['salida'];
+          $this->request->data['Ventascelulare']['almacene_id'] = $idAlmacenCentral;
+          $this->request->data['Ventascelulare']['sucursal_id'] = $almacenCentral['Almacene']['sucursal_id'];
+          $this->request->data['Ventascelulare']['transaccion'] = $num_transaccion;
+          $this->request->data['Ventascelulare']['entrada'] = 0;
+          $this->Ventascelulare->create();
+          $this->Ventascelulare->save($this->request->data['Ventascelulare']);
+          $this->set_total($idProducto, 1, $idAlmacenCentral, ($total_ultimo_c - $this->request->data['Ventascelulare']['salida']));
+          $this->Session->setFlash('Se registro correctamente!!!' ,'msgbueno');
+        } else {
+          $this->Session->setFlash('No hay sudiciente en almacen central!!', 'msgerror');
+        }
+      } else {
+        $totalProducto = $this->get_total($idProducto, 1, $idAlmacenCentral);
+        $num_transaccion = $this->get_num_trans();
+        if ($totalProducto >= $this->request->data['Producto']['ingreso']) {
+          $datos = array();
+          $datos['producto_id'] = $idProducto;
+          $datos['user_id'] = $this->Session->read('Auth.User.id');
+          $datos['almacene_id'] = $this->request->data['Producto']['almacene_id'];
+          $datos['ingreso'] = $this->request->data['Producto']['ingreso'];
+          $datos['salida'] = 0;
+          $datos['transaccion'] = $num_transaccion;
+          $this->Movimiento->create();
+          $this->Movimiento->save($datos);
+          $this->set_total($idProducto, 1, $this->request->data['Producto']['almacene_id'], ($this->get_total($idProducto, 1, $this->request->data['Producto']['almacene_id']) + $this->request->data['Producto']['ingreso']));
+
+          $datos = array();
+          $datos['producto_id'] = $idProducto;
+          $datos['user_id'] = $this->Session->read('Auth.User.id');
+          $datos['almacene_id'] = $idAlmacenCentral;
+          $datos['ingreso'] = 0;
+          $datos['salida'] = $this->request->data['Producto']['ingreso'];
+          $datos['transaccion'] = $num_transaccion;
+          $this->Movimiento->create();
+          $this->Movimiento->save($datos);
+          $this->set_total($idProducto, 1, $idAlmacenCentral, ($totalProducto - $this->request->data['Producto']['ingreso']));
+          $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
+        } else {
+          $this->Session->setFlash("No se pudo registrar en almacen hay " . $totalProducto, 'msgerror');
+        }
+      }
+      $this->redirect($this->referer());
+    }
+    $totalProductoC = $this->get_total($idProducto, 1, $idAlmacenCentral);
+    $almacenes = $this->Almacene->find('list', array(
+      'fields' => array('Almacene.id', 'Almacene.nombre'),
+      'conditions' => array('Almacene.central !=' => 1)
+    ));
+    $this->set(compact('producto', 'almacenes', 'totalProductoC'));
+  }
+
+  public function get_id_alm_cent() {
+    $almacen = $this->Almacene->find('first', array('recursive' => -1, 'conditions' => array('Almacene.central' => 1), 'fields' => array('Almacene.id')));
+    if (!empty($almacen)) {
+      return $almacen['Almacene']['id'];
+    } else {
+      return 0;
     }
   }
 

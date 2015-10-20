@@ -52,11 +52,18 @@
                         <li>
                             <a href="<?php echo $this->Html->url(array('controller' => 'Tiendas','action' => 'report_control_ven'));?>">Control ventas equipos</a>
                         </li>
+                        
+                        <li>
+                            <a href="<?php echo $this->Html->url(array('controller' => 'Tiendas','action' => 'reporte_total'));?>">Control Ventas Total</a>
+                        </li>
                     </ul>
                 </li> 
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'ventas')); ?>">Ventas x Mayor</a></li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'ventastienda')); ?>">Ventas Tienda</a></li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'ventascelulares')); ?>">Ventas Celulares</a></li>
+                <li>
+                    <a href="<?php echo $this->Html->url(array('controller' => 'Cajachicas', 'action' => 'micajachica')); ?>">Caja chica</a>
+                </li>
             </ul>
         </section>
     </div>
