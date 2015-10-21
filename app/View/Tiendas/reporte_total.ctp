@@ -75,7 +75,7 @@
         <h1>CONTROL DE VENTAS EN <?php echo strtoupper($this->Session->read('Auth.User.Sucursal.nombre')); ?></h1>
     </hgroup>
     <div class="with-padding">
-        <?php echo $this->Form->create(NULL, array('url' => array('controller' => 'Tiendas', 'action' => 'report_control_ven'))); ?>
+        <?php echo $this->Form->create(NULL, array('url' => array('controller' => 'Tiendas', 'action' => 'reporte_total'))); ?>
         <div class="columns ocultar_impresion">
             <div class="three-columns twelve-columns-mobile">
                 <p class="block-label button-height">
@@ -104,6 +104,45 @@
         </div>
         <br>
         <?php echo $this->Form->end(); ?>
+        <h2 align="center">CONTROL VENTAS DE PRODUCTOS</h2>
+        <table class="CSSTableGenerator" >
+            <tr>
+                <td>Fecha</td>
+                <td>Producto</td>
+                <td>Inicial</td>
+                <td>Adic.</td>
+                <td>Total</td>
+                <td>Saldos</td>
+                <td>Vendidos</td>
+                <td>Total (Bs)</td>
+            </tr>
+            <?php $total_v = 0.00; ?>
+            <?php foreach ($datos as $da): ?>
+              <?php $total_v +=$da['Movimiento']['precio_v_t']; ?>
+              <tr>
+                  <td><?= $da['Movimiento']['created'] ?></td>
+                  <td><?php echo $da['Producto']['nombre'] ?></td>
+                  <td><?php echo $da['Movimiento']['total_s'] - $da[0]['entregado'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
+                  <td><?php echo $da[0]['entregado'] ?></td>
+                  <td><?= ($da['Movimiento']['total_s'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor']) ?></td>
+                  <td><?php echo $da['Movimiento']['total_s'] ?></td>
+                  <td><?php echo $da['Movimiento']['ventas'] ?></td>
+                  <td><?php echo $da['Movimiento']['precio_v_t'] ?></td>
+              </tr>
+            <?php endforeach; ?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><?= $total_v ?></td>
+            </tr>
+        </table> 
+        <br>
+        <h2 align="center">CONTROL VENTAS DE EQUIPOS</h2>
         <table class="CSSTableGenerator">
             <tr>
                 <td>Cliente</td>
@@ -114,19 +153,19 @@
                 <td>Efectivo</td>
                 <td>c/T de credito</td>
             </tr>
-            <?php 
+            <?php
             $t_coucher = 0.00;
             $t_ticket = 0.00;
             $t_efectivo = 0.00;
             $t_tarjeta = 0.00;
             ?>
             <?php foreach ($datos_array as $pc): ?>
-            <?php
-            $t_voucher = $t_voucher + $pc['Ventascelulare']['voucher'];
-            $t_ticket = $t_ticket + $pc['Ventascelulare']['ticket'];
-            $t_efectivo = $t_efectivo + $pc['Ventascelulare']['efectivo'];
-            $t_tarjeta = $t_tarjeta + $pc['Ventascelulare']['tarjeta'];
-            ?>
+              <?php
+              $t_voucher = $t_voucher + $pc['Ventascelulare']['voucher'];
+              $t_ticket = $t_ticket + $pc['Ventascelulare']['ticket'];
+              $t_efectivo = $t_efectivo + $pc['Ventascelulare']['efectivo'];
+              $t_tarjeta = $t_tarjeta + $pc['Ventascelulare']['tarjeta'];
+              ?>
               <tr>
                   <td><?= $pc['Ventascelulare']['cliente']; ?></td>
                   <td><?= $pc['Ventascelulare']['prod_marca'] ?></td>
@@ -146,37 +185,65 @@
                 <td><?= $t_efectivo ?></td>
                 <td><?= $t_tarjeta ?></td>
             </tr>
-        </table> 
-        <br>
-        <table class="CSSTableGenerator" >
+        </table><br>
+        <table style="width: 100%;">
             <tr>
-                <td>Producto</td>
-                <td>Saldo</td>
-                <td>Entregado</td>
-                <td>Venta</td>
-                <td>Venta x May</td>
-                <td>Total ventas</td>
-                <td>Saldo Total</td>
-                <td>Total venta (Bs)</td>
-                <td>Total mayor (Bs)</td>
-                <td>Total (Bs)</td>
+                <td style="width: 50%;">
+                    <table class="CSSTableGenerator">
+                        <tr>
+                            <td></td>
+                            <td>Caja Inicial</td>
+                            <td></td>
+                            <td>0.00</td>
+                        </tr>
+                        <?php foreach ($cmovimientos as $mo): ?>
+                          <tr>
+                              <td><?= $mo['Cajachica']['fecha'] ?></td>
+                              <td><?= $mo['Cajadetalle']['nombre'] ?></td>
+                              <td><?= $mo['Cajachica']['tipo'] ?></td>
+                              <td><?= $mo['Cajachica']['monto'] ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+                        <tr>
+                            <td></td>
+                            <td>Total Ingresos</td>
+                            <td></td>
+                            <td>0.00</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Total Egresos</td>
+                            <td></td>
+                            <td>0.00</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Total Ventas</td>
+                            <td></td>
+                            <td>0.00</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Efectivo En Caja</td>
+                            <td></td>
+                            <td>0.00</td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width: 50%;">
+                    <table class="CSSTableGenerator">
+                        <tr>
+                            <td>Bolivianos</td>
+                            <td>0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Bolivianos</td>
+                            <td>0.00</td>
+                        </tr>
+                    </table>
+                </td>
             </tr>
-            <?php foreach ($datos as $da): ?>
-            <tr>
-              <td><?php echo $da['Producto']['nombre'] ?></td>
-              <td><?php echo $da['Movimiento']['total_s'] - $da[0]['entregado'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
-              <td><?php echo $da[0]['entregado'] ?></td>
-              <td><?php echo $da['Movimiento']['ventas'] ?></td>
-              <td><?php echo $da['Movimiento']['ventas_mayor'] ?></td>
-              <td><?php echo $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
-              <td><?php echo $da['Movimiento']['total_s'] ?></td>
-              <td><?php echo $da['Movimiento']['precio_v_t'] ?></td>
-              <td><?php echo $da['Movimiento']['precio_v_mayor'] ?></td>
-              <td><?php echo $da['Movimiento']['precio_v_t'] + $da['Movimiento']['precio_v_mayor'] ?></td>
-            </tr>
-              
-            <?php endforeach; ?>
-        </table> 
+        </table>
     </div>
 </div>
 

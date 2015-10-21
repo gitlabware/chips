@@ -22,7 +22,7 @@ class TiendasController extends AppController {
     'Chip',
     'Almacene',
     'Recarga', 'Ventascelulare',
-    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago', 'Rutasusuario', 'Totale'
+    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago', 'Rutasusuario', 'Totale', 'Cajachica'
   );
   public $components = array('RequestHandler', 'DataTable');
 
@@ -88,6 +88,16 @@ class TiendasController extends AppController {
       $this->request->data['Movimiento']['transaccion'] = $numerot;
       $this->Movimiento->save($this->request->data['Movimiento']);
       $this->set_total($key, 1, $idAlmacen, ($total - $ped['cantidad']));
+
+      $this->Cajachica->create();
+      $d_caja['monto'] = $ped['precio'] * $ped['cantidad'];
+      $d_caja['tipo'] = 'Ingreso';
+      $total_a = $this->get_total_caja($this->Session->read('Auth.User.sucursal_id'));
+      $d_caja['total'] = $total_a + $d_caja['monto'];
+      $d_caja['fecha'] = date('Y-m-d');
+      $d_caja['sucursal_id'] = $this->Session->read('Auth.User.sucursal_id');
+      $d_caja['movimiento_id'] = $this->Movimiento->getLastInsertID();
+      $this->Cajachica->save($d_caja);
     }
     $this->Session->setFlash('Venta registrada', 'msgbueno');
     $this->redirect(array('action' => 'index'));
@@ -817,7 +827,7 @@ class TiendasController extends AppController {
       $sql1 = "SELECT nombre FROM marcas WHERE id = Producto.marca_id";
       $sql2 = "SELECT colores.nombre FROM colores WHERE colores.id = Producto.colore_id";
       $this->Productosprecio->virtualFields = array(
-        'imagen' => "CONCAT(IF(ISNULL(Producto.url_imagen),'',CONCAT('" . '<a href="javascript:" onclick="openModal('."',Producto.id,'".','."'$comillas,Producto.nombre,$comillas'".' )"><img src="../' . "',Producto.url_imagen,'" . '" height="51" width="51"></a>' . "')))",
+        'imagen' => "CONCAT(IF(ISNULL(Producto.url_imagen),'',CONCAT('" . '<a href="javascript:" onclick="openModal(' . "',Producto.id,'" . ',' . "'$comillas,Producto.nombre,$comillas'" . ' )"><img src="../' . "',Producto.url_imagen,'" . '" height="51" width="51"></a>' . "')))",
         'cantidad' => "$sql",
         'marca' => "$sql1",
         'color' => "$sql2",
@@ -826,7 +836,7 @@ class TiendasController extends AppController {
       /* debug($id_a);
         exit; */
       $this->paginate = array(
-        'fields' => array('Productosprecio.imagen', 'Producto.nombre', 'Productosprecio.marca','Productosprecio.color', 'Productosprecio.cantidad', 'Productosprecio.precio', 'Productosprecio.acciones'),
+        'fields' => array('Productosprecio.imagen', 'Producto.nombre', 'Productosprecio.marca', 'Productosprecio.color', 'Productosprecio.cantidad', 'Productosprecio.precio', 'Productosprecio.acciones'),
         'recursive' => 0,
         'order' => 'Producto.nombre DESC',
         'conditions' => array('Productosprecio.escala' => 'TIENDA', 'Producto.tiposproducto_id' => $tipo_pro_cel['Tiposproducto']['id'])
@@ -906,6 +916,21 @@ class TiendasController extends AppController {
         $this->request->data['Pago']['ventascelulare_id'] = $idVenta;
         $this->Pago->create();
         $this->Pago->save($this->request->data['Pago']);
+        if ($this->request->data['Pago']['tipo'] == 'Efectivo') {
+          $this->Cajachica->create();
+          if ($this->request->data['Pago']['moneda'] == 'Bolivianos') {
+            $d_caja['monto'] = $this->request->data['Pago']['monto'];
+          } else {
+            $d_caja['monto'] = $this->request->data['Pago']['monto_dolar'];
+          }
+          $d_caja['tipo'] = 'Ingreso';
+          $total_a = $this->get_total_caja($this->Session->read('Auth.User.sucursal_id'));
+          $d_caja['total'] = $total_a + $this->request->data['Pago']['monto'];
+          $d_caja['fecha'] = date('Y-m-d');
+          $d_caja['sucursal_id'] = $this->Session->read('Auth.User.sucursal_id');
+          $d_caja['pago_id'] = $this->Pago->getLastInsertID();
+          $this->Cajachica->save($d_caja);
+        }
       }
     }
     $this->Session->setFlash('Se registro correctamente la venta!!!', 'msgbueno');
@@ -1211,18 +1236,28 @@ class TiendasController extends AppController {
     ));
     $this->set(compact('datos_array', 'productos'));
   }
+
   public function reporte_total() {
     $datos_array = array();
+    $datos = array();
+    $cmovimientos = array();
+    $sucursal = $this->Session->read('Auth.User.sucursal_id');
+    $almacen = $this->Almacene->find('first', array(
+      'recursives' => -1,
+      'conditions' => array('Almacene.sucursal_id' => $sucursal),
+      'fields' => array('Almacene.id')
+    ));
+    $idAlmacen = $almacen['Almacene']['id'];
     if (!empty($this->request->data)) {
       $idSucursal = $this->Session->read('Auth.User.sucursal_id');
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
       $this->Ventascelulare->virtualFields = array(
         'prod_marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)",
-        'voucher' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Voucher" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
-        'ticket' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Ticket" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
-        'efectivo' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Efectivo" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)',
-        'tarjeta' => '(SELECT pa1.monto FROM pagos pa1 WHERE pa1.tipo LIKE "Tarjeta" AND pa1.ventascelulare_id = Ventascelulare.id LIMIT 1)'
+        'voucher' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Voucher" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)',
+        'ticket' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Ticket" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)',
+        'efectivo' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Efectivo" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)',
+        'tarjeta' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Tarjeta" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)'
       );
       $condiciones = array();
       $condiciones['DATE(Ventascelulare.modified) >='] = $fecha_ini;
@@ -1244,14 +1279,56 @@ class TiendasController extends AppController {
         ),
         'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente')
       ));
+
+      //-------------------- Ventas -----------
+      $condiciones = array();
+      $condiciones['Movimiento.almacene_id'] = $idAlmacen;
+      $condiciones['Movimiento.created >='] = $fecha_ini;
+      $condiciones['Movimiento.created <='] = $fecha_fin;
+      $condiciones['Movimiento.salida !='] = NULL;
+      if (!empty($this->request->data['Dato']['tiposproducto_id'])) {
+        $condiciones['Producto.tiposproducto_id'] = $this->request->data['Dato']['tiposproducto_id'];
+      }
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Producto.id'] = $this->request->data['Dato']['producto_id'];
+      }
+
+      $sql1 = "(SELECT IF(ISNULL(SUM(mo.salida)),0,SUM(mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id)";
+      $sql2 = "(SELECT IF(ISNULL(SUM(mo.salida)),0,SUM(mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'MAYOR' AND Producto.id = mo.producto_id)";
+      $sql3 = "(SELECT IF(ISNULL(SUM(mo.precio_uni*mo.salida)),0,SUM(mo.precio_uni*mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id)";
+      $sql4 = "(SELECT IF(ISNULL(SUM(mo.precio_uni*mo.salida)),0,SUM(mo.precio_uni*mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'MAYOR' AND Producto.id = mo.producto_id)";
+
+      $sql6 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.almacene_id = $idAlmacen AND Producto.id = mo.producto_id LIMIT 1)";
+      $sql5 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE mov.almacene_id = $idAlmacen AND mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+      $this->Movimiento->virtualFields = array(
+        'ventas' => "CONCAT($sql1)",
+        'ventas_mayor' => "CONCAT($sql2)",
+        'precio_v_t' => "CONCAT($sql3)",
+        'precio_v_mayor' => "CONCAT($sql4)",
+        'total_s' => "CONCAT($sql6-(IF(ISNULL($sql5),0,$sql5)))"
+      );
+      $datos = $this->Movimiento->find('all', array(
+        'recursive' => 0, 'order' => 'Movimiento.producto_id',
+        'conditions' => $condiciones,
+        'group' => array('Movimiento.producto_id'),
+        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.ventas', 'Movimiento.ventas_mayor', 'Movimiento.precio_v_t', 'Movimiento.precio_v_mayor', 'Movimiento.total_s', 'Movimiento.created')
+      ));
+      $cmovimientos = $this->Cajachica->find('all', array(
+        'recursive' => 0,
+        'conditions' => array(
+          'Cajachica.sucursal_id' => $idSucursal,
+          'Cajachica.fecha >=' => $fecha_ini,
+          'Cajachica.fecha <=' => $fecha_fin
+        ),
+        'order' => array('Cajachica.id ASC')
+      ));
     }
     $productos = $this->Producto->find('list', array(
       'fields' => array('id', 'nombre'),
       'conditions' => array('tipo_producto' => 'CELULARES')
     ));
-    $this->set(compact('datos_array', 'productos'));
+    $this->set(compact('datos_array', 'productos', 'datos', 'cmovimientos'));
   }
-  
 
   public function ajax_img_prod($idProducto = null) {
     $this->layout = 'ajax';
@@ -1269,53 +1346,159 @@ class TiendasController extends AppController {
       'conditions' => array('id' => $idMovimiento),
       'fields' => array('salida', 'producto_id')
     ));
-    $idAlmacen = $this->get_id_almacen();
-    $total = $this->get_total($movimiento['Movimiento']['producto_id'], 1, $idAlmacen);
-    $this->Movimiento->delete($idMovimiento);
-    $this->set_total($movimiento['Movimiento']['producto_id'], 1, $idAlmacen, ($total + $movimiento['Movimiento']['salida']));
-    $this->Session->setFlash("Se elimino correctamente las venta!!", 'msgbueno');
+    $caja = $this->Cajachica->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Cajachica.movimiento_id' => $idMovimiento),
+      'fields' => array('Cajachica.monto', 'Cajachica.id', 'Cajachica.sucursal_id')
+    ));
+    if (!empty($caja['Cajachica']['sucursal_id'])) {
+      $total_c = $this->get_total_caja($caja['Cajachica']['sucursal_id']);
+      if ($total_c >= $caja['Cajachica']['monto']) {
+        $this->Cajachica->delete($caja['Cajachica']['id']);
+        $this->set_total_caja(($total_c - $caja['Cajachica']['monto']), $caja['Cajachica']['sucursal_id']);
+        $idAlmacen = $this->get_id_almacen();
+        $total = $this->get_total($movimiento['Movimiento']['producto_id'], 1, $idAlmacen);
+        $this->Movimiento->delete($idMovimiento);
+        $this->set_total($movimiento['Movimiento']['producto_id'], 1, $idAlmacen, ($total + $movimiento['Movimiento']['salida']));
+        $this->Session->setFlash("Se elimino correctamente las venta!!", 'msgbueno');
+      } else {
+        $this->Session->setFlash("No se ha podido eliminar el pago. No hay en caja chica!!", 'msgbueno');
+      }
+    } else {
+      $this->Session->setFlash("No se ha podido eliminar el pago!!", 'msgbueno');
+    }
+
     $this->redirect($this->referer());
   }
 
   public function ventacelular($idVentacelular = null) {
-    
-    if(!empty($this->request->data['Ventascelulare'])){
+
+    if (!empty($this->request->data['Ventascelulare'])) {
       $this->Ventascelulare->id = $idVentacelular;
       $this->Ventascelulare->save($this->request->data['Ventascelulare']);
-      $this->Session->setFlash("Se ha modificado correctamente!!",'msgbueno');
+      $this->Session->setFlash("Se ha modificado correctamente!!", 'msgbueno');
       $this->redirect(array('action' => 'ventascelulares'));
     }
     $this->request->data = $venta = $this->Ventascelulare->findByid($idVentacelular);
-    $sucursal = $this->Sucursal->findByid($this->Session->read('Auth.User.sucursal_id'),null,null,-1);
+    $sucursal = $this->Sucursal->findByid($this->Session->read('Auth.User.sucursal_id'), null, null, -1);
     //debug($sucursal);exit;
     $tipo_cambio = $sucursal['Sucursal']['tipo_cambio'];
-    $pagos = $this->Pago->findAllByventascelulare_id($idVentacelular,null,null,null,null,-1);
-    $this->set(compact('venta','tipo_cambio','pagos'));
+    $pagos = $this->Pago->findAllByventascelulare_id($idVentacelular, null, null, null, null, -1);
+    $this->set(compact('venta', 'tipo_cambio', 'pagos'));
   }
-  
-  public function registra_pago_v(){
+
+  public function registra_pago_v() {
     $this->Pago->create();
     $this->Pago->save($this->request->data['Pago']);
-    $this->Session->setFlash('Se ha registrado el pago!!','msgbueno');
+    if ($this->request->data['Pago']['tipo'] == 'Efectivo') {
+      $this->Cajachica->create();
+      if ($this->request->data['Pago']['moneda'] == 'Bolivianos') {
+        $d_caja['monto'] = $this->request->data['Pago']['monto'];
+      } else {
+        $d_caja['monto'] = $this->request->data['Pago']['monto_dolar'];
+      }
+      $d_caja['tipo'] = 'Ingreso';
+      $total_a = $this->get_total_caja($this->Session->read('Auth.User.sucursal_id'));
+      $d_caja['total'] = $total_a + $this->request->data['Pago']['monto'];
+      $d_caja['fecha'] = date('Y-m-d');
+      $d_caja['sucursal_id'] = $this->Session->read('Auth.User.sucursal_id');
+      $d_caja['pago_id'] = $this->Pago->getLastInsertID();
+      $this->Cajachica->save($d_caja);
+    }
+    $this->Session->setFlash('Se ha registrado el pago!!', 'msgbueno');
     $this->redirect($this->referer());
   }
-  
-  public function eliminar_pago_v($idPago = null){
-    $this->Pago->delete($idPago);
-    $this->Session->setFlash("Se ha eliminado correctamente el pago!!",'msgbueno');
+
+  public function eliminar_pago_v($idPago = null) {
+
+    $caja = $this->Cajachica->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Cajachica.pago_id' => $idPago),
+      'fields' => array('Cajachica.monto', 'Cajachica.id', 'Cajachica.sucursal_id')
+    ));
+    if (!empty($caja['Cajachica']['sucursal_id'])) {
+      $total_c = $this->get_total_caja($caja['Cajachica']['sucursal_id']);
+      if ($total_c >= $caja['Cajachica']['monto']) {
+        $this->Pago->delete($idPago);
+        $this->Cajachica->delete($caja['Cajachica']['id']);
+        $this->set_total_caja(($total_c - $caja['Cajachica']['monto']), $caja['Cajachica']['sucursal_id']);
+        $this->Session->setFlash("Se ha eliminado correctamente el pago!!", 'msgbueno');
+      } else {
+        $this->Session->setFlash("No se ha podido eliminar el pago. No hay en caja chica!!", 'msgbueno');
+      }
+    } else {
+      $this->Session->setFlash("No se ha podido eliminar el pago!!", 'msgbueno');
+    }
     $this->redirect($this->referer());
   }
-  
-  public function elimina_venta_cel($idVentacelular = null){
-    $venta = $this->Ventascelulare->findByid($idVentacelular,null,null,-1);
+
+  public function set_total_caja($total = null, $idSucursal = null) {
+    $caja = $this->Cajachica->find('first', array(
+      'conditions' => array('Cajachica.sucursal_id' => $idSucursal),
+      'recursive' => -1,
+      'order' => 'id DESC'
+    ));
+    if (!empty($caja)) {
+      $this->Cajachica->id = $caja['Cajachica']['id'];
+      $dcaja['total'] = $total;
+      $dcaja['user_id'] = $this->Session->read('Auth.User.id');
+      $this->Cajachica->save($dcaja);
+    } else {
+      if ($total != 0) {
+        $this->Cajachica->create();
+        $dcaja['total'] = $total;
+        $dcaja['user_id'] = $this->Session->read('Auth.User.id');
+        $this->Cajachica->save($dcaja);
+      }
+    }
+  }
+
+  public function elimina_venta_cel($idVentacelular = null) {
+    $venta = $this->Ventascelulare->findByid($idVentacelular, null, null, -1);
     $total_c = $this->get_total($venta['Ventascelulare']['producto_id'], 1, $this->get_id_almacen());
-    $this->set_total($venta['Ventascelulare']['producto_id'], 1, $this->get_id_almacen(), ($total_c+$venta['Ventascelulare']['salida']));
+    $this->set_total($venta['Ventascelulare']['producto_id'], 1, $this->get_id_almacen(), ($total_c + $venta['Ventascelulare']['salida']));
+    
+    
+    /*$caja = $this->Cajachica->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Cajachica.pago_id' => $idPago),
+      'fields' => array('Cajachica.monto', 'Cajachica.id', 'Cajachica.sucursal_id')
+    ));
+    if (!empty($caja['Cajachica']['sucursal_id'])) {
+      $total_c = $this->get_total_caja($caja['Cajachica']['sucursal_id']);
+      if ($total_c >= $caja['Cajachica']['monto']) {
+        $this->Pago->delete($idPago);
+        $this->Cajachica->delete($caja['Cajachica']['id']);
+        $this->set_total_caja(($total_c - $caja['Cajachica']['monto']), $caja['Cajachica']['sucursal_id']);
+        $this->Session->setFlash("Se ha eliminado correctamente el pago!!", 'msgbueno');
+      } else {
+        $this->Session->setFlash("No se ha podido eliminar el pago. No hay en caja chica!!", 'msgbueno');
+      }
+    } else {
+      $this->Session->setFlash("No se ha podido eliminar el pago!!", 'msgbueno');
+    }*/
+    
+    
     $this->Pago->deleteAll(array('Pago.ventascelulare_id' => $idVentacelular));
     $this->Ventascelulare->delete($idVentacelular);
-    $this->Session->setFlash("Se ha eliminado correctamente la venta!!",'msgbueno');
+    $this->Session->setFlash("Se ha eliminado correctamente la venta!!", 'msgbueno');
     $this->redirect($this->referer());
     //$this->set_
   }
+
+  public function get_total_caja($idSucursal = null) {
+    $caja = $this->Cajachica->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Cajachica.sucursal_id' => $idSucursal),
+      'order' => 'id DESC'
+    ));
+    if (empty($caja)) {
+      return 0.00;
+    } else {
+      return $caja['Cajachica']['total'];
+    }
+  }
+
 }
 
 ?>

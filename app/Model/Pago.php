@@ -5,6 +5,7 @@ App::uses('AppModel', 'Model');
  *
  * @property Ventascelulare $Ventascelulare
  */
+
 class Pago extends AppModel {
 
 

@@ -718,7 +718,7 @@ class ProductosController extends AppController {
         $this->request->data['Ventascelulare']['entrada'] = $this->request->data['Producto']['ingreso'];
         $this->request->data['Ventascelulare']['sucursal_id'] = $almacen['Almacene']['sucursal_id'];
         $this->request->data['Ventascelulare']['almacene_id'] = $this->request->data['Producto']['almacene_id'];
-        if ($total_ultimo_c >= $this->request->data['Ventascelulare']['entrega']) {
+        if ($total_ultimo_c >= $this->request->data['Ventascelulare']['entrada']) {
           $total = $this->get_total($idProducto, 1, $this->request->data['Producto']['almacene_id']) + $this->request->data['Ventascelulare']['entrada'];
           $this->request->data['Ventascelulare']['transaccion'] = $num_transaccion;
           $this->Ventascelulare->create();
