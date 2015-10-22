@@ -188,13 +188,13 @@
         </table><br>
         <table style="width: 100%;">
             <tr>
-                <td style="width: 50%;">
+                <td style="width: 43%;">
                     <table class="CSSTableGenerator">
                         <tr>
                             <td></td>
                             <td>Caja Inicial</td>
                             <td></td>
-                            <td>0.00</td>
+                            <td><?= $inicial_c ?></td>
                         </tr>
                         <?php foreach ($cmovimientos as $mo): ?>
                           <tr>
@@ -208,36 +208,37 @@
                             <td></td>
                             <td>Total Ingresos</td>
                             <td></td>
-                            <td>0.00</td>
+                            <td><?= $ingresos_m ?></td>
                         </tr>
                         <tr>
                             <td></td>
                             <td>Total Egresos</td>
                             <td></td>
-                            <td>0.00</td>
+                            <td><?= $salidas_m ?></td>
                         </tr>
                         <tr>
                             <td></td>
                             <td>Total Ventas</td>
                             <td></td>
-                            <td>0.00</td>
+                            <td><?= $total_v + $t_efectivo ?></td>
                         </tr>
                         <tr>
                             <td></td>
                             <td>Efectivo En Caja</td>
                             <td></td>
-                            <td>0.00</td>
+                            <td><?= $total_a_m ?></td>
                         </tr>
                     </table>
                 </td>
-                <td style="width: 50%;">
+                <td style="width: 4%;"></td>
+                <td style="width: 43%;">
                     <table class="CSSTableGenerator">
                         <tr>
                             <td>Bolivianos</td>
-                            <td>0.00</td>
+                            <td><?= $total_a_m ?></td>
                         </tr>
                         <tr>
-                            <td>Bolivianos</td>
+                            <td>Dolares</td>
                             <td>0.00</td>
                         </tr>
                     </table>

@@ -30,6 +30,20 @@ class Cajachica extends AppModel {
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
+		),
+		'Pago' => array(
+			'className' => 'Pago',
+			'foreignKey' => 'pago_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'Movimiento' => array(
+			'className' => 'Movimiento',
+			'foreignKey' => 'movimiento_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
 		)
 	);
 }

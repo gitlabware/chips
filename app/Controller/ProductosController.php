@@ -37,11 +37,11 @@ class ProductosController extends AppController {
         'acciones' => "CONCAT('$acciones')"
       );
       $this->paginate = array(
-        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre','Colore.nombre','Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones'),
+        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones'),
         'recursive' => 0,
         'order' => 'Producto.id DESC'
       );
-      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre','Colore.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones');
+      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('productos', $this->DataTable->getResponse());
       $this->set('_serialize', 'productos');
@@ -733,7 +733,7 @@ class ProductosController extends AppController {
           $this->Ventascelulare->create();
           $this->Ventascelulare->save($this->request->data['Ventascelulare']);
           $this->set_total($idProducto, 1, $idAlmacenCentral, ($total_ultimo_c - $this->request->data['Ventascelulare']['salida']));
-          $this->Session->setFlash('Se registro correctamente!!!' ,'msgbueno');
+          $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
         } else {
           $this->Session->setFlash('No hay sudiciente en almacen central!!', 'msgerror');
         }
@@ -770,10 +770,15 @@ class ProductosController extends AppController {
       $this->redirect($this->referer());
     }
     $totalProductoC = $this->get_total($idProducto, 1, $idAlmacenCentral);
+    $sql = "SELECT totales.total FROM totales WHERE totales.producto_id = $idProducto AND totales.almacene_id = Almacene.id LIMIT 1";
+    $this->Almacene->virtualFields = array(
+      'nombre_comp' => "CONCAT(Almacene.nombre,' (',(SELECT IF(EXISTS($sql),($sql),0)),')')"
+    );
     $almacenes = $this->Almacene->find('list', array(
-      'fields' => array('Almacene.id', 'Almacene.nombre'),
+      'fields' => array('Almacene.id', 'Almacene.nombre_comp'),
       'conditions' => array('Almacene.central !=' => 1)
     ));
+    //debug($almacenes);exit;
     $this->set(compact('producto', 'almacenes', 'totalProductoC'));
   }
 

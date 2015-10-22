@@ -11,7 +11,7 @@
 
                 <fieldset class="fieldset">
                     <?php echo $this->Form->create('Cajachica', array('id' => 'form-caja')); ?>
-                    <?= $this->Form->hidden('sucursal_id',array('value' => $this->Session->read('Auth.User.sucursal_id'))) ?>
+                    <?= $this->Form->hidden('sucursal_id', array('value' => $this->Session->read('Auth.User.sucursal_id'))) ?>
                     <legend class="legend">Registro caja</legend>
                     <input name="data[Cajachica][tipo]" id="UserGender_" value="" type="hidden" class="validate[required]"/>
                     <p class="inline-label">
@@ -32,7 +32,7 @@
                               $('#select_detalle').val('');
                               $('#select_detalle').addClass('validate[required]');
                               $('#input_detalle').removeClass('validate[required]');">Select. Detalle</label>
-                               <?php echo $this->Form->text('Cajadetalle.nombre', array('class' => 'input full-width', 'id' => 'input_detalle', 'placeholder' => 'Detalle')); ?>
+                               <?php echo $this->Form->text('Cajadetalle.nombre', array('class' => 'input full-width', 'id' => 'input_detalle', 'placeholder' => 'Detalle','value' => '')); ?>
                     </p>
                     <p class="inline-label">
                         <label class="label">Monto</label>
@@ -44,7 +44,7 @@
                     </p>
                     <p class="inline-label">
                         <label class="label">Fecha</label>
-                        <?php echo $this->Form->text('fecha', array('class' => 'input full-width datepicker validate[required]')); ?>
+                        <?php echo $this->Form->text('fecha', array('class' => 'input full-width datepicker validate[required]','value' => date('Y-m-d'))); ?>
                     </p>
                     <p class="inline-label">
                         <label class="label">Observacion</label>
@@ -96,7 +96,17 @@
                                     <tr>
                                         <td><?php echo $ca['Cajachica']['fecha'] ?></td>
                                         <td><?php echo $ca['Cajachica']['nota'] ?></td>
-                                        <td><?php echo $ca['Cajadetalle']['nombre'] ?></td>
+                                        <td>
+                                            <?php
+                                            if (!empty($ca['Cajadetalle']['nombre'])) {
+                                              echo $ca['Cajadetalle']['nombre'];
+                                            } elseif (!empty($ca['Cajachica']['detalle_movimiento'])) {
+                                              echo $ca['Cajachica']['detalle_movimiento'];
+                                            }elseif (!empty($ca['Cajachica']['detalle_pago'])) {
+                                              echo $ca['Cajachica']['detalle_pago'];
+                                            }
+                                            ?>
+                                        </td>
                                         <td><?php echo $ca['Cajachica']['monto'] ?></td>
                                         <td>
                                             <?php echo $this->Html->link("ELiminar", array('action' => 'elimina', $ca['Cajachica']['id'], 'Ingreso'), array('confirm' => 'Esta seguro de eliminar??', 'class' => 'button red-gradient glossy')) ?>

@@ -93,7 +93,7 @@ class CajachicasController extends AppController {
     }
     $dcaja = $this->request->data['Cajachica'];
     if (!empty($dcaja)) {
-      $total = $this->get_total();
+      $total = $this->get_total($this->request->data['Cajachica']['sucursal_id']);
       if ($dcaja['tipo'] == 'Gasto') {
         if ($dcaja['monto'] <= $total) {
           $this->Cajachica->create();
@@ -103,6 +103,7 @@ class CajachicasController extends AppController {
           $this->redirect($this->referer());
         } else {
           $this->Session->setFlash("El gasto no debe exceder al total de $total", 'msgerror');
+          $this->redirect($this->referer());
         }
       } else {
         $this->Cajachica->create();
@@ -113,16 +114,18 @@ class CajachicasController extends AppController {
       }
     } else {
       $this->Session->setFlash("No se pudo registrar intente nuevamente!!", 'msgerror');
+      $this->redirect($this->referer());
     }
   }
 
   public function elimina($idCaja = NULL) {
     $caja = $this->Cajachica->findByid($idCaja, null, null, -1);
-    $total = $this->get_total();
+    $idSucursal = $this->Session->read('Auth.User.sucursal_id');
+    $total = $this->get_total($idSucursal);
     if ($caja['Cajachica']['tipo'] == 'Ingreso') {
       if ($caja['Cajachica']['monto'] <= $total) {
         $this->Cajachica->delete($caja['Cajachica']['id']);
-        $this->set_total(($total - $caja['Cajachica']['monto']));
+        $this->set_total(($total - $caja['Cajachica']['monto']),$idSucursal);
         $this->Session->setFlash("Se elimino correctamente!!", 'msgbueno');
       } else {
         $this->Session->setFlash("El monto del ingreso no puede exceder al total de $total", 'msgerror');
@@ -132,7 +135,7 @@ class CajachicasController extends AppController {
       $this->set_total(($total + $caja['Cajachica']['monto']));
       $this->Session->setFlash("Se elimino correctamente!!", 'msgbueno');
     }
-    $this->redirect(array('action' => 'index'));
+    $this->redirect($this->referer());
   }
 
   public function micajachica() {
@@ -147,7 +150,10 @@ class CajachicasController extends AppController {
     if (empty($this->request->data['Dato']['fecha_fin'])) {
       $this->request->data['Dato']['fecha_fin'] = date('Y-m-d');
     }
-
+    $this->Cajachica->virtualFields = array(
+      'detalle_movimiento' => "CONCAT(Movimiento.salida,' - ',(SELECT productos.nombre FROM productos WHERE productos.id = Movimiento.producto_id))",
+      'detalle_pago' => "CONCAT('Pago por equipo - ',(SELECT ventascelulares.cliente FROM ventascelulares WHERE ventascelulares.id = Pago.ventascelulare_id))"
+    );
     $cajachica_ing = $this->Cajachica->find('all', array(
       'recursive' => 0,
       'conditions' => array(

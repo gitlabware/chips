@@ -125,13 +125,13 @@
                             <label class="label" id="l-monto-d" onclick="$('#l-monto-b').removeClass('green');
                                   $('#l-monto-d').addClass('green');
                                 $('#idtipomoneda').val('Dolares');">Monto $</label>
-                            <input type="text" name="data[Pago][monto]" required="true" class="input full-width" id="idmonto" onkeyup="calc_pag_bol();">
+                            <input type="text" name="data[Pago][monto_dolar]" required="true" class="input full-width" id="idmonto" onkeyup="calc_pag_bol();">
                         </div>
                         <div class="one-column">
                             <label class="label green" id="l-monto-b" onclick="$('#l-monto-d').removeClass('green');
                                   $('#l-monto-b').addClass('green');
                                 $('#idtipomoneda').val('Bolivianos');">Monto Bs</label>
-                            <input type="text" name="data[Pago][]" class="input full-width" id="idmonto-bol" onkeyup="calc_pag_dol();">
+                            <input type="text" name="data[Pago][monto]" class="input full-width" id="idmonto-bol" onkeyup="calc_pag_dol();">
                         </div>
                         <div class="two-columns">
                             <label class="label">Nombre</label>
@@ -178,8 +178,8 @@
                           <tr>
                               <td><?= $pa['Pago']['tipo'] ?></td>
                               <td><?= $pa['Pago']['codigo'] ?></td>
-                              <td <?= $clase_d ?>><?= $pa['Pago']['monto'] ?></td>
-                              <td <?= $clase_b ?>><?= $pa['Pago']['monto'] * $tipo_cambio; ?></td>
+                              <td <?= $clase_d ?>><?= $pa['Pago']['monto_dolar'] ?></td>
+                              <td <?= $clase_b ?>><?= $pa['Pago']['monto'] ?></td>
                               <td><?= $pa['Pago']['nombre'] ?></td>
                               <td><?= $pa['Pago']['celular'] ?></td>
                               <td>
