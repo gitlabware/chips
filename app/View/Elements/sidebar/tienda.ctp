@@ -26,7 +26,6 @@
             <ul class="big-menu">    
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'cambiopass',$this->Session->read('Auth.User.id'))); ?>">Cambiar Password</a></li>
                 <!--<li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'registrocabinas')); ?>">Control cabinas</a></li>-->
-                <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'registrardeposito')); ?>">Registrar deposito</a></li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiendas', 'action' => 'lista_celulares')); ?>">Venta celulares</a></li>
                 <li class="with-right-arrow">
                     <span>Reportes</span>

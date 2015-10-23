@@ -150,6 +150,7 @@
 <!-- End sidebar/drop-down menu --> 
 
 <script>
+  
   var nuevo_pago = '';
   function add_pago(key) {
 

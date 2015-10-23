@@ -79,8 +79,21 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Sucursals', 'action' => 'index')); ?>">Listado de tiendas</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Sucursals', 'action' => 'insertar')); ?>">Nueva tienda</a></li>                                
                             </ul>
-                        </li> 
-
+                        </li>
+                        <li class="with-right-arrow">
+                            <span>Colores</span>
+                            <ul class="big-menu">
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Colores', 'action' => 'index')); ?>">Listado de Colores</a></li>
+                                <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Colores', 'action' => 'color')); ?>','Formulario Color',200);">Nuevo Color</a></li>                                
+                            </ul>
+                        </li>
+                        <li class="with-right-arrow">
+                            <span>Marcas</span>
+                            <ul class="big-menu">
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Marcas', 'action' => 'index')); ?>">Listado de Marcas</a></li>
+                                <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Marcas', 'action' => 'marca')); ?>','Formulario Marca',200);">Nueva Marca</a></li>                                
+                            </ul>
+                        </li>
                         <!--<li class="with-right-arrow">
                             <span>Almacenes</span>
                             <ul class="big-menu">
@@ -184,6 +197,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_celular_cliente')); ?>">Clientes</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_pagos')); ?>">Pagos</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'report_control_ven_cel')); ?>">Control de ventas</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_ven_pa_cel')); ?>">Ventas, Pagos y Caja</a></li>
                             </ul>
                         </li>
                     </ul>

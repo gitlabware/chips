@@ -15,7 +15,7 @@ class ReportesController extends Controller {
     'Chip',
     'Deposito',
     'Sucursal',
-    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto');
+    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto','Cajachica','Totale');
   public $layout = 'viva';
   public $components = array('Fechasconvert', 'Session');
 
@@ -988,7 +988,7 @@ class ReportesController extends Controller {
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
       $condiciones = array();
-      if(!empty($idSucursal)){
+      if (!empty($idSucursal)) {
         $condiciones['Almacene.sucursal_id'] = $idSucursal;
       }
       $condiciones['Ventascelulare.almacene_id !='] = 1;
@@ -1006,10 +1006,231 @@ class ReportesController extends Controller {
       $datos_array = $this->Ventascelulare->find('all', array(
         'recursive' => 0,
         'conditions' => $condiciones,
-        'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente','Almacene.nombre')
+        'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente', 'Almacene.nombre')
       ));
     }
     $this->set(compact('datos_array'));
+  }
+
+  public function reporte_ven_pa_cel() {
+    $datos_array = array();
+    $datos = array();
+    $cmovimientos = array();
+
+    if (!empty($this->request->data)) {
+      //debug($this->request->data);exit;
+
+      $idSucursal = $this->request->data['Dato']['sucursal'];
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $almacen = $this->Almacene->find('first', array(
+        'recursives' => -1,
+        'conditions' => array('Almacene.sucursal_id' => $idSucursal),
+        'fields' => array('Almacene.id')
+      ));
+      $idAlmacen = $almacen['Almacene']['id'];
+      $this->Ventascelulare->virtualFields = array(
+        'prod_marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)",
+        'voucher' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Voucher' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)",
+        'ticket' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Ticket' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)",
+        'efectivo' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Efectivo' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)",
+        'tarjeta' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Tarjeta' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)"
+      );
+      $condiciones = array();
+      $condiciones['DATE(Ventascelulare.modified) >='] = $fecha_ini;
+      $condiciones['DATE(Ventascelulare.modified) <='] = $fecha_fin;
+      $condiciones['DATE(Ventascelulare.modified) <='] = 'CELULARES';
+      $condiciones['Almacene.sucursal_id'] = $idSucursal;
+      $condiciones['Ventascelulare.salida >'] = 0;
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Ventascelulare.producto_id'] = $this->request->data['Dato']['producto_id'];
+      }
+      $datos_array = $this->Ventascelulare->find('all', array(
+        'recursive' => 0,
+        'conditions' => array(
+          'DATE(Ventascelulare.modified) >=' => $fecha_ini,
+          'DATE(Ventascelulare.modified) <=' => $fecha_fin,
+          'Producto.tipo_producto' => 'CELULARES',
+          'Almacene.sucursal_id' => $idSucursal,
+          'Ventascelulare.salida >' => 0
+        ),
+        'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente')
+      ));
+      $a_total_dolares = $this->Cajachica->find('all', array(
+        'recursive' => 0,
+        'conditions' => array(
+          'Cajachica.fecha >=' => $fecha_ini,
+          'Cajachica.fecha <=' => $fecha_fin,
+          'Pago.moneda' => 'Dolares',
+          'Cajachica.sucursal_id' => $idSucursal,
+          'Cajachica.tipo' => 'Ingreso'
+        ),
+        'group' => array('Cajachica.sucursal_id'),
+        'fields' => array('SUM(Pago.monto_dolar) as total_dolares', 'SUM(Pago.monto) as total_dolares_b')
+      ));
+      $total_dolares = 0.00;
+      $total_dolares_b = 0.00;
+      if (!empty($a_total_dolares[0])) {
+        $total_dolares = $a_total_dolares[0][0]['total_dolares'];
+        $total_dolares_b = $a_total_dolares[0][0]['total_dolares_b'];
+      }
+      //-------------------- Ventas -----------
+      $condiciones = array();
+      $condiciones['Movimiento.almacene_id'] = $idAlmacen;
+      $condiciones['Movimiento.created >='] = $fecha_ini;
+      $condiciones['Movimiento.created <='] = $fecha_fin;
+      $condiciones['Movimiento.salida !='] = NULL;
+      if (!empty($this->request->data['Dato']['tiposproducto_id'])) {
+        $condiciones['Producto.tiposproducto_id'] = $this->request->data['Dato']['tiposproducto_id'];
+      }
+      if (!empty($this->request->data['Dato']['producto_id'])) {
+        $condiciones['Producto.id'] = $this->request->data['Dato']['producto_id'];
+      }
+
+      $sql1 = "(SELECT IF(ISNULL(SUM(mo.salida)),0,SUM(mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id)";
+      $sql2 = "(SELECT IF(ISNULL(SUM(mo.salida)),0,SUM(mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'MAYOR' AND Producto.id = mo.producto_id)";
+      $sql3 = "(SELECT IF(ISNULL(SUM(mo.precio_uni*mo.salida)),0,SUM(mo.precio_uni*mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id)";
+      $sql4 = "(SELECT IF(ISNULL(SUM(mo.precio_uni*mo.salida)),0,SUM(mo.precio_uni*mo.salida)) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'MAYOR' AND Producto.id = mo.producto_id)";
+
+      $sql6 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.almacene_id = $idAlmacen AND Producto.id = mo.producto_id LIMIT 1)";
+      $sql5 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE mov.almacene_id = $idAlmacen AND mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+      $sql7 = "(SELECT SUM(mo.ingreso) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id GROUP BY mo.producto_id LIMIT 1)";
+      /* $this->Movimiento->virtualFields = array(
+        'ventas' => "CONCAT($sql1)",
+        'ventas_mayor' => "CONCAT($sql2)",
+        'precio_v_t' => "CONCAT($sql3)",
+        'precio_v_mayor' => "CONCAT($sql4)",
+        'total_s' => "CONCAT($sql6-(IF(ISNULL($sql5),0,$sql5)))"
+        );
+        $datos = $this->Movimiento->find('all', array(
+        'recursive' => 0, 'order' => 'Movimiento.producto_id',
+        'conditions' => $condiciones,
+        'group' => array('Movimiento.producto_id'),
+        'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.ventas', 'Movimiento.ventas_mayor', 'Movimiento.precio_v_t', 'Movimiento.precio_v_mayor', 'Movimiento.total_s', 'Movimiento.created')
+        )); */
+
+      $this->Totale->virtualFields = array(
+        'ventas' => "CONCAT($sql1)",
+        'ventas_mayor' => "CONCAT($sql2)",
+        'precio_v_t' => "CONCAT($sql3)",
+        'precio_v_mayor' => "CONCAT($sql4)",
+        'total_s' => "CONCAT($sql6-(IF(ISNULL($sql5),0,$sql5)))",
+        'entregado' => "($sql7)"
+      );
+      $datos = $this->Totale->find('all', array(
+        'reccursive' => 0,
+        'conditions' => array('Totale.almacene_id' => $idAlmacen, 'Producto.tipo_producto <>' => 'CELULARES'),
+        'fields' => array('Producto.nombre', 'Producto.id', 'Totale.*')
+      ));
+
+
+      $cmovimientos = $this->Cajachica->find('all', array(
+        'recursive' => 0,
+        'conditions' => array(
+          'Cajachica.sucursal_id' => $idSucursal,
+          'Cajachica.fecha >=' => $fecha_ini,
+          'Cajachica.fecha <=' => $fecha_fin,
+          'Cajachica.pago_id' => NULL,
+          'Cajachica.movimiento_id' => NULL
+        ),
+        'order' => array('Cajachica.id ASC'),
+        'fields' => array('Cajachica.*', 'Cajadetalle.*')
+      ));
+      $total_act = $this->get_total_caja($idSucursal);
+      $a_ingresos_pos = $this->Cajachica->find('all', array(
+        'recursive' => -1,
+        'conditions' => array(
+          'Cajachica.sucursal_id' => $idSucursal,
+          'Cajachica.fecha >' => $fecha_fin,
+          'Cajachica.tipo' => 'Ingreso'
+        ),
+        'group' => array('Cajachica.sucursal_id'),
+        'fields' => array("SUM(Cajachica.monto) as total_ingreso_p")
+      ));
+      $ingresos_pos = 0.00;
+      if (!empty($a_ingresos_pos[0])) {
+        $ingresos_pos = $a_ingresos_pos[0][0]['total_ingreso_p'];
+      }
+      $a_salidas_pos = $this->Cajachica->find('all', array(
+        'recursive' => -1,
+        'conditions' => array(
+          'Cajachica.sucursal_id' => $idSucursal,
+          'Cajachica.fecha >' => $fecha_fin,
+          'Cajachica.tipo' => 'Gasto'
+        ),
+        'group' => array('Cajachica.sucursal_id'),
+        'fields' => array("SUM(Cajachica.monto) as total_salida_p")
+      ));
+      $salidas_pos = 0.00;
+      if (!empty($a_salidas_pos[0])) {
+        $salidas_pos = $a_salidas_pos[0][0]['total_salida_p'];
+      }
+
+
+      $a_ingresos_m = $this->Cajachica->find('all', array(
+        'recursive' => -1,
+        'conditions' => array(
+          'Cajachica.sucursal_id' => $idSucursal,
+          'Cajachica.fecha >=' => $fecha_ini,
+          'Cajachica.fecha <=' => $fecha_fin,
+          'Cajachica.tipo' => 'Ingreso'
+        ),
+        'group' => array('Cajachica.sucursal_id'),
+        'fields' => array("SUM(Cajachica.monto) as total_ingreso_p")
+      ));
+      $ingresos_m = 0.00;
+      if (!empty($a_ingresos_m[0])) {
+        $ingresos_m = $a_ingresos_m[0][0]['total_ingreso_p'];
+      }
+      $a_salidas_m = $this->Cajachica->find('all', array(
+        'recursive' => -1,
+        'conditions' => array(
+          'Cajachica.sucursal_id' => $idSucursal,
+          'Cajachica.fecha >=' => $fecha_ini,
+          'Cajachica.fecha <=' => $fecha_fin,
+          'Cajachica.tipo' => 'Gasto'
+        ),
+        'group' => array('Cajachica.sucursal_id'),
+        'fields' => array("SUM(Cajachica.monto) as total_salida_p")
+      ));
+      $salidas_m = 0.00;
+      if (!empty($a_salidas_m[0])) {
+        $salidas_m = $a_salidas_m[0][0]['total_salida_p'];
+      }
+
+      $total_a_m = $total_act + $salidas_pos - $ingresos_pos;
+      $inicial_c = $total_a_m + $salidas_m - $ingresos_m;
+      /* debug($ingresos_m);
+        debug($salidas_m);
+        debug($inicial_c);
+        debug($total_a_m);exit; */
+    }
+    $productos = $this->Producto->find('list', array(
+      'fields' => array('id', 'nombre'),
+      'conditions' => array('tipo_producto' => 'CELULARES')
+    ));
+    if(empty($this->request->data['Dato']['fecha_ini'])){
+      $this->request->data['Dato']['fecha_ini'] = date('Y-m-d');
+    }
+    if(empty($this->request->data['Dato']['fecha_fin'])){
+      $this->request->data['Dato']['fecha_fin'] = date('Y-m-d');
+    }
+    $sucursales = $this->Sucursal->find('list', array('fields' => 'nombre'));
+    $this->set(compact('sucursales','datos_array', 'productos', 'datos', 'cmovimientos', 'inicial_c', 'ingresos_m', 'salidas_m', 'total_a_m', 'total_dolares', 'total_dolares_b'));
+
+  }
+  
+  public function get_total_caja($idSucursal = null) {
+    $caja = $this->Cajachica->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Cajachica.sucursal_id' => $idSucursal),
+      'order' => 'id DESC'
+    ));
+    if (empty($caja)) {
+      return 0.00;
+    } else {
+      return $caja['Cajachica']['total'];
+    }
   }
 
 }

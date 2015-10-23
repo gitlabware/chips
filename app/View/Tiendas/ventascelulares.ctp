@@ -28,8 +28,9 @@
                       <td><?php echo $ven['Ventascelulare']['color']; ?></td>
                       <td><?php echo $ven['Ventascelulare']['precio']; ?></td>
                       <td>
-                          <a href="<?php echo $this->Html->url(array('action' => 'ventacelular', $ven['Ventascelulare']['id'])); ?>" class="button green-gradient">Editar</a> 
-                          <?php echo $this->Html->link('Eliminar',array('action' => 'elimina_venta_cel',$ven['Ventascelulare']['id']),array('class' => 'button red-gradient','confirm' => 'Esta seguro de eliminar la venta??')); ?>
+                          <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'ajax_cambio_cel', $ven['Ventascelulare']['id'])); ?>','Cambio de Equipo',230)" class="button blue-gradient icon-cycle" title="Cambio"></a> 
+                          <a href="<?php echo $this->Html->url(array('action' => 'ventacelular', $ven['Ventascelulare']['id'])); ?>" class="button green-gradient icon-pencil" title="Editar"></a> 
+                          <?php echo $this->Html->link('',array('action' => 'elimina_venta_cel',$ven['Ventascelulare']['id']),array('class' => 'button red-gradient icon-cross-round','confirm' => 'Esta seguro de eliminar la venta??','title' => 'Eliminar')); ?>
                       </td>
                   </tr> 
                 <?php endforeach; ?>

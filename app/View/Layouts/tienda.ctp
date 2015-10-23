@@ -35,7 +35,7 @@
 
         <!-- Webfonts -->
         <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>-->
-
+        
         <!-- Additional styles -->
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/form.css?v=1">
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/switches.css?v=1">
@@ -46,7 +46,7 @@
 
         <!-- JavaScript at bottom except for Modernizr -->
         <script src="<?php echo $this->webroot; ?>js/libs/modernizr.custom.js"></script>
-
+        <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/modal.css?v=1">
         <!-- For Modern Browsers -->
         <link rel="shortcut icon" href="<?php echo $this->webroot; ?>img/favicons/favicon.png">
         <!-- For everything else -->
@@ -128,6 +128,7 @@
         <script src="<?php echo $this->webroot; ?>js/developr.notify.js"></script>
         <script src="<?php echo $this->webroot; ?>js/developr.scroll.js"></script>
         <script src="<?php echo $this->webroot; ?>js/developr.tooltip.js"></script>
+        <script src="<?php echo $this->webroot; ?>js/developr.modal.js"></script>
         <?php echo $this->fetch('js_add'); ?>
 
         <script src="<?php echo $this->webroot; ?>js/developr.table.js"></script>
@@ -207,9 +208,33 @@
               sPlaceHolder: "head:before",
               aoColumns: filtro_c
           });;
-
+          
+          function cargarmodal(url, titulo,alto) {
+          if(alto === undefined){
+            alto = 400;
+          }
+          
+              $.modal({
+                  content: '<div id="idmodal"></div>',
+                  title: titulo,
+                  width: 600,
+                  height: alto,
+                  actions: {
+                      'Cerrar': {
+                          color: 'red',
+                          click: function (win) {
+                              win.closeModal();
+                          }
+                      }
+                  },
+                  buttonsLowPadding: true
+              });
+              $('#idmodal').load(url);
+          }
         </script>
         <?php echo $this->Session->flash(); ?>
+        <br>
+        <br>
         <div class="ocultar_impresion" style="text-align: center; color:gray;">
             <p class="f-left">&copy; 2013 <strong class="green">SASEZ SRL.</strong>, Todos Los Derechos Reservados &reg;</p>
             <p class="f-right">Dise&ntilde;ado y Desarrollado por la Consultora <a href="http://www.labware.com.bo/">LabWare</a></p>

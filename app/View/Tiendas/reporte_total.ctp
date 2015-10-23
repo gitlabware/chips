@@ -82,7 +82,7 @@
                     <label for="block-label-1" class="label">Fecha Inicial</label>
                     <span class="input">
                         <span class="icon-calendar"></span>
-                        <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input-unstyled datepicker', 'value' => date('Y-m-d'))); ?>
+                        <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input-unstyled datepicker')); ?>
                     </span>
                 </p>
             </div>
@@ -91,7 +91,7 @@
                     <label for="block-label-1" class="label">Fecha Final</label>
                     <span class="input">
                         <span class="icon-calendar"></span>
-                        <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input-unstyled datepicker', 'value' => date('Y-m-d'))); ?>
+                        <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input-unstyled datepicker')); ?>
                     </span>
                 </p>
             </div>
@@ -107,7 +107,6 @@
         <h2 align="center">CONTROL VENTAS DE PRODUCTOS</h2>
         <table class="CSSTableGenerator" >
             <tr>
-                <td>Fecha</td>
                 <td>Producto</td>
                 <td>Inicial</td>
                 <td>Adic.</td>
@@ -118,20 +117,18 @@
             </tr>
             <?php $total_v = 0.00; ?>
             <?php foreach ($datos as $da): ?>
-              <?php $total_v +=$da['Movimiento']['precio_v_t']; ?>
+              <?php $total_v +=$da['Totale']['precio_v_t']; ?>
               <tr>
-                  <td><?= $da['Movimiento']['created'] ?></td>
                   <td><?php echo $da['Producto']['nombre'] ?></td>
-                  <td><?php echo $da['Movimiento']['total_s'] - $da[0]['entregado'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor'] ?></td>
-                  <td><?php echo $da[0]['entregado'] ?></td>
-                  <td><?= ($da['Movimiento']['total_s'] + $da['Movimiento']['ventas'] + $da['Movimiento']['ventas_mayor']) ?></td>
-                  <td><?php echo $da['Movimiento']['total_s'] ?></td>
-                  <td><?php echo $da['Movimiento']['ventas'] ?></td>
-                  <td><?php echo $da['Movimiento']['precio_v_t'] ?></td>
+                  <td><?php echo $da['Totale']['total_s'] - $da['Totale']['entregado'] + $da['Totale']['ventas'] + $da['Totale']['ventas_mayor'] ?></td>
+                  <td><?php echo $da['Totale']['entregado'] ?></td>
+                  <td><?= ($da['Totale']['total_s'] + $da['Totale']['ventas'] + $da['Totale']['ventas_mayor']) ?></td>
+                  <td><?php echo $da['Totale']['total_s'] ?></td>
+                  <td><?php echo $da['Totale']['ventas'] ?></td>
+                  <td><?php echo $da['Totale']['precio_v_t'] ?></td>
               </tr>
             <?php endforeach; ?>
             <tr>
-                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -235,11 +232,27 @@
                     <table class="CSSTableGenerator">
                         <tr>
                             <td>Bolivianos</td>
-                            <td><?= $total_a_m ?></td>
+                            <td>
+                                <?php
+                                if ($total_dolares_b <= $total_a_m) {
+                                  echo $total_a_m - $total_dolares_b;
+                                }else{
+                                  echo $total_a_m;
+                                }
+                                ?>
+                            </td>
                         </tr>
                         <tr>
                             <td>Dolares</td>
-                            <td>0.00</td>
+                            <td>
+                                <?php
+                                if ($total_dolares_b <= $total_a_m) {
+                                  echo $total_dolares;
+                                } else {
+                                  echo 0.00;
+                                }
+                                ?>
+                            </td>
                         </tr>
                     </table>
                 </td>

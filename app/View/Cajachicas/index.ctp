@@ -43,7 +43,7 @@
                     </p>
                     <p class="inline-label">
                         <label class="label">Fecha</label>
-<?php echo $this->Form->text('fecha', array('class' => 'input full-width datepicker validate[required]')); ?>
+<?php echo $this->Form->text('fecha', array('class' => 'input full-width datepicker validate[required]','value' => date('Y-m-d'))); ?>
                     </p>
                     <p class="inline-label">
                         <label class="label">Observacion</label>

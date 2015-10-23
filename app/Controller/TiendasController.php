@@ -22,7 +22,7 @@ class TiendasController extends AppController {
     'Chip',
     'Almacene',
     'Recarga', 'Ventascelulare',
-    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago', 'Rutasusuario', 'Totale', 'Cajachica'
+    'Deposito', 'Recargascabina', 'Cabina', 'Movimientoscabina', 'Pago', 'Rutasusuario', 'Totale', 'Cajachica','Celcambio'
   );
   public $components = array('RequestHandler', 'DataTable');
 
@@ -1251,10 +1251,10 @@ class TiendasController extends AppController {
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
       $this->Ventascelulare->virtualFields = array(
         'prod_marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)",
-        'voucher' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Voucher" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)',
-        'ticket' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Ticket" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)',
-        'efectivo' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Efectivo" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)',
-        'tarjeta' => '(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE "Tarjeta" AND pa1.ventascelulare_id = Ventascelulare.id GROUP BY pa1.ventascelulare_id)'
+        'voucher' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Voucher' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)",
+        'ticket' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Ticket' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)",
+        'efectivo' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Efectivo' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)",
+        'tarjeta' => "(SELECT SUM(pa1.monto) FROM pagos pa1 WHERE pa1.tipo LIKE 'Tarjeta' AND pa1.ventascelulare_id = Ventascelulare.id AND pa1.created >= '$fecha_ini' AND pa1.created <= '$fecha_fin' GROUP BY pa1.ventascelulare_id)"
       );
       $condiciones = array();
       $condiciones['DATE(Ventascelulare.modified) >='] = $fecha_ini;
@@ -1276,19 +1276,25 @@ class TiendasController extends AppController {
         ),
         'fields' => array('Producto.nombre', 'Ventascelulare.prod_marca', 'Ventascelulare.voucher', 'Ventascelulare.ticket', 'Ventascelulare.efectivo', 'Ventascelulare.tarjeta', 'Ventascelulare.cliente')
       ));
-      /*$total_dolares = $this->Cajachica->find('all', array(
+      //debug($datos_array);exit;
+      $a_total_dolares = $this->Cajachica->find('all', array(
         'recursive' => 0,
         'conditions' => array(
           'Cajachica.fecha >=' => $fecha_ini,
           'Cajachica.fecha <=' => $fecha_fin,
-          'Pago.moenda' => 'Dolares',
+          'Pago.moneda' => 'Dolares',
           'Cajachica.sucursal_id' => $idSucursal,
           'Cajachica.tipo' => 'Ingreso'
         ),
         'group' => array('Cajachica.sucursal_id'),
         'fields' => array('SUM(Pago.monto_dolar) as total_dolares','SUM(Pago.monto) as total_dolares_b')
       ));
-      debug($total_dolares);exit;*/
+      $total_dolares = 0.00;
+      $total_dolares_b = 0.00;
+      if(!empty($a_total_dolares[0])){
+        $total_dolares = $a_total_dolares[0][0]['total_dolares'];
+        $total_dolares_b = $a_total_dolares[0][0]['total_dolares_b'];
+      }
       //-------------------- Ventas -----------
       $condiciones = array();
       $condiciones['Movimiento.almacene_id'] = $idAlmacen;
@@ -1309,7 +1315,8 @@ class TiendasController extends AppController {
 
       $sql6 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.almacene_id = $idAlmacen AND Producto.id = mo.producto_id LIMIT 1)";
       $sql5 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE mov.almacene_id = $idAlmacen AND mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
-      $this->Movimiento->virtualFields = array(
+      $sql7 = "(SELECT SUM(mo.ingreso) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id GROUP BY mo.producto_id LIMIT 1)";
+      /*$this->Movimiento->virtualFields = array(
         'ventas' => "CONCAT($sql1)",
         'ventas_mayor' => "CONCAT($sql2)",
         'precio_v_t' => "CONCAT($sql3)",
@@ -1321,6 +1328,20 @@ class TiendasController extends AppController {
         'conditions' => $condiciones,
         'group' => array('Movimiento.producto_id'),
         'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.ventas', 'Movimiento.ventas_mayor', 'Movimiento.precio_v_t', 'Movimiento.precio_v_mayor', 'Movimiento.total_s', 'Movimiento.created')
+      ));*/
+      
+      $this->Totale->virtualFields = array(
+        'ventas' => "CONCAT($sql1)",
+        'ventas_mayor' => "CONCAT($sql2)",
+        'precio_v_t' => "CONCAT($sql3)",
+        'precio_v_mayor' => "CONCAT($sql4)",
+        'total_s' => "CONCAT($sql6-(IF(ISNULL($sql5),0,$sql5)))",
+        'entregado' => "($sql7)"
+      );
+      $datos = $this->Totale->find('all',array(
+        'reccursive' => 0,
+        'conditions' => array('Totale.almacene_id' => $idAlmacen,'Producto.tipo_producto <>' => 'CELULARES'),
+        'fields' => array('Producto.nombre','Producto.id','Totale.*')
       ));
 
 
@@ -1405,11 +1426,17 @@ class TiendasController extends AppController {
       debug($inicial_c);
       debug($total_a_m);exit;*/
     }
+    if(empty($this->request->data['Dato']['fecha_ini'])){
+      $this->request->data['Dato']['fecha_ini'] = date('Y-m-d');
+    }
+    if(empty($this->request->data['Dato']['fecha_fin'])){
+      $this->request->data['Dato']['fecha_fin'] = date('Y-m-d');
+    }
     $productos = $this->Producto->find('list', array(
       'fields' => array('id', 'nombre'),
       'conditions' => array('tipo_producto' => 'CELULARES')
     ));
-    $this->set(compact('datos_array', 'productos', 'datos', 'cmovimientos','inicial_c','ingresos_m','salidas_m','total_a_m'));
+    $this->set(compact('datos_array', 'productos', 'datos', 'cmovimientos','inicial_c','ingresos_m','salidas_m','total_a_m','total_dolares','total_dolares_b'));
   }
 
   public function ajax_img_prod($idProducto = null) {
@@ -1571,6 +1598,26 @@ class TiendasController extends AppController {
     } else {
       return $caja['Cajachica']['total'];
     }
+  }
+  
+  public function ajax_cambio_cel($idVentacelular = null){
+    $this->layout = 'ajax';
+    if(!empty($this->request->data['Celcambio'])){
+      $this->Celcambio->create();
+      $this->Celcambio->save($this->request->data['Celcambio']);
+      $this->Ventascelulare->id = $idVentacelular;
+      $dventa['imei'] = $this->request->data['Celcambio']['imei_nuevo'];
+      $dventa['num_serie'] = $this->request->data['Celcambio']['num_serie_nuevo'];
+      $this->Ventascelulare->save($dventa);
+      $this->Session->setFlash("Se ha realizado el cambio correctamente!!",'msgbueno');
+      $this->redirect($this->referer());
+    }
+    $venta = $this->Ventascelulare->find('first',array(
+      'recursive' => -1,
+      'conditions' => array('Ventascelulare.id' => $idVentacelular),
+      'fields' => array('Ventascelulare.*')
+    ));
+    $this->set(compact('venta'));
   }
 
 }

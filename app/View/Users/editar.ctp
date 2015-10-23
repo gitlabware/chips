@@ -33,7 +33,7 @@
             <div class="new-row two-columns">
 
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">C.I. <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">C.I.</label>
                     <?php echo $this->Form->text('Persona.ci', array('class' => 'input full-width')); ?>
                 </p>
             </div>
@@ -46,7 +46,7 @@
             <div class="four-columns">
 
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Direccion <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">Direccion</label>
                     <?php echo $this->Form->text('Persona.direccion', array('class' => 'input full-width')); ?>                       
                 </p>
             </div>
@@ -54,21 +54,21 @@
             <div class="two-columns">
 
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Telefono <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">Telefono</label>
                     <?php echo $this->Form->text('Persona.telefono', array('class' => 'input full-width')) ?>
                 </p>
             </div>
 
             <div class="two-columns">
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Celular <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">Celular</label>
                     <?php echo $this->Form->text('Persona.celular', array('class' => 'input full-width')); ?>
                 </p>
             </div>
 
             <div class="two-columns">
                 <p class="block-label button-height">
-                    <label for="validate-selec" class="label">Lugar<small>(Requerido)</small></label>
+                    <label for="validate-selec" class="label">Lugar</label>
 
                     <?php echo $this->Form->select("User.lugare_id", $lugares, array('class' => 'select validate[required]')) ?>
                 </p>
@@ -107,12 +107,12 @@
                     <?php echo $this->Form->select("User.sucursal_id", $tiendas, array('class' => 'select', 'id' => 'validation-select1')); ?>
                 </p>
             </div>
-            <div class=" new-row three-columns">
-                <p class="block-label button-height" id="mostrarruta" style="<?php
+            <div class="new-row three-columns" id="mostrarruta" style="<?php
                 if ($grupo != 2) {
                   echo 'display: none';
                 }
                 ?>">
+                <p class="block-label button-height">
                     <label for="validation-select" class="label"><b>Ruta:</b></label>
                     <?php echo $this->Form->select('ruta_id', $rutas, array('class' => 'select', 'value' => $idPersona['User']['ruta_id'])); ?>
                 </p>

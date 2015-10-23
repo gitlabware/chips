@@ -45,7 +45,8 @@
   <?php foreach ($meses as $me): ?>
           , <?php echo $this->requestAction(array('action' => 'get_vent_mes', $pro['Producto']['id'], $me[0]['mes'])); ?>
   <?php endforeach; ?>
-    ],
+    ]
+    ,
 <?php endforeach; ?>
   ];
           var meses = [
@@ -53,4 +54,5 @@
                 '<?php echo $me[0]['nombre']; ?>',
 <?php endforeach; ?>
           ];
+
 </script>

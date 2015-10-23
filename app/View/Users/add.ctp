@@ -18,14 +18,14 @@
             </div>
             <div class="four-columns">                
                 <p class="block-label button-height">
-                    <label for="block-label-2" class="label">Apellido Paterno <small>(requerido)</small></label>
+                    <label for="block-label-2" class="label">Apellido Paterno</label>
                     <?php echo $this->Form->text('Persona.ap_paterno', array('class' => 'input full-width', 'placeholder' => 'Ingrese el apellido paterno', 'value' => "")); ?>
                 </p>  
             </div>
 
             <div class="four-columns">                
                 <p class="block-label button-height">
-                    <label for="block-label-2" class="label">Apellido Materno <small>(requerido)</small></label>
+                    <label for="block-label-2" class="label">Apellido Materno</label>
                     <?php echo $this->Form->text('Persona.ap_materno', array('class' => 'input full-width', 'placeholder' => 'Ingrese el apellido materno')); ?>
                 </p>  
             </div>
@@ -33,7 +33,7 @@
             <div class="new-row two-columns">
 
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">C.I. <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">C.I.</label>
                     <?php echo $this->Form->text('Persona.ci', array('class' => 'input full-width', 'placeholder' => 'Ingrese la cedula de identidad')); ?>
                 </p>
             </div>
@@ -45,26 +45,26 @@
             </div>
             <div class="four-columns">
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Direccion <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">Direccion</label>
                     <?php echo $this->Form->text('Persona.direccion', array('class' => 'input full-width', 'placeholder' => 'Direccion')); ?>                       
                 </p>
             </div>
             <div class="two-columns">
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Telefono <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">Telefono</label>
                     <?php echo $this->Form->text('Persona.telefono', array('class' => 'input full-width', 'placeholder' => 'Numero telefonico', 'type' => 'number')) ?>
                 </p>
             </div>
 
             <div class="two-columns">
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Celular <small>(requerido)</small></label>
+                    <label for="block-label-1" class="label">Celular</label>
                     <?php echo $this->Form->text('Persona.celular', array('class' => 'input full-width', 'placeholder' => 'numero de celular')); ?>
                 </p>
             </div>
             <div class="two-columns">
                 <p class="block-label button-height">
-                    <label for="validation-select" class="label">Lugar<small>(Requerido)</small></label>
+                    <label for="validation-select" class="label">Lugar</label>
                     <select id="validation-select" name="data[User][lugare_id]" class="select" style="width: 147px">
                         <?php foreach ($lugares as $lug): ?>
                           <option value="<?php echo $lug['Lugare']['id'] ?>">
