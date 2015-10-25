@@ -1600,6 +1600,23 @@ class TiendasController extends AppController {
     }
   }
   
+  public function get_ingresos_caja($idSucursal = null,$fecha_ini = null,$fecha_fin = null){
+    return $prueba =  $this->Cajachica->find('all',array(
+      'recursive' => -1,
+      'conditions' => array(
+        'Cajachica.fecha >=' => $fecha_ini,
+        'Cajachica.fecha <=' => $fecha_fin,
+        'Cajachica.sucursal_id' => $idSucursal,
+        'tipo' => 'Ingreso'
+      ),
+      'group' => array('Cajachica.fecha'),
+      'fields' => array('Cajachica.fecha','SUM(Cajachica.monto) as monto_total','YEAR(Cajachica.fecha) as ano','MONTH(Cajachica.fecha) as mes','DAY(Cajachica.fecha) as dia')
+    ));
+    //debug($prueba);exit;
+     //http://localhost/chips/Tiendas/get_ingresos_caja/17/2015-10-01/2015-10-24
+  }
+
+
   public function ajax_cambio_cel($idVentacelular = null){
     $this->layout = 'ajax';
     if(!empty($this->request->data['Celcambio'])){

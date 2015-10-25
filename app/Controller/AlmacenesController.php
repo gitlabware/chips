@@ -473,7 +473,7 @@ class AlmacenesController extends AppController {
       /* debug($id_a);
         exit; */
       $this->paginate = array(
-        'fields' => array('Producto.imagen', 'Producto.nombre', 'Marca.nombre','Colore.nombre', 'Producto.cantidad', 'Producto.acciones'),
+        'fields' => array('Producto.imagen', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.cantidad', 'Producto.acciones'),
         'recursive' => 0,
         'order' => 'Producto.nombre DESC',
         'conditions' => array('Tiposproducto.nombre' => 'CELULARES')
@@ -494,7 +494,7 @@ class AlmacenesController extends AppController {
     $movimientos = $this->Ventascelulare->find('all', array('order' => 'Ventascelulare.id DESC', 'limit' => 10,
       'conditions' => array('Ventascelulare.producto_id' => $idProducto, 'Ventascelulare.almacene_id' => $id_a)
     ));
-    
+
     if ($almacen['Almacene']['central'] != 1) {
       $Almacen_central = $this->Almacene->find('first', array('recursive' => -1, 'ALmacene.central' => 1));
       $ultimo_total = $this->get_total($idProducto, 1, $Almacen_central['Almacene']['id']);
@@ -773,20 +773,27 @@ class AlmacenesController extends AppController {
   }
 
   public function principal() {
-    $idCentral = $this->get_id_alm_cent();
-    $sql = "SELECT t.total FROM totales t WHERE t.almacene_id = $idCentral AND t.producto_id = Producto.id LIMIT 1";
-    $this->Producto->virtualFields = array(
-      'total_central' => "CONCAT(($sql))"
-    );
-    $productos = $this->Producto->find('all', array(
+    $productos_1 = $this->Producto->find('all', array(
       'recursive' => -1,
-      //'conditions' => array('Producto.total_central' => 0),
-      'order' => array('Producto.total_central DESC'),
-      'limit' => 4,
-      'fields' => array('Producto.id', 'Producto.nombre', 'Producto.total_central')
+      'conditions' => array('Producto.tipo_producto !=' => 'CELULARES'),
+      'fields' => array('Producto.id', 'Producto.nombre')
     ));
-    $meses = $this->get_meses();
-    $this->set(compact('productos', 'meses'));
+    $productos_2 = $this->Producto->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Producto.tipo_producto' => 'CELULARES'),
+      'fields' => array('Producto.id', 'Producto.nombre')
+    ));
+    $almacenes_1 = $this->Almacene->find('all', array(
+      'recursive' => -1
+    ));
+    $almacenes_3 = $this->Almacene->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Almacene.central !=' => 1)
+    ));
+    $fecha_inicial = date('Y-m-01');
+    //debug($fecha_inicial);exit;
+    $fecha_final = date('Y-m-d');
+    $this->set(compact('productos_1', 'almacenes_1', 'productos_2', 'almacenes_3','fecha_final','fecha_inicial'));
   }
 
   public function get_vent_mes($idProducto = null, $mes = null) {
@@ -1529,6 +1536,34 @@ class AlmacenesController extends AppController {
       'conditions' => array('Distribucione.excel_id' => $idExcel)
     ));
     $this->set(compact('distribuciones', 'excel'));
+  }
+
+  public function get_ventat_pro_alm($idAlmacen = null, $idProducto = null) {
+    $ven_total = $this->Movimiento->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('almacene_id' => $idAlmacen, 'producto_id' => $idProducto, 'salida !=' => 0, 'created' => date('Y-m-d')),
+      'group' => array('Movimiento.almacene_id'),
+      'fields' => array('SUM(Movimiento.salida) as tsalidas')
+    ));
+    if (!empty($ven_total[0][0]['tsalidas'])) {
+      return $ven_total[0][0]['tsalidas'];
+    } else {
+      return 0;
+    }
+  }
+  
+  public function get_ventat_cel_alm($idAlmacen = null, $idProducto = null) {
+    $ven_total = $this->Ventascelulare->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('almacene_id' => $idAlmacen, 'producto_id' => $idProducto, 'salida !=' => 0, 'created' => date('Y-m-d')),
+      'group' => array('Ventascelulare.almacene_id'),
+      'fields' => array('SUM(Ventascelulare.salida) as tsalidas')
+    ));
+    if (!empty($ven_total[0][0]['tsalidas'])) {
+      return $ven_total[0][0]['tsalidas'];
+    } else {
+      return 0;
+    }
   }
 
 }
