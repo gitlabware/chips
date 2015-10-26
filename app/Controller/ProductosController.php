@@ -21,6 +21,7 @@ class ProductosController extends AppController {
 
   //public
   function index() {
+    $idAlmacen = $this->get_id_alm_cent();
     if ($this->RequestHandler->responseType() == 'json') {
       $sql = '(SELECT COUNT(id) FROM productosprecios WHERE (productosprecios.producto_id = Producto.id))';
       $editar = '<a href="javascript:" class="button orange-gradient compact icon-pencil" title="Editar" onclick="editar_p(' . "',Producto.id,'" . ')"></a>';
@@ -34,14 +35,15 @@ class ProductosController extends AppController {
       $this->Producto->virtualFields = array(
         'imagen' => "CONCAT(IF(ISNULL(Producto.url_imagen),'',CONCAT('" . '<img src="' . "',Producto.url_imagen,'" . '" height="51" width="51">' . "')))",
         'precios' => "CONCAT((IF($sql = 0,CONCAT('$small_r'),CONCAT('$small_n'))))",
+        'total_aln_cen' => "(SELECT totales.total FROM totales WHERE totales.almacene_id = $idAlmacen AND totales.producto_id = Producto.id)",
         'acciones' => "CONCAT('$acciones')"
       );
       $this->paginate = array(
-        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones'),
+        'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.total_aln_cen', 'Producto.acciones'),
         'recursive' => 0,
         'order' => 'Producto.id DESC'
       );
-      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.proveedor', 'Producto.acciones');
+      $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.total_aln_cen', 'Producto.acciones');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('productos', $this->DataTable->getResponse());
       $this->set('_serialize', 'productos');

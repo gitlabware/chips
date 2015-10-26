@@ -55,7 +55,7 @@
                 </div>
                 <?php foreach ($celulares as $key => $cel): ?>
                   <script>
-                    numero_p[<?php echo $key ?>] = 0;</script>
+                      numero_p[<?php echo $key ?>] = 0;</script>
                   <?php echo $this->Form->hidden("Ventascelulare.$key.producto_id", array('value' => $cel['Producto']['id'])); ?>
                   <?php echo $this->Form->hidden("Ventascelulare.$key.cliente", array('value' => $this->request->data['Tienda']['cliente'])); ?>
                   <?php //echo $this->Form->hidden("Ventascelulare.$key.precio", array('value' => $cel['precio'])); ?>
@@ -112,12 +112,12 @@
                           </div>
                           <div class="one-column">
                               <label class="label" id="l-monto-d" onclick="$('#l-monto-b').removeClass('green');
-                                    $('#l-monto-d').addClass('green');">Monto $</label>
+                                      $('#l-monto-d').addClass('green');">Monto $</label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-<?php echo $key; ?>" onkeyup="calc_pag_bol(<?php echo $key; ?>);">
                           </div>
                           <div class="one-column">
                               <label class="label green" id="l-monto-b" onclick="$('#l-monto-d').removeClass('green');
-                                    $('#l-monto-b').addClass('green');">Monto Bs</label>
+                                      $('#l-monto-b').addClass('green');">Monto Bs</label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-bol-<?php echo $key; ?>" onkeyup="calc_pag_dol(<?php echo $key; ?>);">
                           </div>
                           <div class="two-columns">
@@ -131,6 +131,25 @@
                           <div class="two-columns"><br>
                               <button type="button" class="button green-gradient glossy icon-plus" onclick="add_pago(<?php echo $key; ?>);">Add</button> 
                               <button type="button" class="button red-gradient glossy icon-minus" onclick="quita(<?php echo $key; ?>);">Quitar</button>
+                          </div>
+                      </div>
+                      <div class="columns">
+                          <div class="two-columns">
+                          </div>
+                          <div class="two-columns">
+                              <span style="font-weight: bold;">TOTAL: </span>
+                          </div>
+                          <div class="one-column">
+                              <span style="font-weight: bold;" id="monto-total-<?php echo $key; ?>">0.00 </span>
+                          </div>
+                          <div class="one-column">
+                              <span style="font-weight: bold;" id="monto-total-bol-<?php echo $key; ?>">0.00 </span>
+                          </div>
+                          <div class="two-columns">
+                          </div>
+                          <div class="two-columns">
+                          </div>
+                          <div class="two-columns">
                           </div>
                       </div>
                       </p>
@@ -150,7 +169,7 @@
 <!-- End sidebar/drop-down menu --> 
 
 <script>
-  
+
   var nuevo_pago = '';
   function add_pago(key) {
 
@@ -162,6 +181,7 @@
       var optticket = '     <option value="Ticket">Ticket</option>';
       var optefectivo = '     <option value="Efectivo">Efectivo</option>';
       var opttarjeta = '     <option value="Tarjeta">Tarjeta</option>';
+
       switch (tipopago) {
           case "Voucher":
               optvoucher = '     <option value="Voucher" selected>Voucher</option>';
@@ -204,12 +224,12 @@
               + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][codigo]" class="input full-width" value="' + codigo + '">'
               + ' </div>'
               + ' <div class="two-columns">'
-              + '   <label class="label '+clase_d+'">Monto Dolares</label>'
-              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto_dolar]" class="input full-width" value="' + monto + '">'
+              + '   <label class="label ' + clase_d + '">Monto Dolares</label>'
+              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto_dolar]" class="input full-width c-monto-' + key + '" value="' + monto + '">'
               + ' </div>'
               + ' <div class="two-columns">'
-              + '   <label class="label '+clase_b+'">Monto Bolivianos</label>'
-              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto]" class="input full-width" value="' + monto_bol + '">'
+              + '   <label class="label ' + clase_b + '">Monto Bolivianos</label>'
+              + '   <input type="text" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][monto]" class="input full-width c-monto-bol-' + key + '" value="' + monto_bol + '">'
               + '   <input type="hidden" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][tipo_cambio]" class="input" value="' + tipo_cambio + '">'
               + ' </div>'
               + ' <div class="two-columns">'
@@ -235,12 +255,14 @@
       $('#id-nombre-' + key).val('');
       $('#id-celular-' + key).val('');
       $('#tipocambio').attr('disabled', true);
+      calcula_monto_t(key);
   }
   function quita(key) {
       if (numero_p[key] > 0) {
           $('#block-' + key + '-' + numero_p[key]).remove();
           numero_p[key]--;
       }
+      calcula_monto_t(key);
   }
   function calcula_tipo_cambio_bol(key) {
       var tipo_cambio = <?php echo $tipo_cambio; ?>;
@@ -253,6 +275,20 @@
       var precio_bolivianos = parseFloat($('#precio-' + key + '-bol').val());
       var precio_dolar = precio_bolivianos / tipo_cambio;
       $('#precio-' + key + '-dol').val(precio_dolar);
+  }
+  function calcula_monto_t(key) {
+      var sum_total_d = 0.00;
+      var sum_total_b = 0.00;
+      $('.c-monto-' + key).each(function (i, elemento) {
+          sum_total_d += parseFloat($(elemento).val());
+      });
+      $('.c-monto-bol-' + key).each(function (i, elemento) {
+          sum_total_b += parseFloat($(elemento).val());
+      });
+      $('#monto-total-' + key).html(sum_total_d);
+      $('#monto-total-bol-' + key).html(sum_total_b);
+      //console.log(sum_total_d);
+      //console.log(sum_total_b);
   }
   calcula_tipo_cambio();
 </script>

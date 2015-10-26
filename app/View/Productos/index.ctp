@@ -12,7 +12,6 @@
     <div class="with-padding">                   
 
         <table class="table responsive-table" id="tabla-json">
-
             <thead>
                 <tr>
                     <th scope="col" width="3%">Precios</th>
@@ -22,7 +21,7 @@
                     <th scope="col" class="align-center hide-on-mobile">Marca</th>
                     <th scope="col" class="align-center hide-on-mobile">Color</th>
                     <th scope="col" width="5%" class="align-center hide-on-mobile">Precio compra</th>
-                    <th scope="col" width="10%" class="align-center hide-on-mobile-portrait">proveedor</th>  
+                    <th scope="col" width="10%" class="align-center hide-on-mobile-portrait">Total Central</th>  
                     <th scope="col" width="17%" class="align-center">Acciones</th>
                 </tr>
             </thead>          
