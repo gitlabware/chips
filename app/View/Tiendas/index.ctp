@@ -4,10 +4,28 @@
     <hgroup id="main-title" class="thin">
         <h1>Tienda <?php echo $this->Session->read("Auth.User.Sucursal.nombre") ?></h1>
     </hgroup>
+    <style>
+        .dataTables_wrapper, .dataTables_header, .dataTables_footer {
+            background: -webkit-linear-gradient(top, #b1dc64, #58b104 50%, #499400 50%, #5eb80a);
+            border-color: #6d960c;
+        }
+        .paginate_enabled_previous:hover, .paginate_enabled_next:hover, .paging_full_numbers a:hover{
+            background: -webkit-linear-gradient(top, #b1dc64, #58b104 50%, #499400 50%, #5eb80a);
+            border-color: #6d960c;
+        }
+        .paginate_disabled_previous, .paginate_enabled_previous, .paginate_disabled_next, .paginate_enabled_next, .paging_full_numbers a{
+            background: -webkit-linear-gradient(top, #b1dc64, #58b104 50%, #499400 50%, #5eb80a);
+            border-color: #6d960c;
+        }
+        .paging_full_numbers a.paginate_active, .paging_full_numbers a.paginate_active.first, .paging_full_numbers a.paginate_active.last{
+            background: -webkit-linear-gradient(top, #499400, #5eb80a);
+            border-color: #6d960c;
+        }
+    </style>
     <div class="with-padding">
         <div class="columns">
             <div class="seven-columns twelve-columns-mobile twelve-columns-tablet">
-                <table class="table responsive-table" id="sorting-advanced">
+                <table class="table responsive-table verde" id="sorting-advanced">
                     <thead>
                         <tr>
                             <th>Producto</th>

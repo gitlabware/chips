@@ -165,8 +165,12 @@
               "order": [],
               'fnInitComplete': function (oSettings)
               {
-                  // Style length select
+                if(!$('#sorting-advanced').hasClass('verde')){
+                  //alert('eynar');
                   table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+                }else{
+                  table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select green-gradient glossy').styleSelect();
+                }
                   tableStyled = true;
               }
           }).columnFilter({

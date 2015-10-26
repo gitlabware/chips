@@ -111,13 +111,13 @@
                               <input type="text" name="data[][]" class="input full-width" id="idcodigo-<?php echo $key; ?>">
                           </div>
                           <div class="one-column">
-                              <label class="label" id="l-monto-d" onclick="$('#l-monto-b').removeClass('green');
-                                      $('#l-monto-d').addClass('green');">Monto $</label>
+                              <label class="label" id="l-monto-d-<?php echo $key; ?>" onclick="$('#l-monto-b-<?php echo $key; ?>').removeClass('green');
+                                      $('#l-monto-d-<?php echo $key; ?>').addClass('green');">Monto $</label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-<?php echo $key; ?>" onkeyup="calc_pag_bol(<?php echo $key; ?>);">
                           </div>
                           <div class="one-column">
-                              <label class="label green" id="l-monto-b" onclick="$('#l-monto-d').removeClass('green');
-                                      $('#l-monto-b').addClass('green');">Monto Bs</label>
+                              <label class="label green" id="l-monto-b-<?php echo $key; ?>" onclick="$('#l-monto-d-<?php echo $key; ?>').removeClass('green');
+                                      $('#l-monto-b-<?php echo $key; ?>').addClass('green');">Monto Bs</label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-bol-<?php echo $key; ?>" onkeyup="calc_pag_dol(<?php echo $key; ?>);">
                           </div>
                           <div class="two-columns">
@@ -200,7 +200,7 @@
       var clase_b = '';
       var clase_d = '';
       var inputpago = '';
-      if ($('#l-monto-b').hasClass('green')) {
+      if ($('#l-monto-b-' + key).hasClass('green')) {
           clase_b = 'green';
           inputpago = '   <input type="hidden" name="data[Ventascelulare][' + key + '][Pago][' + numero_p[key] + '][moneda]" class="input full-width" value="Bolivianos">';
       } else {
