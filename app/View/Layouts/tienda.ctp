@@ -35,7 +35,7 @@
 
         <!-- Webfonts -->
         <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>-->
-        
+
         <!-- Additional styles -->
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/form.css?v=1">
         <link rel="stylesheet" href="<?php echo $this->webroot; ?>css/styles/switches.css?v=1">
@@ -91,7 +91,7 @@
     <body class="clearfix with-menu with-shortcuts">
         <script>var urljsontabla = '';
           var datos_tabla2 = null;
-        var filtro_c = [];
+          var filtro_c = [];
         </script>
 
         <!-- Prompt IE 6 users to install Chrome Frame -->
@@ -110,7 +110,7 @@
 
         <!-- Main content -->
 
-        
+
         <?php echo $this->fetch('content'); ?>
 
         <!-- End main content -->       
@@ -138,7 +138,7 @@
         <script src="<?php echo $this->webroot; ?>js/libs/jquery.tablesorter.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.min.js"></script>
         <script src="<?php echo $this->webroot; ?>js/jquery.dataTables.columnFilter.js"></script>
-        
+
         <script>
           // Call template init (optional, but faster if called manually)
           $.template.init();
@@ -165,35 +165,35 @@
               "order": [],
               'fnInitComplete': function (oSettings)
               {
-                if(!$('#sorting-advanced').hasClass('verde')){
-                  //alert('eynar');
-                  table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
-                }else{
-                  table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select green-gradient glossy').styleSelect();
-                }
+                  if (!$('#sorting-advanced').hasClass('verde')) {
+                      //alert('eynar');
+                      table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+                  } else {
+                      table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select green-gradient glossy').styleSelect();
+                  }
                   tableStyled = true;
               }
           }).columnFilter({
               sPlaceHolder: "head:before",
               aoColumns: filtro_c
           });
-          
+
 
           var table2 = $('#tabla-json');
           //console.log(datos_tabla2);
           if (datos_tabla2 == null) {
               datos_tabla2 = {
-                "oLanguage": {
-                  "oPaginate": {
-                      "sPrevious": "Anterior",
-                      "sNext": "Siguiente",
-                      "sFirst": "Primero",
-                      "sLast": "Ultimo"
+                  "oLanguage": {
+                      "oPaginate": {
+                          "sPrevious": "Anterior",
+                          "sNext": "Siguiente",
+                          "sFirst": "Primero",
+                          "sLast": "Ultimo"
+                      },
+                      "sSearch": "Buscar",
+                      "sLengthMenu": "Mostrar _MENU_ registros",
+                      "sInfo": "Tiene un total de _TOTAL_ registros para mostrar (_START_ to _END_)"
                   },
-                  "sSearch": "Buscar",
-                  "sLengthMenu": "Mostrar _MENU_ registros",
-                  "sInfo": "Tiene un total de _TOTAL_ registros para mostrar (_START_ to _END_)"
-              },
                   'sPaginationType': 'full_numbers',
                   'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
                   'bProcessing': true,
@@ -202,8 +202,14 @@
                   "order": [],
                   'fnInitComplete': function (oSettings)
                   {
+                      if (!$('#tabla-json').hasClass('verde')) {
+                          //alert('eynar');
+                          table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+                      } else {
+                          table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select green-gradient glossy').styleSelect();
+                      }
                       // Style length select
-                      table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+                      //table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
                       tableStyled = true;
                   }
               };
@@ -211,13 +217,14 @@
           table2.dataTable(datos_tabla2).columnFilter({
               sPlaceHolder: "head:before",
               aoColumns: filtro_c
-          });;
-          
-          function cargarmodal(url, titulo,alto) {
-          if(alto === undefined){
-            alto = 400;
-          }
-          
+          });
+          ;
+
+          function cargarmodal(url, titulo, alto) {
+              if (alto === undefined) {
+                  alto = 400;
+              }
+
               $.modal({
                   content: '<div id="idmodal"></div>',
                   title: titulo,
@@ -236,7 +243,7 @@
               $('#idmodal').load(url);
           }
         </script>
-        <?php echo $this->Session->flash(); ?>
+<?php echo $this->Session->flash(); ?>
         <br>
         <br>
         <div class="ocultar_impresion" style="text-align: center; color:gray;">

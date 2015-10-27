@@ -1162,7 +1162,7 @@ class TiendasController extends AppController {
       'color' => "(SELECT colores.nombre FROM colores WHERE colores.id = Producto.colore_id)"
     );
     $ventas = $this->Ventascelulare->find('all', array(
-      'conditions' => array('Ventascelulare.sucursal_id' => $this->Session->read('Auth.User.sucursal_id')),
+      'conditions' => array('Ventascelulare.sucursal_id' => $this->Session->read('Auth.User.sucursal_id'),'Ventascelulare.salida !=' => 0),
       //'group' => array('Ventascelulare.transaccion'),
       'fields' => array('Producto.nombre', 'Ventascelulare.id', 'Ventascelulare.marca', 'Ventascelulare.color', 'Ventascelulare.created', 'Ventascelulare.cliente', 'Ventascelulare.precio', 'Ventascelulare.transaccion'),
       'order' => array('Ventascelulare.created DESC')

@@ -321,7 +321,12 @@
                           }
                   },
                   yAxis: {
-                  min: 0,
+                  labels: {
+                  formatter: function() {
+                  return this.value;
+                  }
+                  },
+                          min: 0,
                           title: {
                           text: 'Efectivo (Bolivianos)'
                           }

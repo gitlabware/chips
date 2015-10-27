@@ -1555,7 +1555,7 @@ class AlmacenesController extends AppController {
   public function get_ventat_cel_alm($idAlmacen = null, $idProducto = null) {
     $ven_total = $this->Ventascelulare->find('all', array(
       'recursive' => -1,
-      'conditions' => array('almacene_id' => $idAlmacen, 'producto_id' => $idProducto, 'salida !=' => 0, 'created' => date('Y-m-d')),
+      'conditions' => array('almacene_id' => $idAlmacen, 'producto_id' => $idProducto, 'salida !=' => 0, 'DATE(Ventascelulare.created)' => date('Y-m-d')),
       'group' => array('Ventascelulare.almacene_id'),
       'fields' => array('SUM(Ventascelulare.salida) as tsalidas')
     ));

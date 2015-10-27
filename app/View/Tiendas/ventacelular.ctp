@@ -164,8 +164,8 @@
                         <?php $total_d = 0.00; ?>
                         <?php $total_b = 0.00; ?>
                         <?php foreach ($pagos as $pa): ?>
-                          <?php $total_d += $pa['Pago']['monto']; ?>
-                          <?php $total_b += ($pa['Pago']['monto'] * $tipo_cambio); ?>
+                          <?php $total_d += $pa['Pago']['monto_dolar']; ?>
+                          <?php $total_b += ($pa['Pago']['monto']); ?>
                           <?php
                           $clase_b = '';
                           $clase_d = '';
