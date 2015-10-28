@@ -101,7 +101,7 @@
         <header role="banner" id="title-bar" class="ocultar_impresion">
             <h2>SISTEMA DE INVENTARIOS</h2>
         </header>
-
+        <?php echo $this->element('menu/tienda'); ?> 
         <!-- Button to open/hide menu -->
         <a href="#" id="open-menu" class="ocultar_impresion"><span>Menu</span></a>
 

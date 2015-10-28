@@ -26,6 +26,9 @@ class SucursalsController extends AppController {
   }
 
   public function index() {
+    $this->Sucursal->virtualFields = array(
+      'central' => "SELECT almacenes.central FROM almacenes WHERE almacenes.sucursal_id = Sucursal.id LIMIT 1"
+    );
     $sucursals = $this->Sucursal->find('all', array(
       'recursive' => 0,
     ));

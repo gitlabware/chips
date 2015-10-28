@@ -111,13 +111,13 @@
                               <input type="text" name="data[][]" class="input full-width" id="idcodigo-<?php echo $key; ?>">
                           </div>
                           <div class="one-column">
-                              <label class="label" id="l-monto-d-<?php echo $key; ?>" onclick="$('#l-monto-b-<?php echo $key; ?>').removeClass('green');
-                                      $('#l-monto-d-<?php echo $key; ?>').addClass('green');">Monto $</label>
+                              <label class="label" onclick="$('#l-monto-b-<?php echo $key; ?>').removeClass('tag');
+                                $('#l-monto-d-<?php echo $key; ?>').addClass('tag');"><span id="l-monto-d-<?php echo $key; ?>" >Monto$</span></label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-<?php echo $key; ?>" onkeyup="calc_pag_bol(<?php echo $key; ?>);">
                           </div>
                           <div class="one-column">
-                              <label class="label green" id="l-monto-b-<?php echo $key; ?>" onclick="$('#l-monto-d-<?php echo $key; ?>').removeClass('green');
-                                      $('#l-monto-b-<?php echo $key; ?>').addClass('green');">Monto Bs</label>
+                              <label class="label" onclick="$('#l-monto-d-<?php echo $key; ?>').removeClass('tag');
+                                $('#l-monto-b-<?php echo $key; ?>').addClass('tag');"><span id="l-monto-b-<?php echo $key; ?>" class="tag">MontoBs</span></label>
                               <input type="text" name="data[][]" class="input full-width" id="idmonto-bol-<?php echo $key; ?>" onkeyup="calc_pag_dol(<?php echo $key; ?>);">
                           </div>
                           <div class="two-columns">

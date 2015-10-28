@@ -1094,7 +1094,7 @@ class ReportesController extends Controller {
 
       $sql6 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE mo.almacene_id = $idAlmacen AND Producto.id = mo.producto_id LIMIT 1)";
       $sql5 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE mov.almacene_id = $idAlmacen AND mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
-      $sql7 = "(SELECT SUM(mo.ingreso) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND mo.escala = 'TIENDA' AND Producto.id = mo.producto_id GROUP BY mo.producto_id LIMIT 1)";
+      $sql7 = "(SELECT SUM(mo.ingreso) FROM movimientos mo WHERE mo.almacene_id = $idAlmacen AND mo.created >= '$fecha_ini' AND mo.created <= '$fecha_fin' AND Producto.id = mo.producto_id GROUP BY mo.producto_id LIMIT 1)";
       /* $this->Movimiento->virtualFields = array(
         'ventas' => "CONCAT($sql1)",
         'ventas_mayor' => "CONCAT($sql2)",

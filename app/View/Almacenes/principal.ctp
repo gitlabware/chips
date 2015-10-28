@@ -42,8 +42,60 @@
         </div>
     </div>
     <div class="with-padding">                   
+        <div class="columns">
+            <div class="six-columns six-columns-tablet twelve-columns-mobile">
+                <h3 class="relative thin">
+                    Quedan pocos productos en Almacen Central
+                </h3>
 
+                <ul class="list spaced">
+                    <?php foreach ($productos_me as $pro):?>
+                    <li>
+                        <a href="javascript:" class="list-link icon-drawer" title="Click to edit">
+                            <span class="meter red-gradient"></span>
+                            <span class="meter red-gradient"></span>
+                            <span class="meter"></span>
+                            <span class="meter"></span>
+                            <span class="meter"></span>
+                            <span class="meter"></span>
+
+                            <strong><?= $pro['Producto']['nombre']?></strong> (<?= $pro['Producto']['tipo_producto']?>)
+                        </a>
+                        <div class="absolute-right">
+                            <strong>56</strong>
+                        </div>
+                    </li>
+                    <?php endforeach;?>
+                </ul>
+
+            </div>
+            <div class="six-columns six-columns-tablet twelve-columns-mobile">
+                <h3 class="relative thin">
+                    Quedan pocos celulares en Almacen Central
+                </h3>
+
+                <ul class="list spaced">
+                    <?php foreach ($celulares_me as $pro):?>
+                    <li>
+                        <a href="javascript:" class="list-link icon-drawer" title="Click to edit">
+                            <span class="meter red-gradient"></span>
+                            <span class="meter red-gradient"></span>
+                            <span class="meter"></span>
+                            <span class="meter"></span>
+                            <span class="meter"></span>
+                            <span class="meter"></span>
+                            <strong><?= $pro['Totale']['marca']?></strong> <?= $pro['Producto']['nombre']." (".$pro['Totale']['color'].")"?>
+                        </a>
+                        <div class="absolute-right">
+                            <strong><?= $pro['Totale']['total']?></strong>
+                        </div>
+                    </li>
+                    <?php endforeach;?>
+                </ul>
+            </div>
+        </div>
     </div>
+
 </section>	
 <?php echo $this->element('sidebar/administrador'); ?>
 <?= $this->Html->script(array('highcharts', 'exporting', 'dark-green')); ?>

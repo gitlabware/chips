@@ -773,6 +773,7 @@ class AlmacenesController extends AppController {
   }
 
   public function principal() {
+    $idAlmacen_cen = $this->get_id_alm_cent();
     $productos_1 = $this->Producto->find('all', array(
       'recursive' => -1,
       'conditions' => array('Producto.tipo_producto !=' => 'CELULARES'),
@@ -793,7 +794,28 @@ class AlmacenesController extends AppController {
     $fecha_inicial = date('Y-m-01');
     //debug($fecha_inicial);exit;
     $fecha_final = date('Y-m-d');
-    $this->set(compact('productos_1', 'almacenes_1', 'productos_2', 'almacenes_3','fecha_final','fecha_inicial'));
+    
+    
+    $productos_me = $this->Totale->find('all',array(
+      'recursive' => 0,
+      'conditions' => array('Totale.almacene_id' => $idAlmacen_cen,'Producto.tipo_producto !=' => 'CELULARES'),
+      'fields' => array('Producto.*'),
+      'limit' => 5,
+      'order' => array('Totale.total ASC')
+    ));
+    $this->Totale->virtualFields = array(
+      'marca' => "(SELECT marcas.nombre FROM marcas WHERE marcas.id = Producto.marca_id)",
+      'color' => "(SELECT colores.nombre FROM colores WHERE colores.id = Producto.colore_id)"
+    );
+    $celulares_me = $this->Totale->find('all',array(
+      'recursive' => 0,
+      'conditions' => array('Totale.almacene_id' => $idAlmacen_cen,'Producto.tipo_producto' => 'CELULARES'),
+      'fields' => array('Producto.*','Totale.*'),
+      'limit' => 5,
+      'order' => array('Totale.total ASC')
+    ));
+    
+    $this->set(compact('productos_me','celulares_me','productos_1', 'almacenes_1', 'productos_2', 'almacenes_3','fecha_final','fecha_inicial'));
   }
 
   public function get_vent_mes($idProducto = null, $mes = null) {

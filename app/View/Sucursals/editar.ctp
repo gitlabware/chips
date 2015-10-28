@@ -32,8 +32,6 @@
 
             <div class="six-columns">
                 <p class="block-label button-height">
-                    <label for="block-label-2" class="label"> Numero de Cabinas<small>(requerido)</small></label>
-                    <?php echo $this->Form->text('ncabinas', array('class' => 'input full-width')); ?>
                 </p> 
             </div>
             <div class="new-row six-columns">
