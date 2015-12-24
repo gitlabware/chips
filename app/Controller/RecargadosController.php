@@ -295,7 +295,7 @@ class RecargadosController extends AppController {
   }
 
   public function reporte() {
-
+    $recargas = array();
     if (!empty($this->request->data)) {
       
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
@@ -304,8 +304,9 @@ class RecargadosController extends AppController {
         'recursive' => 0,
         'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini,'DATE(Recargado.created) <=' => $fecha_fin)
       ));
-      $this->set(compact('recargas'));
+      
     }
+    $this->set(compact('recargas'));
   }
 
 }

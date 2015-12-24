@@ -222,10 +222,8 @@ class RecargasController extends AppController {
   }
 
   public function estadorecargas2() {
-    $recarga = $this->Movimientosrecarga->find('first', array('order' => array('Movimientosrecarga.id DESC')));
-    $realizados = $this->Recarga->find('all', array('conditions' => array('Recarga.estado' => 1), 'order' => array('Recarga.id DESC')));
-
-    $this->set(compact('recarga', 'realizados'));
+    
+    
   }
 
   public function ajaxanunciarecargas() {

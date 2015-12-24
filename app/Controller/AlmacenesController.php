@@ -774,11 +774,20 @@ class AlmacenesController extends AppController {
 
   public function principal() {
     $idAlmacen_cen = $this->get_id_alm_cent();
-    $productos_1 = $this->Producto->find('all', array(
+    /*$productos_1 = $this->Producto->find('all', array(
       'recursive' => -1,
       'conditions' => array('Producto.tipo_producto !=' => 'CELULARES'),
       'fields' => array('Producto.id', 'Producto.nombre')
+    ));*/
+    
+    $productos_1 = $this->Totale->find('all',array(
+      'recursive' => 0,
+      'conditions' => array('Producto.tipo_producto !=' => 'CELULARES'),
+      'fields' => array('Producto.id', 'Producto.nombre'),
+      'order' => array('Totale.total DESC'),
+      'limit' => 5
     ));
+    
     $productos_2 = $this->Producto->find('all', array(
       'recursive' => -1,
       'conditions' => array('Producto.tipo_producto' => 'CELULARES'),

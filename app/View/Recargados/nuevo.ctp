@@ -2,8 +2,6 @@
 <!DOCTYPE html>
 <section role="main" id="main">
 
-    <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
-
     <hgroup id="main-title" class="thin">
         <h1>MOVIMIENTOS RECARGAS <span style="font-size: 19px;color: #01ab01;">TOTAL: <?php echo $this->requestAction(array('action' => 'get_total'));?></span></h1>
     </hgroup>

@@ -13,15 +13,22 @@
                 <b><?php echo $this->Session->read('Auth.User.Persona.ap_paterno'); ?></b>
             </span>
         </div>
-        
+
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
             <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'principal')) ?>" title="Estadisticas"><span class="icon-line-graph"></span></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'editar', $idUsuario)) ?>" title="Mis Datos"><span class="icon-user"></span></span></a></li>
-            <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Productos"><span class="icon-clipboard"></span></a></li>
+            <?php
+            $num_chips_v = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_venciendo'));
+            ?>
+            <?php if (empty($num_chips_v)): ?>
+              <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Productos"><span class="icon-clipboard"></span></a></li>
+              <?php else:?>
+              <li><a href="<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'get_venciendo')) ?>" title="Chips en Vencimiento"><span class="icon-warning"></span><span class="count"><?= $num_chips_v ?></span></a></li>
+            <?php endif; ?>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'users', 'action' => 'salir')) ?>" title="Salir"><span class="icon-extract"></span></a></li>            
         </ul>
-        
+
         <section class="navigable">            
             <ul class="big-menu">
 
@@ -66,8 +73,8 @@
                             <ul class="big-menu">
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Productos', 'action' => 'index')); ?>">Listado de Productos</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Productos', 'action' => 'insertar')); ?>">Nuevo Producto</a></li>
-                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'index'));              ?>">Listado de Precio</a></li>-->
-                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'nuevoprecio'));              ?>">Nuevos Precios</a></li>-->
+                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'index'));               ?>">Listado de Precio</a></li>-->
+                                <!--<li><a href="<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'nuevoprecio'));               ?>">Nuevos Precios</a></li>-->
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiposproductos', 'action' => 'index')); ?>">Listado de Categorias</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Tiposproductos', 'action' => 'add')); ?>">Nueva Categoria</a></li>
                             </ul>
@@ -84,14 +91,14 @@
                             <span>Colores</span>
                             <ul class="big-menu">
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Colores', 'action' => 'index')); ?>">Listado de Colores</a></li>
-                                <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Colores', 'action' => 'color')); ?>','Formulario Color',200);">Nuevo Color</a></li>                                
+                                <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Colores', 'action' => 'color')); ?>', 'Formulario Color', 200);">Nuevo Color</a></li>                                
                             </ul>
                         </li>
                         <li class="with-right-arrow">
                             <span>Marcas</span>
                             <ul class="big-menu">
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Marcas', 'action' => 'index')); ?>">Listado de Marcas</a></li>
-                                <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Marcas', 'action' => 'marca')); ?>','Formulario Marca',200);">Nueva Marca</a></li>                                
+                                <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Marcas', 'action' => 'marca')); ?>', 'Formulario Marca', 200);">Nueva Marca</a></li>                                
                             </ul>
                         </li>
                         <!--<li class="with-right-arrow">
@@ -143,7 +150,7 @@
                         <li>
                             <a href="<?php echo $this->Html->url(array('controller' => 'Recargados', 'action' => 'nuevo')); ?>">Registrar recarga</a></li>
                         <li>
-                            <a href="<?php echo $this->Html->url(array('controller' => 'Recargas', 'action' => 'estadorecargas2')); ?>">Reporte Recargas</a>
+                            <a href="<?php echo $this->Html->url(array('controller' => 'Recargados', 'action' => 'reporte')); ?>">Reporte Recargas</a>
 
                         </li>                        
                     </ul>
@@ -152,10 +159,10 @@
                 <!--<li class="with-right-arrow">
                     <span>Depositos</span>
                     <ul class="big-menu">
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listadepositos'))      ?>">Listado depositos</a></li>	
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'deposito'));      ?>">Nuevo Deposito</a></li>
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'index'))      ?>">Listado de Bancos</a></li>
-                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'add'));      ?>">Nuevo Banco</a></li>
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'listadepositos'))       ?>">Listado depositos</a></li>	
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'deposito'));       ?>">Nuevo Deposito</a></li>
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'index'))       ?>">Listado de Bancos</a></li>
+                        <li><a href="<?php //echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'add'));       ?>">Nuevo Banco</a></li>
                     </ul>
                 </li>-->
 
@@ -230,5 +237,5 @@
 </section>
 
 <script>
-$(".big-menu a[href='"+String(window.location.pathname)+"']").addClass('current navigable-current');
+  $(".big-menu a[href='" + String(window.location.pathname) + "']").addClass('current navigable-current');
 </script>

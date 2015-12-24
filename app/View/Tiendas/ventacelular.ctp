@@ -122,15 +122,15 @@
                             <input type="text" name="data[Pago][codigo]" class="input full-width" id="idcodigo">
                         </div>
                         <div class="one-column">
-                            <label class="label" id="l-monto-d" onclick="$('#l-monto-b').removeClass('green');
-                                  $('#l-monto-d').addClass('green');
-                                $('#idtipomoneda').val('Dolares');">Monto $</label>
+                            <label class="label" id="l-monto-d" onclick="$('#l-monto-b').removeClass('tag');
+                                  $('#l-monto-d').addClass('tag');
+                                $('#idtipomoneda').val('Dolares');"><span id="l-monto-d" >Monto$</span></label>
                             <input type="text" name="data[Pago][monto_dolar]" required="true" class="input full-width" id="idmonto" onkeyup="calc_pag_bol();">
                         </div>
                         <div class="one-column">
-                            <label class="label green" id="l-monto-b" onclick="$('#l-monto-d').removeClass('green');
-                                  $('#l-monto-b').addClass('green');
-                                $('#idtipomoneda').val('Bolivianos');">Monto Bs</label>
+                            <label class="label" onclick="$('#l-monto-d').removeClass('tag');
+                                  $('#l-monto-b').addClass('tag');
+                                $('#idtipomoneda').val('Bolivianos');"><span id="l-monto-b" class="tag">MontoBs</span></label>
                             <input type="text" name="data[Pago][monto]" class="input full-width" id="idmonto-bol" onkeyup="calc_pag_dol();">
                         </div>
                         <div class="two-columns">

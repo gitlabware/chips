@@ -569,9 +569,9 @@ class ProductosController extends AppController {
       $this->request->data = "";
       $duplicados = '';
       foreach ($array_data as $d) {
-        if ($d['A'] == '' || $d['B'] == '' || $d['C'] == '' || $d['D'] == '' || $d['E'] == '' || $d['F'] == '') {
+        /*if ($d['A'] == '' || $d['B'] == '' || $d['C'] == '' || $d['D'] == '' || $d['E'] == '' || $d['F'] == '') {
           break;
-        }
+        }*/
         // ------ Marca -------
         $marca = $this->Marca->find('first', array(
           'recursive' => -1,

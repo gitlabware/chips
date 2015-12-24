@@ -146,5 +146,5 @@ echo $this->Html->script(array('libs/glDatePicker/glDatePicker.min.js?v=1', 'ini
 ?>
 
 <!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/recargas'); ?>
+<?php echo $this->element('sidebar/administrador'); ?>
 <!-- End sidebar/drop-down menu --> 

@@ -7,9 +7,10 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class ChipsController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente','Precio');
+  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente', 'Precio');
   public $layout = 'viva';
-  public $components = array('RequestHandler', 'DataTable','Montoliteral');
+  public $components = array('RequestHandler', 'DataTable', 'Montoliteral');
+
   public function beforeFilter() {
     parent::beforeFilter();
     if ($this->RequestHandler->responseType() == 'json') {
@@ -21,7 +22,7 @@ class ChipsController extends AppController {
   public function subirexcel() {
     $excels = $this->Excel->find('all', array(
       'order' => array('Excel.id DESC'),
-      'conditions' => array('tipo' => array('asignacion','activacion')),
+      'conditions' => array('tipo' => array('asignacion', 'activacion')),
       'limit' => 30));
     $this->set(compact('excels'));
     //debug($chips);exit;
@@ -578,12 +579,12 @@ class ChipsController extends AppController {
         'acciones' => "CONCAT('$acciones')"
         ); */
       $this->paginate = array(
-        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja'),
+        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja'),
         'recursive' => 0,
         'order' => 'Chip.created'
         , 'conditions' => array('Chip.distribuidor_id' => NULL)
       );
-      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja');
+      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('chips', $this->DataTable->getResponse());
       $this->set('_serialize', 'chips');
@@ -632,11 +633,11 @@ class ChipsController extends AppController {
     $this->set(compact('entregados'));
   }
 
-  public function detalle_entrega($idExcel = null,$fecha = null, $idDistribuidor = null) {
+  public function detalle_entrega($idExcel = null, $fecha = null, $idDistribuidor = null) {
     $distribuidor = $this->User->findByid($idDistribuidor, null, null, 0);
     $entregados = $this->Chip->find('all', array(
       'recursive' => -1,
-      'conditions' => array('Chip.fecha_entrega_d' => $fecha, 'Chip.distribuidor_id' => $idDistribuidor,'Chip.excel_id' => $idExcel)
+      'conditions' => array('Chip.fecha_entrega_d' => $fecha, 'Chip.distribuidor_id' => $idDistribuidor, 'Chip.excel_id' => $idExcel)
     ));
     $this->set(compact('entregados', 'fecha', 'distribuidor', 'idDistribuidor'));
   }
@@ -932,7 +933,7 @@ class ChipsController extends AppController {
       'recursive' => 0,
       'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d' => $fecha_entrega),
       'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f", 'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist'),
-      'order'=>array('Chip.id')
+      'order' => array('Chip.id')
     ));
     //debug($chips);exit;
     $cont = 1;
@@ -1104,66 +1105,66 @@ class ChipsController extends AppController {
   }
 
   public function todos() {
-    
+
     if ($this->RequestHandler->responseType() == 'json') {
       $sql1 = "SELECT fecha_act FROM activados ac WHERE ac.phone_number = Chip.telefono";
-      $ver = '<a href="javascript:void(0)" class="button blue-gradient glossy" onclick="infochip('."',Chip.id,'".')"><span class="icon-info"></span></a>';
+      $ver = '<a href="javascript:void(0)" class="button blue-gradient glossy" onclick="infochip(' . "',Chip.id,'" . ')"><span class="icon-info"></span></a>';
       $this->Chip->virtualFields = array(
         'fecha_activacion' => "($sql1)",
         'ver' => "CONCAT('$ver')"
       );
       $this->paginate = array(
-        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver'),
+        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi', 'Chip.ver'),
         'recursive' => 0,
         'order' => 'Chip.created'
       );
-      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi','Chip.ver');
+      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.telefono', 'Chip.factura', 'Chip.caja', 'Chip.fecha', 'Chip.sim', 'Chip.imsi', 'Chip.ver');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
       $this->set('chips', $this->DataTable->getResponse());
       $this->set('_serialize', 'chips');
     }
   }
-  
-  public function info_chip($idChip = null){
+
+  public function info_chip($idChip = null) {
     $this->layout = 'ajax';
     $this->Chip->virtualFields = array(
       'distribuidor' => "(SELECT CONCAT(pe.nombre,' ',pe.ap_paterno,' ',pe.ap_materno) FROM personas pe WHERE Distribuidor.persona_id = pe.id)"
     );
-    $chip = $this->Chip->find('first',array(
+    $chip = $this->Chip->find('first', array(
       'recursive' => 0,
       'conditions' => array('Chip.id' => $idChip)
     ));
-    
-    $activacion = $this->Activado->find('first',array(
+
+    $activacion = $this->Activado->find('first', array(
       'recursive' => -1,
       'conditions' => array('Activado.phone_number' => $chip['Chip.telefono']),
       'fields' => array('Activado.fecha_act')
     ));
-    $this->set(compact('chip','activacion'));
+    $this->set(compact('chip', 'activacion'));
   }
-  
+
   public function excel_asignados($idExcel = null) {
-    $excel = $this->Excel->findByid($idExcel,null,null,-1);
+    $excel = $this->Excel->findByid($idExcel, null, null, -1);
     $sql = "SELECT CONCAT(p.nombre,' ',p.ap_paterno,' ',p.ap_materno) FROM personas p WHERE p.id = Distribuidor.persona_id";
     $this->Chip->virtualFields = array(
       'nombre_dist' => "CONCAT(($sql))"
     );
     $entregados = $this->Chip->find('all', array(
-      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist','Chip.pagado','Chip.precio_d')
+      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.nombre_dist', 'Chip.pagado', 'Chip.precio_d')
       , 'recursive' => 0
-      , 'conditions' => array('Chip.distribuidor_id !=' => NULL,'Chip.excel_id' => $idExcel)
+      , 'conditions' => array('Chip.distribuidor_id !=' => NULL, 'Chip.excel_id' => $idExcel)
       , 'group' => array('Chip.fecha_entrega_d', 'distribuidor_id')
       , 'order' => 'fecha_entrega_d DESC'
       , 'LIMIT' => 50
     ));
     //debug($entregados);exit;
     $precio_chip = $this->Precio->findByid(3);
-    /*debug($precio_chip);exit;*/
-    $this->set(compact('entregados','excel','precio_chip'));
+    /* debug($precio_chip);exit; */
+    $this->set(compact('entregados', 'excel', 'precio_chip'));
   }
-  
-  public function cambia_pagado($idExcel = null,$fecha = null,$idDistribuidor = null){
-    $chips = $this->Chip->find('all',array(
+
+  public function cambia_pagado($idExcel = null, $fecha = null, $idDistribuidor = null) {
+    $chips = $this->Chip->find('all', array(
       'recursive' => -1,
       'conditions' => array(
         'Chip.excel_id' => $idExcel,
@@ -1172,37 +1173,38 @@ class ChipsController extends AppController {
       ),
       'fields' => array('Chip.*')
     ));
-    if(empty($chips)){
+    if (empty($chips)) {
       $this->redirect($this->referer());
     }
     $primer_chip = current($chips);
     $ultimo_chip = end($chips);
     $cantidad = count($chips);
     $precio = 0.00;
-    $precio_c = $this->Precio->findByid(3,null,null,-1);
-    if(!empty($primer_chip['Chip']['precio_d'])){
+    $precio_c = $this->Precio->findByid(3, null, null, -1);
+    if (!empty($primer_chip['Chip']['precio_d'])) {
       $precio = $primer_chip['Chip']['precio_d'];
-    }elseif(!empty($precio_c['Precio']['monto'])){
+    } elseif (!empty($precio_c['Precio']['monto'])) {
       $precio = $precio_c['Precio']['monto'];
     }
-    $total_b = $cantidad*$precio;
+    $total_b = $cantidad * $precio;
     $literaltotal = $this->Montoliteral->getMontoLiteral($total_b);
-    foreach($chips as $ch){
+    foreach ($chips as $ch) {
       $this->Chip->id = $ch['Chip']['id'];
       $dchip['pagado'] = 1;
       $this->Chip->save($dchip);
     }
-    $distribuidor = $this->User->find('first',array(
+    $distribuidor = $this->User->find('first', array(
       'recursive' => 0,
       'conditions' => array('User.id' => $idDistribuidor),
       'fields' => array('Persona.*')
     ));
-    $this->set(compact('primer_chip','ultimo_chip','cantidad','precio','literaltotal','total_b','distribuidor'));
+    $this->set(compact('primer_chip', 'ultimo_chip', 'cantidad', 'precio', 'literaltotal', 'total_b', 'distribuidor'));
     //$this->Session->setFlash('Se registro el cambio!!','msgbueno');
     //$this->redirect($this->referer());
   }
-  public function cambia_nopagado($idExcel = null,$fecha = null,$idDistribuidor = null){
-    $chips = $this->Chip->find('all',array(
+
+  public function cambia_nopagado($idExcel = null, $fecha = null, $idDistribuidor = null) {
+    $chips = $this->Chip->find('all', array(
       'recursive' => -1,
       'conditions' => array(
         'Chip.excel_id' => $idExcel,
@@ -1211,20 +1213,47 @@ class ChipsController extends AppController {
       ),
       'fields' => array('Chip.id')
     ));
-    foreach($chips as $ch){
+    foreach ($chips as $ch) {
       $this->Chip->id = $ch['Chip']['id'];
       $dchip['pagado'] = 0;
       $this->Chip->save($dchip);
     }
-    $this->Session->setFlash('Se registro el cambio!!','msgbueno');
+    $this->Session->setFlash('Se registro el cambio!!', 'msgbueno');
     $this->redirect($this->referer());
   }
-  
-  public function eliminar_ac($idExcel = null){
+
+  public function eliminar_ac($idExcel = null) {
     $this->Excel->delete($idExcel);
     $this->Activado->deleteAll(array('excel_id' => $idExcel));
-    $this->Session->setFlash("Se elimino correctamente el excel!!",'msgbueno');
+    $this->Session->setFlash("Se elimino correctamente el excel!!", 'msgbueno');
     $this->redirect($this->referer());
+  }
+
+  public function get_num_venciendo() {
+    /*$chip_pr = $this->Chip->find('first',array(
+      'recursive' => -1,
+      'fields' => array('DATE_ADD(Chip.fecha, INTERVAL 60 DAY) as nueva_fecha')
+    ));
+    debug($chip_pr);exit;*/
+
+    $dia_actual = date('Y-m-d');
+    $dia_20 = date('Y-m-d', strtotime($dia_actual . ' -20 day'));
+    //debug($dia_20);exit;
+
+    $sql3 = "(IF(EXISTS(SELECT id FROM activados ac WHERE ac.phone_number = Chip.telefono),1,0))";
+    $this->Chip->virtualFields = array(
+      'activado' => "CONCAT($sql3)"
+    );
+    
+    $condiciones = array();
+    $condiciones['DATE_ADD(Chip.fecha, INTERVAL 60 DAY) >='] = $dia_20;
+    $condiciones['Chip.activado'] = 0;
+    //debug($condiciones);exit;
+    $datos = $this->Chip->find('count', array(
+      'conditions' => $condiciones
+    ));
+    return $datos;
+    //debug($datos);exit;
   }
 
 }
