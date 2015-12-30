@@ -48,15 +48,16 @@
                           <?php //$ajaxv = 'openAjax(' . $usu['User']['id'] . ')' ?>
                           <?php //echo $this->Html->image("iconos/menu.png", array('onclick' => $ajaxv));   ?>
                           <?php //echo $this->Html->link($this->Html->image("iconos/editar.png", array("alt" => 'Editar', 'title' => 'editar')), array('action' => 'editar', $usu['User']['id']), array('escape' => false));  ?>                          
-                          <a href="<?php echo $this->Html->url(array('action' => 'editar', $usu['User']['id'])); ?>" class="button orange-gradient compact icon-pencil">Editar</a>
+                          <a href="<?php echo $this->Html->url(array('action' => 'editar', $usu['User']['id'])); ?>" class="button orange-gradient compact icon-pencil" title="Editar"></a>
                           <?php if ($usu['User']['group_id'] == 2): ?>
-                            <?php echo $this->Html->link('Retorno', array('controller' => 'Almacenes', 'action' => 'devuelto', $usu['User']['persona_id']), array('class' => 'button blue-gradient compact icon-mailbox')); ?>
-                            <a href="javascript:" class="button green-gradient compact icon-page-list" onclick="precios_productos('<?php echo $usu['User']['id'] ?>')">Rutas</a>
+                            <?php echo $this->Html->link('', array('controller' => 'Almacenes', 'action' => 'devuelto', $usu['User']['persona_id']), array('class' => 'button blue-gradient compact icon-mailbox','title' => 'devueltos')); ?>
+                          <?php echo $this->Html->link('Entregas', array('controller' => 'Almacenes', 'action' => 'listaentregas', $usu['User']['persona_id'],0), array('class' => 'button green-gradient compact icon-mailbox','title' => 'Entregas')); ?>
+                          <a href="javascript:" class="button black-gradient compact icon-page-list" onclick="precios_productos('<?php echo $usu['User']['id'] ?>')" title="Rutas"></a>
                           <?php endif; ?>
-                          <a href="<?php echo $this->Html->url(array('action' => 'delete', $usu['User']['id'])); ?>" onclick="if (confirm('Desea eliminar realmente a '+'<?php echo $nombre?>')) {
+                          <a href="<?php echo $this->Html->url(array('action' => 'delete', $usu['User']['id'])); ?>" title="Eliminar" onclick="if (confirm('Desea eliminar realmente a '+'<?php echo $nombre?>')) {
                                     return true;
                                 }
-                                return false;" class="button red-gradient compact icon-cross-round">Elim</a>
+                                return false;" class="button red-gradient compact icon-cross-round"></a>
                       </td>
 
                   </tr> 

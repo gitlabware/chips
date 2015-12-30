@@ -23,6 +23,7 @@ class VentasController extends AppController {
       'recursive' => -1,
       'conditions' => array('Ventasdistribuidore.persona_id' => $idPersona, 'Ventasdistribuidore.fecha' => $fecha)
     ));
+    //debug($venta);exit;
     if (!empty($venta)) {
       $dventa['id'] = $venta['Ventasdistribuidore']['id'];
     }

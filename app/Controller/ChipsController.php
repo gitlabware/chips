@@ -564,7 +564,9 @@ class ChipsController extends AppController {
     //debug($this->data);
   }
 
-  public function asigna_distrib() {
+  public function asigna_distrib($idUser = null) {
+
+    $this->request->data['Dato']['distribuidor_id'] = $idUser;
     $sql2 = "SELECT fecha_entrega_d FROM chips WHERE distribuidor_id = User.id ORDER BY fecha_entrega_d DESC LIMIT 1";
     $sql = "SELECT COUNT(*) FROM chips ch,activados ac WHERE ch.telefono = ac.phone_number AND ch.distribuidor_id = User.id AND ch.fecha_entrega_d = ($sql2)";
     $this->User->virtualFields = array(
@@ -1230,11 +1232,11 @@ class ChipsController extends AppController {
   }
 
   public function get_num_venciendo() {
-    /*$chip_pr = $this->Chip->find('first',array(
+    /* $chip_pr = $this->Chip->find('first',array(
       'recursive' => -1,
       'fields' => array('DATE_ADD(Chip.fecha, INTERVAL 60 DAY) as nueva_fecha')
-    ));
-    debug($chip_pr);exit;*/
+      ));
+      debug($chip_pr);exit; */
 
     $dia_actual = date('Y-m-d');
     $dia_20 = date('Y-m-d', strtotime($dia_actual . ' -20 day'));
@@ -1244,7 +1246,7 @@ class ChipsController extends AppController {
     $this->Chip->virtualFields = array(
       'activado' => "CONCAT($sql3)"
     );
-    
+
     $condiciones = array();
     $condiciones['DATE_ADD(Chip.fecha, INTERVAL 60 DAY) >='] = $dia_20;
     $condiciones['Chip.activado'] = 0;
@@ -1254,6 +1256,52 @@ class ChipsController extends AppController {
     ));
     return $datos;
     //debug($datos);exit;
+  }
+
+  public function get_num_chips_dist($fecha_ini = null, $fecha_fin = null, $idDistribuidor = null) {
+
+    $sql = "(SELECT COUNT(chips.id) FROM chips WHERE chips.distribuidor_id = $idDistribuidor AND chips.fecha_entrega_d >= '$fecha_ini' AND chips.fecha_entrega_d <= '$fecha_fin' AND iSNULL(chips.cliente_id) GROUP BY chips.distribuidor_id)";
+    $this->Chip->virtualFields = array(
+      'ingresado' => "IF(ISNULL($sql),0,$sql)"
+    );
+    $chips = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d <=' => $fecha_fin, 'Chip.cliente_id' => NULL),
+      'group' => array('Chip.distribuidor_id'),
+      'fields' => array('COUNT(Chip.id) AS total_S', 'Chip.ingresado')
+    ));
+
+    /* debug($chips);
+      exit; */
+    return $chips;
+  }
+
+  public function get_precios_ven() {
+    $precios = $this->Precio->find('all', array(
+      'recursive' => -1,
+      'conditions' => array(
+        'OR' => array(
+          array('Precio.descripcion LIKE' => 'Chips'),
+          array('Precio.descripcion LIKE' => 'Chip Distribuidor')
+        )
+      )
+    ));
+
+    return $precios;
+  }
+
+  public function get_num_vent_d($fecha_ini = null, $fecha_fin = null, $idDistribuidor = null, $precio = null) {
+    $chips = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d >=' => $fecha_ini, 'Chip.fecha_entrega_d <=' => $fecha_fin, 'Chip.cliente_id' => NULL, 'Chip.precio_d' => $precio),
+      'group' => array('Chip.distribuidor_id'),
+      'fields' => array('COUNT(Chip.id) AS monto_v')
+    ));
+    if(!empty($chips)){
+      return $chips[0][0]['monto_v'];
+    }else{
+      return 0;
+    }
   }
 
 }

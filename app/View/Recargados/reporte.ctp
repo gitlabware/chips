@@ -124,7 +124,7 @@
                   <td><?php echo $rec['Porcentaje']['nombre'] ?></td>
                   <?php
                   $total_rec = $rec['Recargado']['salida'] + ($rec['Recargado']['salida'] * ((float) $rec['Porcentaje']['nombre'] / 100));
-                  $total_total = $total_tota + $total_rec;
+                  $total_total = $total_total + $total_rec;
                   ?>
                   <td><?php echo $total_rec ?></td>
               </tr>

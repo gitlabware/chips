@@ -21,7 +21,7 @@ class AlmacenesController extends AppController {
     'Detalle', 'User', 'Deposito', 'Movimientosrecarga', 'Sucursal',
     'Banco', 'Ventascelulare', 'Pedido', 'Productosprecio',
     'Devuelto', 'Recargado',
-    'Totale', 'Excel', 'Distribucione'
+    'Totale', 'Excel', 'Distribucione','Porcentaje'
   );
   public $components = array('Session', 'Fechasconvert', 'RequestHandler', 'DataTable');
   public $layout = 'viva';
@@ -148,10 +148,29 @@ class AlmacenesController extends AppController {
     $pedidos = array();
 
     $condiciones = array();
+    $nombre = "";
     if ($almacen == 1) {
       $condiciones['Totale.almacene_id'] = $idPersona;
     } else {
       $condiciones['Totale.persona_id'] = $idPersona;
+      $distribuidor = $this->User->find('first', array(
+        'recursive' => 0,
+        'fields' => array('User.id', 'Persona.nombre', 'Persona.ap_paterno', 'Persona.ap_materno'),
+        'conditions' => array('User.persona_id' => $idPersona)
+      ));
+      /* debug($distribuidor);
+        exit; */
+      $nombre = " a " . $distribuidor['Persona']['nombre'] . " " . $distribuidor['Persona']['ap_paterno'] . " " . $distribuidor['Persona']['ap_materno'];
+      $ultima = $this->Pedido->find('first', array(
+        'fields' => array('Pedido.numero'),
+        'conditions' => array('Pedido.distribuidor_id' => $distribuidor['User']['id']),
+        'order' => 'Pedido.id DESC'
+      ));
+      if (!empty($ultima)) {
+        $pedidos = $this->Pedido->find('all', array(
+          'conditions' => array('Pedido.distribuidor_id' => $distribuidor['User']['id'], 'Pedido.numero' => $ultima['Pedido']['numero'])
+        ));
+      }
     }
     $this->Totale->virtualFields = array(
       'marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)"
@@ -161,18 +180,8 @@ class AlmacenesController extends AppController {
       'conditions' => $condiciones,
       'fields' => array('Producto.nombre', 'Producto.tipo_producto', 'Totale.marca', 'Totale.total', 'Totale.producto_id', 'Producto.marca_id')
     ));
-    $idDistribuidor = $this->User->find('first', array('fields' => array('User.id'), 'conditions' => array('User.persona_id' => $idPersona)));
-    $ultima = $this->Pedido->find('first', array(
-      'fields' => array('Pedido.numero'),
-      'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id']),
-      'order' => 'Pedido.id DESC'
-    ));
-    if (!empty($ultima)) {
-      $pedidos = $this->Pedido->find('all', array(
-        'conditions' => array('Pedido.distribuidor_id' => $idDistribuidor['User']['id'], 'Pedido.numero' => $ultima['Pedido']['numero'])
-      ));
-    }
-    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos'));
+
+    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos','distribuidor'));
   }
 
   public function ajaxrepartir($idPersona = null, $almacen = null) {
@@ -774,20 +783,20 @@ class AlmacenesController extends AppController {
 
   public function principal() {
     $idAlmacen_cen = $this->get_id_alm_cent();
-    /*$productos_1 = $this->Producto->find('all', array(
+    /* $productos_1 = $this->Producto->find('all', array(
       'recursive' => -1,
       'conditions' => array('Producto.tipo_producto !=' => 'CELULARES'),
       'fields' => array('Producto.id', 'Producto.nombre')
-    ));*/
-    
-    $productos_1 = $this->Totale->find('all',array(
+      )); */
+
+    $productos_1 = $this->Totale->find('all', array(
       'recursive' => 0,
       'conditions' => array('Producto.tipo_producto !=' => 'CELULARES'),
       'fields' => array('Producto.id', 'Producto.nombre'),
       'order' => array('Totale.total DESC'),
       'limit' => 5
     ));
-    
+
     $productos_2 = $this->Producto->find('all', array(
       'recursive' => -1,
       'conditions' => array('Producto.tipo_producto' => 'CELULARES'),
@@ -803,11 +812,11 @@ class AlmacenesController extends AppController {
     $fecha_inicial = date('Y-m-01');
     //debug($fecha_inicial);exit;
     $fecha_final = date('Y-m-d');
-    
-    
-    $productos_me = $this->Totale->find('all',array(
+
+
+    $productos_me = $this->Totale->find('all', array(
       'recursive' => 0,
-      'conditions' => array('Totale.almacene_id' => $idAlmacen_cen,'Producto.tipo_producto !=' => 'CELULARES'),
+      'conditions' => array('Totale.almacene_id' => $idAlmacen_cen, 'Producto.tipo_producto !=' => 'CELULARES'),
       'fields' => array('Producto.*'),
       'limit' => 5,
       'order' => array('Totale.total ASC')
@@ -816,15 +825,15 @@ class AlmacenesController extends AppController {
       'marca' => "(SELECT marcas.nombre FROM marcas WHERE marcas.id = Producto.marca_id)",
       'color' => "(SELECT colores.nombre FROM colores WHERE colores.id = Producto.colore_id)"
     );
-    $celulares_me = $this->Totale->find('all',array(
+    $celulares_me = $this->Totale->find('all', array(
       'recursive' => 0,
-      'conditions' => array('Totale.almacene_id' => $idAlmacen_cen,'Producto.tipo_producto' => 'CELULARES'),
-      'fields' => array('Producto.*','Totale.*'),
+      'conditions' => array('Totale.almacene_id' => $idAlmacen_cen, 'Producto.tipo_producto' => 'CELULARES'),
+      'fields' => array('Producto.*', 'Totale.*'),
       'limit' => 5,
       'order' => array('Totale.total ASC')
     ));
-    
-    $this->set(compact('productos_me','celulares_me','productos_1', 'almacenes_1', 'productos_2', 'almacenes_3','fecha_final','fecha_inicial'));
+
+    $this->set(compact('productos_me', 'celulares_me', 'productos_1', 'almacenes_1', 'productos_2', 'almacenes_3', 'fecha_final', 'fecha_inicial'));
   }
 
   public function get_vent_mes($idProducto = null, $mes = null) {
@@ -1582,7 +1591,7 @@ class AlmacenesController extends AppController {
       return 0;
     }
   }
-  
+
   public function get_ventat_cel_alm($idAlmacen = null, $idProducto = null) {
     $ven_total = $this->Ventascelulare->find('all', array(
       'recursive' => -1,
@@ -1595,6 +1604,98 @@ class AlmacenesController extends AppController {
     } else {
       return 0;
     }
+  }
+
+  public function ajax_ventas_dist() {
+    /* debug($this->request->data);
+      exit; */
+    $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+    $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+    $persona = $this->request->data['Dato']['persona_id'];
+    $persona_sql = "mo.persona_id = $persona AND";
+    $persona_sql2 = "mov.persona_id = $persona AND";
+    $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE $persona_sql Producto.id = mo.producto_id LIMIT 1)";
+    $sql2 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE $persona_sql2 mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+
+    $this->Productosprecio->virtualFields = array(
+      'total_s' => "CONCAT($sql1-(IF(ISNULL($sql2),0,$sql2)))"
+    );
+    $productos = $this->Productosprecio->find('all', array(
+      'recurisve' => 0,
+      'conditions' => array(
+        'Productosprecio.tipousuario_id' => 3,
+        'Producto.id !=' => NULL
+      ),
+      'fields' => array('Producto.nombre', 'Producto.id', 'total_s'),
+      'group' => 'Producto.id'
+    ));
+    $porcentajes = $this->Porcentaje->find('all',array(
+      'recursive' => -1,
+      'fields' => array('Porcentaje.nombre','Porcentaje.id')
+    ));
+    $distribuidor = $this->User->find('first',array(
+      'recurisve' => -1,
+      'conditions' => array('User.persona_id' => $persona),
+      'fields' => array('User.id')
+    ));
+    //debug($productos);exit;
+    $this->set(compact('productos', 'fecha_ini', 'fecha_fin', 'persona','porcentajes','distribuidor'));
+  }
+
+  public function get_ventas_dist($fecha_ini = null, $fecha_fin = null, $persona = null, $idProducto = null) {
+    //$persona = $this->request->data['Dato']['persona_id'];
+    $condiciones1 = array();
+    $condiciones1['Movimiento.persona_id'] = $persona;
+    $condiciones1['Movimiento.producto_id'] = $idProducto;
+    $persona_sql = "mo.persona_id = $persona AND";
+    $persona_sql2 = "mov.persona_id = $persona AND";
+    $condiciones1['Movimiento.salida !='] = NULL;
+    $condiciones1['Movimiento.created >='] = $fecha_ini;
+    $condiciones1['Movimiento.created <='] = $fecha_fin;
+    $datos = array();
+    $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE $persona_sql Producto.id = mo.producto_id LIMIT 1)";
+    $sql2 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE $persona_sql2 mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+
+    $this->Movimiento->virtualFields = array(
+      'total_s' => "CONCAT($sql1-(IF(ISNULL($sql2),0,$sql2)))"
+    );
+    $datos = $this->Movimiento->find('all', array(
+      'recursive' => 0, 'order' => 'Movimiento.producto_id',
+      'conditions' => $condiciones1,
+      'group' => array('Movimiento.producto_id'),
+      'fields' => array('Producto.nombre', 'SUM(Movimiento.ingreso) entregado', 'Producto.id', 'Movimiento.total_s')
+    ));
+    return $datos;
+  }
+
+  public function get_precios_prod($fecha_ini = null, $fecha_fin = null, $persona = null, $idProducto = null) {
+    /* $precios = $this->Productosprecio->find('all',array(
+      'recursive' => -1,
+      'conditions' => array('Productosprecio.producto_id' => $idProducto)
+      )); */
+    //debug()
+    $sql4 = "(SELECT SUM(Movimiento.salida) vendidos FROM movimientos Movimiento WHERE Movimiento.persona_id = $persona AND Movimiento.created >= '$fecha_ini' AND Movimiento.created <= '$fecha_fin' AND Movimiento.producto_id = $idProducto AND Movimiento.precio_uni = Productosprecio.precio)";
+    $sql5 = "(SELECT (Movimiento.precio_uni*SUM(Movimiento.salida)) precio_total FROM movimientos Movimiento WHERE Movimiento.persona_id = $persona AND Movimiento.created >= '$fecha_ini' AND Movimiento.created <= '$fecha_fin' AND Movimiento.producto_id = $idProducto AND Movimiento.precio_uni = Productosprecio.precio)";
+    $sql3 = "SELECT Productosprecio.precio , (IF(ISNULL($sql4),0,$sql4)) vendidos, (IF(ISNULL($sql5),0,$sql5)) precio_total FROM productosprecios Productosprecio WHERE Productosprecio.producto_id = $idProducto AND Productosprecio.tipousuario_id = 3 GROUP BY Productosprecio.precio";
+    $precios = $this->Movimiento->query($sql3);
+    //debug($precios);exit;
+    return $precios;
+  }
+  
+  public function ajax_venta($fecha_ini = null, $fecha_fin = null, $persona = null, $idProducto = null){
+    $this->layout = 'ajax';
+    //$this->request->data['Movimiento']['created'] = date('Y-m-d');
+    $precios = $this->Productosprecio->find('all',array(
+      'recursive' => -1,
+      'conditions' => array('Productosprecio.producto_id' => $idProducto,'Productosprecio.tipousuario_id' => 3),
+      'fields' => array('Productosprecio.precio')
+    ));
+    $producto = $this->Producto->find('first',array(
+      'recursive' => -1,
+      'conditions' => array('Producto.id' => $idProducto),
+      'fields' => array('Producto.nombre')
+    ));
+    $this->set(compact('producto','precios','idProducto','persona','fecha_ini','fecha_fin'));
   }
 
 }

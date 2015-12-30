@@ -24,13 +24,24 @@ class VentasdistribuidorController extends AppController {
     'Tiposobservacione',
     'Deposito',
     'Recargado',
-    'Listacliente', 'User', 'Rutasusuario', 'Totale','Precio');
+    'Listacliente', 'User', 'Rutasusuario', 'Totale', 'Precio');
   public $layout = 'vivadistribuidor';
   public $components = array('RequestHandler', 'Session', 'Acl', 'Auth', 'DataTable');
 
   function beforeFilter() {
     parent::beforeFilter();
     //$this->Auth->allow();
+  }
+
+  function respond($message = null, $json = false) {
+    if ($message != null) {
+      if ($json == true) {
+        $this->RequestHandler->setContent('json', 'application/json');
+        $message = json_encode($message);
+      }
+      $this->set('message', $message);
+    }
+    $this->render('message');
   }
 
   public function formularioventapormayor() {
@@ -356,6 +367,46 @@ class VentasdistribuidorController extends AppController {
     //$this->registra_recarga();
     $this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
     $this->redirect(array('action' => 'clientes'));
+  }
+
+  public function registra_venta_mayor_ajax($persona = null) {
+    /* debug($this->request->data);
+      exit; */
+    $array['correcto'] = '';
+    $array['incorrecto'] = '';
+    foreach ($this->request->data['Movimiento'] as $dat) {
+      $total = $this->get_total($dat['producto_id'], 0, $persona);
+      if ($dat['salida'] > 0) {
+        if ($dat['salida'] > $total) {
+          //$this->Session->write('form_venta_mayor', $this->request->data);
+          $array['incorrecto'] = 'Solo hay ' . $total . ' unidades de ' . $dat['nombre_prod'] . '!!!';
+          //$this->Session->setFlash('Solo hay ' . $total . ' unidades de ' . $dat['nombre_prod'] . '!!!', 'msgerror');
+          //$this->redirect(array('action' => 'formulario', $this->request->data['Ventastienda']['cliente_id']));
+          //$this->redirect(array('controller' => 'Almacenes','action' => 'ajax_venta',$fecha_ini,$fecha_fin,$persona,$idProducto));
+        }
+      }
+    }
+    if ($array['incorrecto'] == '') {
+      $num_transaccion = $this->get_num_trans();
+      foreach ($this->request->data['Movimiento'] as $dat) {
+        $total = $this->get_total($dat['producto_id'], 0, $persona);
+        $this->Movimiento->create();
+        //$dat['total'] = $total - $dat['salida'];
+        $dat['transaccion'] = $num_transaccion;
+        $dat['capacitacion'] = $this->request->data['Aux']['capacitacion'];
+        $dat['est_punt'] = $this->request->data['Aux']['est_punt'];
+        $this->Movimiento->save($dat);
+        if (!empty($dat['id'])) {
+          $total = $total + $dat['salida_ant'];
+        }
+        $this->set_total($dat['producto_id'], 0, $persona, ($total - $dat['salida']));
+      }
+      $array['correcto'] = 'Se registro correctamente!!!';
+    }
+    //$this->registra_recarga();
+    //$this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
+    //$this->redirect(array('action' => 'clientes'));
+    $this->respond($array, true);
   }
 
   public function get_total_dis($idProducto = null) {
@@ -1248,7 +1299,7 @@ class VentasdistribuidorController extends AppController {
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $datos['cantidad'], 'fields' => array('Chip.id'),
-        'conditions' => array('Chip.id >=' => $datos['rango_ini'],'Chip.cliente_id' => NULL, 'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
+        'conditions' => array('Chip.id >=' => $datos['rango_ini'], 'Chip.cliente_id' => NULL, 'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
       ));
       foreach ($chips as $ch) {
         $this->Chip->id = $ch['Chip']['id'];
@@ -1261,8 +1312,6 @@ class VentasdistribuidorController extends AppController {
     }
     $this->redirect(array('action' => 'chips', $datos['cliente_id']));
   }
-  
-  
 
   public function reporte_detallado_precio() {
     $fecha_ini = $this->request->data['Dato']['fecha_ini'];
@@ -1328,14 +1377,14 @@ class VentasdistribuidorController extends AppController {
 
   public function entregados() {
     $entregados = $this->Chip->find('all', array(
-      'fields' => array('Chip.fecha_entrega_d', 'Cliente.nombre', 'Cliente.id', 'Cliente.num_registro', 'COUNT(*) as num_chips','Chip.pagado','Chip.precio_d')
+      'fields' => array('Chip.fecha_entrega_d', 'Cliente.nombre', 'Cliente.id', 'Cliente.num_registro', 'COUNT(*) as num_chips', 'Chip.pagado', 'Chip.precio_d')
       , 'conditions' => array('Chip.distribuidor_id' => $this->Session->read('Auth.User.id'), 'Chip.cliente_id !=' => NULL)
       , 'group' => array('Chip.fecha_entrega_d', 'cliente_id')
       , 'order' => 'fecha_entrega_d DESC'
       , 'LIMIT' => 50
     ));
     $precio_chip = $this->Precio->findByid(3);
-    $this->set(compact('entregados','precio_chip'));
+    $this->set(compact('entregados', 'precio_chip'));
   }
 
   public function modifica_entregas() {
@@ -1565,10 +1614,10 @@ class VentasdistribuidorController extends AppController {
     }
     $this->redirect(array('action' => 'clientes'));
   }
-  
+
   public function asignados() {
     $entregados = $this->Chip->find('all', array(
-      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips','Chip.pagado','Chip.precio_d')
+      'fields' => array('Chip.fecha_entrega_d', 'Chip.distribuidor_id', 'COUNT(*) as num_chips', 'Chip.pagado', 'Chip.precio_d')
       , 'recursive' => 0
       , 'conditions' => array('Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
       , 'group' => array('Chip.fecha_entrega_d')
@@ -1577,14 +1626,14 @@ class VentasdistribuidorController extends AppController {
     ));
     //debug($entregados);exit;
     $precio_chip = $this->Precio->findByid(3);
-    /*debug($precio_chip);exit;*/
-    $this->set(compact('entregados','excel','precio_chip'));
+    /* debug($precio_chip);exit; */
+    $this->set(compact('entregados', 'excel', 'precio_chip'));
   }
-  
-  public function detalle_asignados($fecha = null){
+
+  public function detalle_asignados($fecha = null) {
     $entregados = $this->Chip->find('all', array(
       'recursive' => -1,
-      'conditions' => array('Chip.fecha_entrega_d' => $fecha,'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
+      'conditions' => array('Chip.fecha_entrega_d' => $fecha, 'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
     ));
     $this->set(compact('entregados', 'fecha'));
   }

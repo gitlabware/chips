@@ -297,16 +297,30 @@ class RecargadosController extends AppController {
   public function reporte() {
     $recargas = array();
     if (!empty($this->request->data)) {
-      
+
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
-      $recargas = $this->Recargado->find('all',array(
+      $recargas = $this->Recargado->find('all', array(
         'recursive' => 0,
-        'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini,'DATE(Recargado.created) <=' => $fecha_fin)
+        'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin)
       ));
-      
     }
     $this->set(compact('recargas'));
+  }
+
+  public function get_recargas_dist($fecha_ini = null, $fecha_fin = null, $idPersona = null, $idPorcentaje = null) {
+    
+    $recargas = $this->Recargado->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin, 'Recargado.persona_id' => $idPersona, 'Recargado.porcentaje_id' => $idPorcentaje),
+      'group' => array('Recargado.porcentaje_id'),
+      'fields' => array('SUM(Recargado.monto) monto_total')
+    ));
+    if(!empty($recargas)){
+      return $recargas[0][0]['monto_total'];
+    }else{
+      return 0;
+    }
   }
 
 }
