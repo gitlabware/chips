@@ -1,9 +1,9 @@
 <h3 id="tit-entregas">
-    Fomulario de entregas Chips
+    Fomulario de entregas Chips <?php echo $fecha_ini ?>
 </h3>
 
 <div class="twelve-columns" id="mod-normal">
-    <?php echo $this->Form->create('Chip', array('class' => 'columns', 'id' => 'form-reg', 'url' => 'Chips/registra_venta_mayor_ajax')) ?>
+    <?php echo $this->Form->create('Chip', array('class' => 'columns', 'id' => 'form-reg', 'url' => array('controller' => 'Chips', 'action' => 'registra_ventachips'))) ?>
     <fieldset class="fieldset">
 
         <legend class="legend">
@@ -33,6 +33,32 @@
     <?php echo $this->Form->end(); ?>
 </div>
 
+<br>
+<div class="with-padding">
+    <table class="simple-table responsive-table" id="sorting-example2">
+        <thead>
+            <tr>
+                <th>Creado</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($ventas as $mov): ?>
+              <tr>
+                  <td><?php echo $mov['Ventaschip']['created']; ?></td>
+                  <td><?php echo $mov['Ventaschip']['precio']; ?></td>
+                  <td><?php echo $mov['Ventaschip']['cantidad']; ?></td>
+                  <td>
+                      <?php echo $this->Html->link("Eliminar", array('action' => 'elimina_chip_dis', $mov['Ventaschip']['id']), array('class' => 'tag red-bg', 'confirm' => 'Esta seguro de eliminar el registro???')) ?>
+                  </td>
+              </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
+
 <script>
   $('.clase-cantidad').keyup(function () {
       var cantidad_t = 0;
@@ -58,40 +84,34 @@
 
   }
 
-  $("#form-reg").submit(function (e)
-  {
-      var postData = $(this).serializeArray();
-      var formURL = '<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'registra_ventachips')); ?>';
-      $.ajax(
-              {
-                  url: formURL,
-                  type: "POST",
-                  data: postData,
-                  /*beforeSend:function (XMLHttpRequest) {
-                   alert("antes de enviar");
-                   },
-                   complete:function (XMLHttpRequest, textStatus) {
-                   alert('despues de enviar');
-                   },*/
-                  success: function (data, textStatus, jqXHR)
-                  {
-                      if ($.parseJSON(data).correcto != '') {
-                          mensaje_nota('Excelente!!', $.parseJSON(data).correcto);
-                      } else {
-                          mensaje_nota('Error!!', $.parseJSON(data).incorrecto);
-                      }
-
-                      $('#idmodal').load('<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'ajax_venta', $fecha_ini, $fecha_fin, $persona, $idProducto)); ?>');
-                      //data: return data from server
-                      //$("#div-ventas").html(data);
-                  },
-                  error: function (jqXHR, textStatus, errorThrown)
-                  {
-                      //if fails   
-                      alert("error");
-                  }
-              });
-      e.preventDefault(); //STOP default action
-      //e.unbind(); //unbind. to stop multiple form submit.
-  });
+  /* $("#form-reg").submit(function (e)
+   {
+   var postData = $(this).serializeArray();
+   var formURL = '<?php //echo $this->Html->url(array('controller' => 'Chips', 'action' => 'registra_ventachips'));  ?>';
+   $.ajax(
+   {
+   url: formURL,
+   type: "POST",
+   data: postData,
+   success: function (data, textStatus, jqXHR)
+   {
+   if ($.parseJSON(data).correcto != '') {
+   mensaje_nota('Excelente!!', $.parseJSON(data).correcto);
+   } else {
+   mensaje_nota('Error!!', $.parseJSON(data).incorrecto);
+   }
+   
+   $('#idmodal').load('<?php //echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'ajax_venta', $fecha_ini, $fecha_fin, $persona, $idProducto));  ?>');
+   //data: return data from server
+   //$("#div-ventas").html(data);
+   },
+   error: function (jqXHR, textStatus, errorThrown)
+   {
+   //if fails   
+   alert("error");
+   }
+   });
+   e.preventDefault(); //STOP default action
+   //e.unbind(); //unbind. to stop multiple form submit.
+   });*/
 </script>

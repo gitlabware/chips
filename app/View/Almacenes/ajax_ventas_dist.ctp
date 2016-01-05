@@ -166,34 +166,46 @@
 <?php $pagos = $this->requestAction(array('controller' => 'Cajachicas', 'action' => 'get_pagos_dist', $fecha_ini, $fecha_fin, $distribuidor['User']['id'])) ?>
 
 <?php if (!empty($pagos)): ?>
-  <table class="simple-table responsive-table" style="width: 50%;">
-      <tr>
-          <td>TOTAL VENTAS</td>
-          <td><?php echo $total_bs + $total_recarga ?> Bs</td>
-      </tr>
-      <?php foreach ($pagos['bancos'] as $ba): ?>
-        <tr>
-            <td><?php echo $ba['nombre'] ?> Bs</td>
-            <td><?php echo $ba['monto'] ?> Bs</td>
-        </tr>
-      <?php endforeach; ?>
-      <tr>
-          <td>FALTANTE</td>
-          <td><?php echo $pagos['faltante'] ?> Bs</td>
-      </tr>
-      <tr>
-          <td>OTROS INGRESOS</td>
-          <td><?php echo $pagos['otro_ingreso'] ?> Bs</td>
-      </tr>
-      <tr>
-          <td>OBSERVACIONES</td>
-          <td><?php echo $pagos['observaciones'] ?></td>
-      </tr>
-      <tr>
-          <td>TOTAL</td>
-          <td><?php echo $total_bs + $total_recarga + $pagos['otro_ingreso'] ?> Bs</td>
-      </tr>
-  </table>
+  <div class="columns">
+      <div class="six-columns">
+          <table class="simple-table responsive-table" style="width: 100%;">
+              <tr>
+                  <td>TOTAL VENTAS</td>
+                  <td><?php echo $total_bs + $total_recarga ?> Bs</td>
+              </tr>
+              <?php foreach ($pagos['bancos'] as $ba): ?>
+                <tr>
+                    <td><?php echo $ba['nombre'] ?> Bs</td>
+                    <td><?php echo $ba['monto'] ?> Bs</td>
+                </tr>
+              <?php endforeach; ?>
+              <tr>
+                  <td>FALTANTE</td>
+                  <td><?php echo $pagos['faltante'] ?> Bs</td>
+              </tr>
+              <tr>
+                  <td>OTROS INGRESOS</td>
+                  <td><?php echo $pagos['otro_ingreso'] ?> Bs</td>
+              </tr>
+              <tr>
+                  <td>OBSERVACIONES</td>
+                  <td><?php echo $pagos['observaciones'] ?></td>
+              </tr>
+              <tr>
+                  <td>TOTAL</td>
+                  <td><?php echo $total_bs + $total_recarga + $pagos['otro_ingreso'] ?> Bs</td>
+              </tr>
+          </table>
+      </div>
+      <div class="six-columns">
+          <p class="block-label button-height">
+              <label for="block-label-1" class="label">&nbsp;</label>
+              <a class="button black-gradient full-width"  href="<?php echo $this->Html->url(array('action' => 'reporte_ventas_dist',$persona,$fecha_ini,$fecha_fin));?>" target="_blank">IMPRIMIR</a>
+            
+          </p>
+      </div>
+  </div>
+
 <?php endif; ?>
 
 <script>

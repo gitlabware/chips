@@ -946,6 +946,21 @@ class AlmacenesController extends AppController {
     $this->redirect($this->referer());
   }
 
+  public function elimina_venta_dis($idMovimiento = null) {
+    $movimiento = $this->Movimiento->find('first', array(
+      'recursive' => 0,
+      'conditions' => array('Movimiento.id' => $idMovimiento),
+      'fields' => array('Movimiento.salida', 'Almacene.id', 'Almacene.central', 'Movimiento.producto_id', 'Movimiento.persona_id')
+    ));
+    //debug($movimiento);exit;
+    $total_p = $this->get_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id']);
+    //debug($total_p);exit;
+    $this->Movimiento->delete($idMovimiento);
+    $this->set_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id'], ($total_p+$movimiento['Movimiento']['salida']));
+    $this->Session->setFlash("Se ha eliminado correctamente el movimiento!!",'msgbueno');
+    $this->redirect($this->referer());
+  }
+
   public function quita_ent_cel($numTransaccion = NULL) {
     $movimiento = $this->Ventascelulare->find('first', array(
       'recursive' => 0,
@@ -1695,10 +1710,20 @@ class AlmacenesController extends AppController {
       'conditions' => array('Producto.id' => $idProducto),
       'fields' => array('Producto.nombre')
     ));
-    $this->set(compact('producto', 'precios', 'idProducto', 'persona', 'fecha_ini', 'fecha_fin'));
+    $movimientos = $this->Movimiento->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Movimiento.created' => $fecha_ini, 'Movimiento.persona_id' => $persona, 'Movimiento.salida !=' => 0, 'Movimiento.salida !=' => NULL, 'Movimiento.producto_id' => $idProducto),
+      'fields' => array('Movimiento.id', 'Movimiento.modified', 'Movimiento.precio_uni', 'Movimiento.salida')
+    ));
+    $this->set(compact('producto', 'precios', 'idProducto', 'persona', 'fecha_ini', 'fecha_fin', 'movimientos'));
   }
 
-  public function reporte_ventas_dist() {
+  public function reporte_ventas_dist($persona = null,$fecha_ini = null,$fecha_fin = null) {
+    if(!empty($persona)){
+      $this->request->data['Dato']['fecha_ini'] = $fecha_ini;
+      $this->request->data['Dato']['fecha_fin'] = $fecha_fin;
+      $this->request->data['Dato']['persona_id'] = $persona;
+    }
     if (!empty($this->request->data)) {
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
@@ -1725,21 +1750,21 @@ class AlmacenesController extends AppController {
         'fields' => array('Porcentaje.nombre', 'Porcentaje.id')
       ));
       $distribuidor = $this->User->find('first', array(
-        'recurisve' => -1,
+        'recurisve' => 0,
         'conditions' => array('User.persona_id' => $persona),
-        'fields' => array('User.id')
+        'fields' => array('User.id','Persona.*')
       ));
     }
     $this->User->virtualFields = array(
       'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
     );
-    $personas = $this->User->find('list',array(
+    $personas = $this->User->find('list', array(
       'recursive' => 0,
       'conditions' => array('User.group_id' => 2),
-      'fields' => array('Persona.id','User.nombre_completo')
+      'fields' => array('Persona.id', 'User.nombre_completo')
     ));
     //debug($productos);exit;
-    $this->set(compact('productos', 'fecha_ini', 'fecha_fin', 'persona', 'porcentajes', 'distribuidor','personas'));
+    $this->set(compact('productos', 'fecha_ini', 'fecha_fin', 'persona', 'porcentajes', 'distribuidor', 'personas'));
   }
 
 }

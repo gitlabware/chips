@@ -372,41 +372,33 @@ class VentasdistribuidorController extends AppController {
   public function registra_venta_mayor_ajax($persona = null) {
     /* debug($this->request->data);
       exit; */
-    $array['correcto'] = '';
-    $array['incorrecto'] = '';
+
     foreach ($this->request->data['Movimiento'] as $dat) {
       $total = $this->get_total($dat['producto_id'], 0, $persona);
       if ($dat['salida'] > 0) {
         if ($dat['salida'] > $total) {
-          //$this->Session->write('form_venta_mayor', $this->request->data);
-          $array['incorrecto'] = 'Solo hay ' . $total . ' unidades de ' . $dat['nombre_prod'] . '!!!';
-          //$this->Session->setFlash('Solo hay ' . $total . ' unidades de ' . $dat['nombre_prod'] . '!!!', 'msgerror');
-          //$this->redirect(array('action' => 'formulario', $this->request->data['Ventastienda']['cliente_id']));
-          //$this->redirect(array('controller' => 'Almacenes','action' => 'ajax_venta',$fecha_ini,$fecha_fin,$persona,$idProducto));
+          $this->Session->setFlash('Solo hay ' . $total . ' unidades de ' . $dat['nombre_prod'] . '!!!','msgerror');
+          $this->redirect($this->referer());
         }
       }
     }
-    if ($array['incorrecto'] == '') {
+    
+    foreach ($this->request->data['Movimiento'] as $dat) {
       $num_transaccion = $this->get_num_trans();
-      foreach ($this->request->data['Movimiento'] as $dat) {
-        $total = $this->get_total($dat['producto_id'], 0, $persona);
-        $this->Movimiento->create();
-        //$dat['total'] = $total - $dat['salida'];
-        $dat['transaccion'] = $num_transaccion;
-        $dat['capacitacion'] = $this->request->data['Aux']['capacitacion'];
-        $dat['est_punt'] = $this->request->data['Aux']['est_punt'];
-        $this->Movimiento->save($dat);
-        if (!empty($dat['id'])) {
-          $total = $total + $dat['salida_ant'];
-        }
-        $this->set_total($dat['producto_id'], 0, $persona, ($total - $dat['salida']));
+      $total = $this->get_total($dat['producto_id'], 0, $persona);
+      $this->Movimiento->create();
+      //$dat['total'] = $total - $dat['salida'];
+      $dat['transaccion'] = $num_transaccion;
+      $dat['capacitacion'] = $this->request->data['Aux']['capacitacion'];
+      $dat['est_punt'] = $this->request->data['Aux']['est_punt'];
+      $this->Movimiento->save($dat);
+      if (!empty($dat['id'])) {
+        $total = $total + $dat['salida_ant'];
       }
-      $array['correcto'] = 'Se registro correctamente!!!';
+      $this->set_total($dat['producto_id'], 0, $persona, ($total - $dat['salida']));
     }
-    //$this->registra_recarga();
-    //$this->Session->setFlash('Se registro correctamente!!!', 'msgbueno');
-    //$this->redirect(array('action' => 'clientes'));
-    $this->respond($array, true);
+    $this->Session->setFlash('Se registro correctamente!!!','msgbueno');
+    $this->redirect($this->referer());
   }
 
   public function get_total_dis($idProducto = null) {

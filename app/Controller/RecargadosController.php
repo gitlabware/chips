@@ -125,6 +125,64 @@ class RecargadosController extends AppController {
 
   public function nuevo() {
 
+    if (!empty($this->request->data['Dato'])) {
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+    } else {
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'] = date('Y-m-d');
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'] = date('Y-m-d');
+    }
+
+    $hoy = $this->Recargado;
+    $ultimo = $this->Recargado->find('first', array(
+      'recursive' => -1,
+      'order' => 'Recargado.id DESC'
+    ));
+    $movimientosHoy = $this->Recargado->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Recargado.modified >=' => $fecha_ini,'Recargado.modified <=' => $fecha_fin),
+      'order' => array('Recargado.id DESC')
+    ));
+    //debug($movimientosHoy);
+    $movimientosHoy2 = $this->Recargado->find('all', array(
+      'recursive' => 0,
+      'order' => array('Recargado.id DESC'),
+      'group' => array('Recargado.porcentaje_id'),
+      'fields' => array('Porcentaje.nombre', 'SUM(Recargado.salida) as recargados', 'SUM(Recargado.monto) as rec_porcentaje'),
+      'conditions' => array('Recargado.entrada' => 0),
+    ));
+
+    $movimientosDistribuidor = $this->Recargado->find('all', array(
+      'recursive' => 0,
+      'order' => array('Recargado.id DESC'),
+      'group' => array('Recargado.persona_id'),
+      'fields' => array('Persona.nombre', 'SUM(Recargado.salida) as recargados', 'SUM(Recargado.monto) as rec_porcentaje'),
+      'conditions' => array('Recargado.entrada' => 0),
+    ));
+
+    $ultimototal = $this->Recargado->find('first', array(
+      'recursive' => -1,
+      'order' => array('Recargado.id DESC'),
+      'fields' => array('Recargado.total')
+    ));
+    $this->set(compact('hoy', 'movimientosHoy', 'ultimo', 'movimientosHoy2', 'ultimototal', 'movimientosDistribuidor'));
+
+    $sql_p = "(SELECT recargados.total_distribuidor FROM recargados WHERE recargados.persona_id = Persona.id ORDER BY recargados.id DESC LIMIT 1)";
+    $this->User->virtualFields = array(
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno, '(',( IF( ISNULL($sql_p),0,$sql_p ) ),')')"
+    );
+    $distribuidor = $this->User->find('list', array(
+      'recursive' => 0,
+      'fields' => array('User.id', 'User.nombre_completo'),
+      'conditions' => array('Group.name' => 'Distribuidores'),
+    ));
+    $porcentaje = $this->Porcentaje->find('list', array('fields' => 'Porcentaje.nombre'));
+    //debug($distribuidor);exit;
+
+    $this->set(compact('distribuidor', 'porcentaje', 'tipo'));
+  }
+
+  public function registra_recarga() {
     if ($this->request->is('post')) {
 
       /* debug($this->request->data);
@@ -227,57 +285,15 @@ class RecargadosController extends AppController {
       $this->Recargado->create();
       if ($this->Recargado->save($this->request->data['Recargado'])) {
         $this->Session->setFlash('Registro Correctamente.', 'msgbueno');
-        return $this->redirect(array('action' => 'nuevo'));
+        return $this->redirect($this->referer());
       } else {
         $this->Session->setFlash('Registro Correctamente.', 'msgerror');
-        return $this->redirect(array('action' => 'nuevo'));
+        return $this->redirect($this->referer());
       }
     } else {
-      $hoy = $this->Recargado;
-      $ultimo = $this->Recargado->find('first', array(
-        'recursive' => -1,
-        'order' => 'Recargado.id DESC'
-      ));
-      $movimientosHoy = $this->Recargado->find('all', array(
-        'recursive' => 0,
-        'order' => array('Recargado.id DESC')
-      ));
-      //debug($movimientosHoy);
-      $movimientosHoy2 = $this->Recargado->find('all', array(
-        'recursive' => 0,
-        'order' => array('Recargado.id DESC'),
-        'group' => array('Recargado.porcentaje_id'),
-        'fields' => array('Porcentaje.nombre', 'SUM(Recargado.salida) as recargados', 'SUM(Recargado.monto) as rec_porcentaje'),
-        'conditions' => array('Recargado.entrada' => 0),
-      ));
-
-      $movimientosDistribuidor = $this->Recargado->find('all', array(
-        'recursive' => 0,
-        'order' => array('Recargado.id DESC'),
-        'group' => array('Recargado.persona_id'),
-        'fields' => array('Persona.nombre', 'SUM(Recargado.salida) as recargados', 'SUM(Recargado.monto) as rec_porcentaje'),
-        'conditions' => array('Recargado.entrada' => 0),
-      ));
-
-      $ultimototal = $this->Recargado->find('first', array(
-        'recursive' => -1,
-        'order' => array('Recargado.id DESC'),
-        'fields' => array('Recargado.total')
-      ));
-      $this->set(compact('hoy', 'movimientosHoy', 'ultimo', 'movimientosHoy2', 'ultimototal', 'movimientosDistribuidor'));
+      $this->Session->setFlash("No se ha podido registrar intente nuevamente!!", 'msgerror');
+      $this->redirect($this->referer());
     }
-    $sql_p = "(SELECT recargados.total_distribuidor FROM recargados WHERE recargados.persona_id = Persona.id ORDER BY recargados.id DESC LIMIT 1)";
-    $this->User->virtualFields = array(
-      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno, '(',( IF( ISNULL($sql_p),0,$sql_p ) ),')')"
-    );
-    $distribuidor = $this->User->find('list', array(
-      'recursive' => 0,
-      'fields' => array('User.id', 'User.nombre_completo'),
-      'conditions' => array('Group.name' => 'Distribuidores'),
-    ));
-    $porcentaje = $this->Porcentaje->find('list', array('fields' => 'Porcentaje.nombre'));
-    //debug($distribuidor);exit;
-    $this->set(compact('distribuidor', 'porcentaje', 'tipo'));
   }
 
   public function delete($id = null) {
@@ -354,44 +370,44 @@ class RecargadosController extends AppController {
     $recargado = $this->Recargado->find('first', array(
       'recursive' => -1,
       'conditions' => array('Recargado.id' => $idRecargado),
-      'fields' => array('Recargado.total', 'Recargado.monto','Recargado.entrada', 'Recargado.salida','Recargado.persona_id','Recargado.tipo')
+      'fields' => array('Recargado.total', 'Recargado.monto', 'Recargado.entrada', 'Recargado.salida', 'Recargado.persona_id', 'Recargado.tipo')
     ));
-    if($recargado['Recargado']['tipo'] == '1' && !empty($recargado['Recargado']['persona_id'])){
+    if ($recargado['Recargado']['tipo'] == '1' && !empty($recargado['Recargado']['persona_id'])) {
       //debug($recargado);exit;
       $total_u = $this->get_total($recargado['Recargado']['persona_id']);
-      if($total_u >= $recargado['Recargado']['monto']){
+      if ($total_u >= $recargado['Recargado']['monto']) {
         $total = $this->get_total(NULL);
         $this->Recargado->delete($idRecargado);
         $this->set_total(($total_u - $recargado['Recargado']['monto']), $recargado['Recargado']['persona_id']);
         $this->set_total(($total + $recargado['Recargado']['monto']), NULL);
-      }else{
-        $this->Session->setFlash("No se ha podido eliminar la recarga el distribuidor no tiene suficiente para reponer!!!",'msgerror');
+      } else {
+        $this->Session->setFlash("No se ha podido eliminar la recarga el distribuidor no tiene suficiente para reponer!!!", 'msgerror');
         $this->redirect($this->referer());
       }
-    }elseif($recargado['Recargado']['tipo'] == '1' && empty($recargado['Recargado']['persona_id'])){
+    } elseif ($recargado['Recargado']['tipo'] == '1' && empty($recargado['Recargado']['persona_id'])) {
       $total = $this->get_total(NULL);
-      if($total >= $recargado['Recargado']['monto']){
+      if ($total >= $recargado['Recargado']['monto']) {
         $this->Recargado->delete($idRecargado);
         $this->set_total(($total - $recargado['Recargado']['monto']), NULL);
       }
-    }elseif($recargado['Recargado']['tipo'] == '2'){
+    } elseif ($recargado['Recargado']['tipo'] == '2') {
       $total = $this->get_total(NULL);
-      if(!empty($recargado['Recargado']['persona_id'])){
+      if (!empty($recargado['Recargado']['persona_id'])) {
         $total_u = $this->get_total($recargado['Recargado']['persona_id']);
       }
       $this->Recargado->delete($idRecargado);
       $this->set_total(($total + $recargado['Recargado']['monto']), NULL);
-      if(!empty($recargado['Recargado']['persona_id'])){
+      if (!empty($recargado['Recargado']['persona_id'])) {
         $this->set_total(($total_u), $recargado['Recargado']['persona_id']);
       }
-    }elseif($recargado['Recargado']['tipo'] == '3'){
+    } elseif ($recargado['Recargado']['tipo'] == '3') {
       $total_u = $this->get_total($recargado['Recargado']['persona_id']);
       $total = $this->get_total(NULL);
       $this->Recargado->delete($idRecargado);
       $this->set_total(($total_u + $recargado['Recargado']['monto']), $recargado['Recargado']['persona_id']);
       $this->set_total($total, NULL);
     }
-    
+
     $this->Session->setFlash("Se elimino correctamente!!!", 'msgbueno');
     $this->redirect($this->referer());
   }
@@ -410,11 +426,11 @@ class RecargadosController extends AppController {
     $this->set(compact('recargas'));
   }
 
-  public function get_recargas_dist($fecha_ini = null, $fecha_fin = null, $idPersona = null, $idPorcentaje = null,$tipo = null) {
+  public function get_recargas_dist($fecha_ini = null, $fecha_fin = null, $idPersona = null, $idPorcentaje = null, $tipo = null) {
 
     $recargas = $this->Recargado->find('all', array(
       'recursive' => -1,
-      'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin, 'Recargado.persona_id' => $idPersona, 'Recargado.porcentaje_id' => $idPorcentaje,'Recargado.tipo' => $tipo),
+      'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin, 'Recargado.persona_id' => $idPersona, 'Recargado.porcentaje_id' => $idPorcentaje, 'Recargado.tipo' => $tipo),
       'group' => array('Recargado.porcentaje_id'),
       'fields' => array('SUM(Recargado.monto) monto_total')
     ));

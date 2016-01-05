@@ -1,5 +1,9 @@
 <style>
-
+    @media print{
+        .ocultar_impresion{
+            display: none !important; 
+        }
+    }
     .CSSTableGenerator {
         margin:0px;padding:0px;
         width:100%;
@@ -73,7 +77,7 @@
 <div id="main" class="contenedor">
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
     <hgroup id="main-title" class="thin">
-        <h1>REPORTE DE TIENDA</h1>
+        <h1>REPORTE DE DISTRIBUIDORES</h1>
     </hgroup>
     <div class="with-padding">
         <?php echo $this->Form->create('Almacene', array()); ?>
@@ -116,7 +120,23 @@
 
         <?php if (!empty($this->request->data['Dato']['persona_id'])): ?>       
 
-
+          <table class="CSSTableGenerator">
+              <tr>
+                  <td style="width: 40%;">
+                      FECHA: 
+                      <?php
+                      if ($this->request->data['Dato']['fecha_ini'] == $this->request->data['Dato']['fecha_fin']) {
+                        echo $this->request->data['Dato']['fecha_ini'];
+                      } else {
+                        echo 'DE ' . $this->request->data['Dato']['fecha_ini'] . ' A ' . $this->request->data['Dato']['fecha_fin'];
+                      }
+                      ?>
+                  </td>
+                  <td style="width: 60%;">
+                      DISTRIBUIDOR: <?php echo $distribuidor['Persona']['nombre'] . ' ' . $distribuidor['Persona']['ap_paterno'] . ' ' . $distribuidor['Persona']['ap_materno'] ?>
+                  </td>
+              </tr>
+          </table><br>
           <table class="CSSTableGenerator">
               <tbody>
                   <tr>
@@ -173,7 +193,7 @@
                         ?>
                         <td style="text-align: center;"><?php echo $venta_prec_total ?></td>
                         <td style="text-align: center;"><?php echo $pro['Productosprecio']['total_s'] ?></td>
-                        
+
                     </tr>
                   <?php endforeach; ?>
                   <?php $total_recarga = 0.00; ?>
@@ -216,7 +236,7 @@
                       </td>
                       <td style="text-align: center;"><?php echo $num_chips_p_t; ?></td>
                       <td style="text-align: center;"><?php echo $c_total_s - $c_vendidos ?></td>
-                      
+
                       <?php $total_bs = $total_bs + $num_chips_p_t; ?>
                   </tr>
                   <tr>
@@ -276,36 +296,92 @@
           <?php $pagos = $this->requestAction(array('controller' => 'Cajachicas', 'action' => 'get_pagos_dist', $fecha_ini, $fecha_fin, $distribuidor['User']['id'])) ?>
 
           <?php if (!empty($pagos)): ?>
-        <br>
-        <br>
-            <table class="CSSTableGenerator" style="width: 50%;">
+            <br>
+            <br>
+            <table style="width: 100%;">
                 <tr>
-                    <td><b>TOTAL VENTAS</b></td>
-                    <td><?php echo $total_bs + $total_recarga ?> Bs</td>
-                </tr>
-                <?php foreach ($pagos['bancos'] as $ba): ?>
-                  <tr>
-                      <td><?php echo $ba['nombre'] ?> Bs</td>
-                      <td><?php echo $ba['monto'] ?> Bs</td>
-                  </tr>
-                <?php endforeach; ?>
-                <tr>
-                    <td>FALTANTE</td>
-                    <td><?php echo $pagos['faltante'] ?> Bs</td>
-                </tr>
-                <tr>
-                    <td>OTROS INGRESOS</td>
-                    <td><?php echo $pagos['otro_ingreso'] ?> Bs</td>
-                </tr>
-                <tr>
-                    <td>OBSERVACIONES</td>
-                    <td><?php echo $pagos['observaciones'] ?></td>
-                </tr>
-                <tr>
-                    <td>TOTAL</td>
-                    <td><?php echo $total_bs + $total_recarga + $pagos['otro_ingreso'] ?> Bs</td>
+                    <td style="width: 40%;">
+                        <table class="CSSTableGenerator" style="width: 100%;">
+                            <tr>
+                                <td><b>TOTAL VENTAS</b></td>
+                                <td><?php echo $total_bs + $total_recarga ?> Bs</td>
+                            </tr>
+                            <?php foreach ($pagos['bancos'] as $ba): ?>
+                              <tr>
+                                  <td><?php echo $ba['nombre'] ?> Bs</td>
+                                  <td><?php echo $ba['monto'] ?> Bs</td>
+                              </tr>
+                            <?php endforeach; ?>
+                            <tr>
+                                <td>FALTANTE</td>
+                                <td><?php echo $pagos['faltante'] ?> Bs</td>
+                            </tr>
+                            <tr>
+                                <td>OTROS INGRESOS</td>
+                                <td><?php echo $pagos['otro_ingreso'] ?> Bs</td>
+                            </tr>
+                            <tr>
+                                <td>OBSERVACIONES</td>
+                                <td><?php echo $pagos['observaciones'] ?></td>
+                            </tr>
+                            <tr>
+                                <td>TOTAL</td>
+                                <td><?php echo $total_bs + $total_recarga + $pagos['otro_ingreso'] ?> Bs</td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td style="width: 60%;">
+                        <table style="width: 100%; color: black;">
+                            <tr style="height: 10px;">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="width: 40%; padding-left: 20px; padding-right: 20px; padding-top: 30px;">
+                                    <div style="text-align: center; border-top: 1px solid #000000;">
+                                        Entregue conforme<br>
+                                        <span contentEditable="true">CI: </span>
+                                    </div>
+                                </td>
+                                <td style="width: 20%;text-align: center;">
+                                    INGRESOS
+                                </td>
+                                <td style="width: 40%; padding-left: 20px; padding-right: 20px; padding-top: 30px;">
+                                    <div style="text-align: center; border-top: 1px solid #000000;">
+                                        Recibi conforme<br>
+                                        <span contentEditable="true">CI: <?php echo $distribuidor['Persona']['ci'] ?></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr style="height: 40px;">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="width: 40%; padding-left: 20px; padding-right: 20px; padding-top: 30px;">
+                                    <div style="text-align: center; border-top: 1px solid #000000;">
+                                        Entregue conforme<br>
+                                        <span contentEditable="true">CI: <?php echo $distribuidor['Persona']['ci'] ?></span>
+                                    </div>
+                                </td>
+                                <td style="width: 20%;text-align: center;">
+                                    VENTAS
+                                </td>
+                                <td style="width: 40%; padding-left: 20px; padding-right: 20px; padding-top: 30px;">
+                                    <div style="text-align: center; border-top: 1px solid #000000;">
+                                        Recibi conforme<br>
+                                        <span contentEditable="true">CI: </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
+
+
           <?php endif; ?>
 
 
@@ -313,7 +389,14 @@
         <?php endif; ?>
 
 
-
+        <div class="columns ocultar_impresion">
+            <div class="twelve-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">&nbsp;</label>
+                    <button class="button black-gradient full-width" type="button" onclick="window.print();"> IMPRIMIR</button>
+                </p>
+            </div>
+        </div>
 
 
     </div>

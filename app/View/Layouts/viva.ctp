@@ -98,15 +98,15 @@
         <!--[if lt IE 7]><p class="message red-gradient simpler">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
         <!-- Title bar -->
-        <header class="no-imprime" role="banner" id="title-bar">
+        <header class="ocultar_impresion" role="banner" id="title-bar">
             <h2>SISTEMA DE INVENTARIOS</h2>
         </header>
 
         <!-- Button to open/hide menu -->
-        <a class="no-imprime" href="#" id="open-menu"><span>Menu</span></a>
+        <a class="ocultar_impresion" href="#" id="open-menu"><span>Menu</span></a>
 
         <!-- Button to open/hide shortcuts -->
-        <a class="no-imprime" href="#" id="open-shortcuts"><span class="icon-thumbs"></span></a>
+        <a class="ocultar_impresion" href="#" id="open-shortcuts"><span class="icon-thumbs"></span></a>
 
         <!-- Main content -->
 
@@ -248,7 +248,7 @@
         <?php echo $this->Session->flash(); ?>
         <br>
         <br>
-        <div class="no-imprime" style="text-align: center; color:gray;">
+        <div class="ocultar_impresion" style="text-align: center; color:gray;">
             <p class="f-left">&copy; 2015 <strong class="green">SEJAS SRL.</strong>, Todos Los Derechos Reservados &reg;</p>
             <p class="f-right">Dise&ntilde;ado y Desarrollado por la Consultora <a href="http://www.virtualware.com.bo/">VirtualWare</a></p>
         </div> 

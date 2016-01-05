@@ -1,9 +1,10 @@
 <?php App::uses('CakeNumber', 'Utility'); ?>
 <!DOCTYPE html>
+<link rel="stylesheet" href="<?php echo $this->webroot; ?>js/libs/glDatePicker/developr.fixed.css?v=1">
 <section role="main" id="main">
 
     <hgroup id="main-title" class="thin">
-        <h1>MOVIMIENTOS RECARGAS <span style="font-size: 19px;color: #01ab01;">TOTAL: <?php echo $this->requestAction(array('action' => 'get_total'));?></span></h1>
+        <h1>MOVIMIENTOS RECARGAS <span style="font-size: 19px;color: #01ab01;">TOTAL: <?php echo $this->requestAction(array('action' => 'get_total')); ?></span></h1>
     </hgroup>
 
     <div class="with-padding">        
@@ -12,14 +13,14 @@
 
             <div class="new-row three-columns">
                 <?php
-                echo $this->Form->create('Recargado', array('action' => 'nuevo', 'id' => 'formID'));
+                echo $this->Form->create('Recargado', array('action' => 'registra_recarga', 'id' => 'formID'));
                 ?>
                 <?php echo $this->Form->hidden('Recargado.user_id', array('value' => $this->Session->read('Auth.User.id'))); ?>
 
                 <h3 class="thin underline">Recargas </h3>      
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Tipo<small>(Requerido)</small></label>
-                    <?php echo $this->Form->select('tipo', array(2 => 'Recarga',1 => 'Carga',3 => 'Recarga del Distribuidor'), array('class' => 'select full-width validate[required]','required','value' => 2,'empty' => 'Seleccione el tipo de recarga')); ?>
+                    <?php echo $this->Form->select('tipo', array(2 => 'Recarga', 1 => 'Carga', 3 => 'Recarga del Distribuidor'), array('class' => 'select full-width validate[required]', 'required', 'value' => 2, 'empty' => 'Seleccione el tipo de recarga')); ?>
                 </p>
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Distribuidor<small>(Requerido)</small></label>
@@ -49,10 +50,23 @@
                     </button>                                      
 
                 </div>
-                </form>
+                <?php echo $this->Form->end(); ?>
             </div>
             <div class="nine-columns twelve-columns-tablet">
-
+                <fieldset class="fieldset">
+                    <?php echo $this->Form->create('Recargado') ?>
+                    <p class="button-height">
+                    <div class="columns">
+                        <label class="label two-columns">De</label>
+                        <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input two-columns datepicker')); ?>
+                        <label class="label two-columns">hasta</label>
+                        <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input two-columns datepicker')); ?>
+                        <?php //echo $this->Form->select('Dato.sucursal_id',array(), array('class' => 'select three-columns')); ?>
+                        <button type="submit" class="button black-gradient two-columns">GENERAR</button>
+                    </div>
+                    </p>
+                    <?php echo $this->Form->end(); ?>
+                </fieldset>
                 <h3 class="thin underline">Detalle</h3>
                 <table class="table responsive-table">
                     <thead>
@@ -86,9 +100,9 @@
                               <td><?php echo $this->Number->currency($rec['Recargado']['salida'], ''); ?></td>
                               <td><?php echo $rec['Porcentaje']['nombre']; ?></td>
                               <td><?php echo $this->Number->currency($rec['Recargado']['monto'], ''); ?> </td>
-                              <!--<td><?php //echo $this->Number->currency($rec['Recargado']['total'], ''); ?></td>-->
+                              <!--<td><?php //echo $this->Number->currency($rec['Recargado']['total'], '');  ?></td>-->
                               <td scope="col" width="8%" class="align-center">
-                                  <?php echo $this->Html->link("", array('action' => 'elimina', $rec['Recargado']['id']), array('class' => 'button red-gradient compact icon-cross-round','confirm' => 'Esta seguro de eliminar el registro de recarga??')) ?>
+                                  <?php echo $this->Html->link("", array('action' => 'elimina', $rec['Recargado']['id']), array('class' => 'button red-gradient compact icon-cross-round', 'confirm' => 'Esta seguro de eliminar el registro de recarga??')) ?>
                               </td>
                           </tr>
                         <?php endforeach; ?>
@@ -181,7 +195,12 @@
 <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
   <?php echo $this->element('sidebar/recargas'); ?>
 <?php endif; ?>
-
+<?php
+echo $this->Html->script(array(
+  'libs/glDatePicker/glDatePicker.min.js?v=1',
+  'ini_lg_datepicker.js'
+  ), array('block' => 'js_add'));
+?>
 
 <script>
   $(document).ready(function () {

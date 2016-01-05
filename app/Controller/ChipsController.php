@@ -1323,12 +1323,21 @@ class ChipsController extends AppController {
         )
       )
     ));
-    $this->set(compact('precios', 'idDistribuidor', 'fecha_ini'));
+    
+    $ventas = $this->Ventaschip->find('all',array(
+      'recurisive' => -1,
+      'conditions' => array('Ventaschip.fecha' => $fecha_ini,'Ventaschip.distribuidor_id' => $idDistribuidor)
+    ));
+    $this->set(compact('precios', 'idDistribuidor', 'fecha_ini','ventas'));
+  }
+  
+  public function elimina_chip_dis($idVentaChip = null){
+    $this->Ventaschip->delete($idVentaChip);
+    $this->Session->setFlash("Se ha eliminado correctamente la venta de chip!!",'msgbueno');
+    $this->redirect($this->referer());
   }
 
   public function registra_ventachips() {
-    $array['correcto'] = '';
-    $array['incorrecto'] = '';
     $fecha_fin = $this->request->data['Dato']['fecha'];
     $idDistribuidor = $this->request->data['Dato']['distribuidor_id'];
     $cantidad_total = $this->request->data['Dato']['cantidad_total'];
@@ -1356,14 +1365,14 @@ class ChipsController extends AppController {
             $this->Ventaschip->save($ven);
           }
         }
-        $array['correcto'] = 'Se ha registrado correctamente la venta';
+        $this->Session->setFlash('Se ha registrado correctamente la venta','msgbueno');
       } else {
-        $array['incorrecto'] = 'No hay suficiente para descontar!!';
+        $this->Session->setFlash('No hay suficiente para descontar!!','msgerror');
       }
     } else {
-      $array['incorrecto'] = 'No hay suficiente para descontar!!';
+      $this->Session->setFlash('No hay suficiente para descontar!!','msgerror');
     }
-    $this->respond($array, true);
+    $this->redirect($this->referer());
   }
 
 }
