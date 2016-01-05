@@ -8,8 +8,10 @@
             <thead>
                 <tr>
                     <th scope="col" width="5%" class="align-center hide-on-mobile">No.</th>
-                    <th scope="col" width="30%" class="align-center hide-on-mobile">Nombre</th>
-                    <th scope="col" width="40%" class="align-center hide-on-mobile">Descripcion</th>
+                    <th scope="col"  class="align-center hide-on-mobile">Nombre</th>
+                    <th scope="col"  class="align-center hide-on-mobile">Sucursal</th>
+                    <th scope="col"  class="align-center hide-on-mobile">Total</th>
+                    <th scope="col"  class="align-center hide-on-mobile">Descripcion</th>
                     <th scope="col" width="10" class="align-center">Acciones</th>
                 </tr>
             </thead>
@@ -19,6 +21,8 @@
                     <tr>
                         <td><?php echo $i; $i++; ?></td>
                         <td><?php echo $ban['Banco']['nombre']; ?></td>
+                        <td><?php echo $ban['Sucursal']['nombre']; ?></td>
+                        <td><?php echo $ban['Banco']['total']; ?></td>
                         <td><?php echo $ban['Banco']['descripcion'] ?></td>
                         <td  scope="col" width="20%" class="align-center">
                             <a href="<?php echo $this->Html->url(array('action' => 'edit', $ban['Banco']['id'])); ?>" class="button orange-gradient compact icon-pencil">Editar</a>

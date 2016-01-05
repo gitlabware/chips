@@ -16,10 +16,11 @@
                 ?>
                 <?php echo $this->Form->hidden('Recargado.user_id', array('value' => $this->Session->read('Auth.User.id'))); ?>
 
-                <h3 class="thin underline">Recargas </h3>
-                <p class="button-height">
-                    <input type="checkbox" name="data[Recargado][tipo]" id="switch-custom-3" class="switch wider green-active mid-margin-right" value="1" checked data-text-on="RECARGA" data-text-off="CARGA">                    
-                </p>                
+                <h3 class="thin underline">Recargas </h3>      
+                <p class="block-label button-height">
+                    <label for="validation-select" class="label">Tipo<small>(Requerido)</small></label>
+                    <?php echo $this->Form->select('tipo', array(2 => 'Recarga',1 => 'Carga',3 => 'Recarga del Distribuidor'), array('class' => 'select full-width validate[required]','required','value' => 2,'empty' => 'Seleccione el tipo de recarga')); ?>
+                </p>
                 <p class="block-label button-height">
                     <label for="validation-select" class="label">Distribuidor<small>(Requerido)</small></label>
                     <?php echo $this->Form->select('user_id', $distribuidor, array('class' => 'select full-width')); ?>

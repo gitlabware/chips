@@ -3,7 +3,7 @@
 class BancosController extends AppController {
 
     public $layout = 'viva';
-    public $uses = 'Banco';
+    public $uses = array('Banco','Sucursal');
 
     public function beforeFilter() {
         parent::beforeFilter();
@@ -11,8 +11,9 @@ class BancosController extends AppController {
     }
 
     public function index() {
-        $this->paginate = array('Banco' => array('limit' => 100));
-        $this->set('bancos', $this->paginate('Banco'));
+        $bancos = $this->Banco->find('all');
+        //debug($bancos);exit;
+        $this->set(compact('bancos'));
     }
     
     public function add (){
@@ -26,6 +27,8 @@ class BancosController extends AppController {
                 return $this->redirect(array('action'=>'add'));
             }
         }
+        $sucursales = $this->Sucursal->find('list',array('fields' => array('id','nombre')));
+        $this->set(compact('sucursales'));
     }
     
     public function edit($id=null){
@@ -43,6 +46,8 @@ class BancosController extends AppController {
         } else {
             $this->request->data=  $this->Banco->read(null, $id);
         }
+        $sucursales = $this->Sucursal->find('list',array('fields' => array('id','nombre')));
+        $this->set(compact('sucursales'));
     }
     
     public function delete($id=null){

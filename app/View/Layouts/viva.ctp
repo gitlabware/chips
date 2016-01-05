@@ -240,7 +240,10 @@
                   buttonsLowPadding: true
               });
               $('#idmodal').load(url);
+              //cierra_modal();
+              
           }
+          
         </script>
         <?php echo $this->Session->flash(); ?>
         <br>

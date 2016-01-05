@@ -7,7 +7,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class ChipsController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente', 'Precio');
+  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente', 'Precio', 'Ventaschip');
   public $layout = 'viva';
   public $components = array('RequestHandler', 'DataTable', 'Montoliteral');
 
@@ -17,6 +17,17 @@ class ChipsController extends AppController {
       $this->RequestHandler->setContent('json', 'application/json');
     }
     //$this->Auth->allow();
+  }
+
+  function respond($message = null, $json = false) {
+    if ($message != null) {
+      if ($json == true) {
+        $this->RequestHandler->setContent('json', 'application/json');
+        $message = json_encode($message);
+      }
+      $this->set('message', $message);
+    }
+    $this->render('message');
   }
 
   public function subirexcel() {
@@ -1259,16 +1270,17 @@ class ChipsController extends AppController {
   }
 
   public function get_num_chips_dist($fecha_ini = null, $fecha_fin = null, $idDistribuidor = null) {
-
-    $sql = "(SELECT COUNT(chips.id) FROM chips WHERE chips.distribuidor_id = $idDistribuidor AND chips.fecha_entrega_d >= '$fecha_ini' AND chips.fecha_entrega_d <= '$fecha_fin' AND iSNULL(chips.cliente_id) GROUP BY chips.distribuidor_id)";
+    $sql1 = "(SELECT SUM(ventaschips.cantidad) FROM ventaschips WHERE ventaschips.distribuidor_id = $idDistribuidor AND ventaschips.fecha <= '$fecha_fin')";
+    $sql = "(SELECT COUNT(chips.id) FROM chips WHERE chips.distribuidor_id = $idDistribuidor AND chips.fecha_entrega_d >= '$fecha_ini' AND chips.fecha_entrega_d <= '$fecha_fin' GROUP BY chips.distribuidor_id)";
     $this->Chip->virtualFields = array(
-      'ingresado' => "IF(ISNULL($sql),0,$sql)"
+      'ingresado' => "IF(ISNULL($sql),0,$sql)",
+      'vendidos_t' => "IF(ISNULL($sql1),0,$sql1)"
     );
     $chips = $this->Chip->find('all', array(
       'recursive' => -1,
-      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d <=' => $fecha_fin, 'Chip.cliente_id' => NULL),
+      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d <=' => $fecha_fin),
       'group' => array('Chip.distribuidor_id'),
-      'fields' => array('COUNT(Chip.id) AS total_S', 'Chip.ingresado')
+      'fields' => array('COUNT(Chip.id) AS total_S', 'Chip.ingresado', 'Chip.vendidos_t')
     ));
 
     /* debug($chips);
@@ -1291,17 +1303,67 @@ class ChipsController extends AppController {
   }
 
   public function get_num_vent_d($fecha_ini = null, $fecha_fin = null, $idDistribuidor = null, $precio = null) {
-    $chips = $this->Chip->find('all', array(
-      'recursive' => -1,
-      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d >=' => $fecha_ini, 'Chip.fecha_entrega_d <=' => $fecha_fin, 'Chip.cliente_id' => NULL, 'Chip.precio_d' => $precio),
-      'group' => array('Chip.distribuidor_id'),
-      'fields' => array('COUNT(Chip.id) AS monto_v')
-    ));
-    if(!empty($chips)){
-      return $chips[0][0]['monto_v'];
-    }else{
+    $sql1 = "(SELECT IF(ISNULL(SUM(ventaschips.cantidad)),0,SUM(ventaschips.cantidad)) AS monto_total  FROM ventaschips WHERE ventaschips.distribuidor_id = $idDistribuidor AND ventaschips.fecha >= '$fecha_ini' AND ventaschips.fecha <= '$fecha_fin' AND ventaschips.precio = $precio)";
+    $ven_t = $this->Ventaschip->query("$sql1");
+
+    if (!empty($ven_t)) {
+      return $ven_t[0][0]['monto_total'];
+    } else {
       return 0;
     }
+  }
+
+  public function ajax_ventas_chips($fecha_ini = null, $fecha_fin = null, $idDistribuidor = null) {
+    $precios = $this->Precio->find('all', array(
+      'recursive' => -1,
+      'conditions' => array(
+        'OR' => array(
+          array('Precio.descripcion LIKE' => 'Chips'),
+          array('Precio.descripcion LIKE' => 'Chip Distribuidor')
+        )
+      )
+    ));
+    $this->set(compact('precios', 'idDistribuidor', 'fecha_ini'));
+  }
+
+  public function registra_ventachips() {
+    $array['correcto'] = '';
+    $array['incorrecto'] = '';
+    $fecha_fin = $this->request->data['Dato']['fecha'];
+    $idDistribuidor = $this->request->data['Dato']['distribuidor_id'];
+    $cantidad_total = $this->request->data['Dato']['cantidad_total'];
+
+    $sql1 = "(SELECT SUM(ventaschips.cantidad) FROM ventaschips WHERE ventaschips.distribuidor_id = $idDistribuidor AND ventaschips.fecha <= '$fecha_fin')";
+    $this->Chip->virtualFields = array(
+      'vendidos_t' => "IF(ISNULL($sql1),0,$sql1)"
+    );
+
+    $chips = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.distribuidor_id' => $idDistribuidor, 'Chip.fecha_entrega_d <=' => $fecha_fin),
+      'group' => array('Chip.distribuidor_id'),
+      'fields' => array('COUNT(Chip.id) AS total_S', 'Chip.vendidos_t')
+    ));
+
+    if (!empty($chips)) {
+      $c_vendidos = $chips[0]['Chip']['vendidos_t'];
+      $c_total_s = $chips[0][0]['total_S'];
+      $total_actual = $c_total_s - $c_vendidos;
+      if ($cantidad_total <= $total_actual) {
+        foreach ($this->request->data['Ventaschip'] as $ven) {
+          if (!empty($ven['cantidad'])) {
+            $this->Ventaschip->create();
+            $this->Ventaschip->save($ven);
+          }
+        }
+        $array['correcto'] = 'Se ha registrado correctamente la venta';
+      } else {
+        $array['incorrecto'] = 'No hay suficiente para descontar!!';
+      }
+    } else {
+      $array['incorrecto'] = 'No hay suficiente para descontar!!';
+    }
+    $this->respond($array, true);
   }
 
 }

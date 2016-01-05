@@ -21,7 +21,7 @@ class AlmacenesController extends AppController {
     'Detalle', 'User', 'Deposito', 'Movimientosrecarga', 'Sucursal',
     'Banco', 'Ventascelulare', 'Pedido', 'Productosprecio',
     'Devuelto', 'Recargado',
-    'Totale', 'Excel', 'Distribucione','Porcentaje'
+    'Totale', 'Excel', 'Distribucione', 'Porcentaje'
   );
   public $components = array('Session', 'Fechasconvert', 'RequestHandler', 'DataTable');
   public $layout = 'viva';
@@ -181,7 +181,7 @@ class AlmacenesController extends AppController {
       'fields' => array('Producto.nombre', 'Producto.tipo_producto', 'Totale.marca', 'Totale.total', 'Totale.producto_id', 'Producto.marca_id')
     ));
 
-    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos','distribuidor'));
+    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos', 'distribuidor'));
   }
 
   public function ajaxrepartir($idPersona = null, $almacen = null) {
@@ -1629,17 +1629,17 @@ class AlmacenesController extends AppController {
       'fields' => array('Producto.nombre', 'Producto.id', 'total_s'),
       'group' => 'Producto.id'
     ));
-    $porcentajes = $this->Porcentaje->find('all',array(
+    $porcentajes = $this->Porcentaje->find('all', array(
       'recursive' => -1,
-      'fields' => array('Porcentaje.nombre','Porcentaje.id')
+      'fields' => array('Porcentaje.nombre', 'Porcentaje.id')
     ));
-    $distribuidor = $this->User->find('first',array(
+    $distribuidor = $this->User->find('first', array(
       'recurisve' => -1,
       'conditions' => array('User.persona_id' => $persona),
       'fields' => array('User.id')
     ));
     //debug($productos);exit;
-    $this->set(compact('productos', 'fecha_ini', 'fecha_fin', 'persona','porcentajes','distribuidor'));
+    $this->set(compact('productos', 'fecha_ini', 'fecha_fin', 'persona', 'porcentajes', 'distribuidor'));
   }
 
   public function get_ventas_dist($fecha_ini = null, $fecha_fin = null, $persona = null, $idProducto = null) {
@@ -1681,21 +1681,65 @@ class AlmacenesController extends AppController {
     //debug($precios);exit;
     return $precios;
   }
-  
-  public function ajax_venta($fecha_ini = null, $fecha_fin = null, $persona = null, $idProducto = null){
+
+  public function ajax_venta($fecha_ini = null, $fecha_fin = null, $persona = null, $idProducto = null) {
     $this->layout = 'ajax';
     //$this->request->data['Movimiento']['created'] = date('Y-m-d');
-    $precios = $this->Productosprecio->find('all',array(
+    $precios = $this->Productosprecio->find('all', array(
       'recursive' => -1,
-      'conditions' => array('Productosprecio.producto_id' => $idProducto,'Productosprecio.tipousuario_id' => 3),
+      'conditions' => array('Productosprecio.producto_id' => $idProducto, 'Productosprecio.tipousuario_id' => 3),
       'fields' => array('Productosprecio.precio')
     ));
-    $producto = $this->Producto->find('first',array(
+    $producto = $this->Producto->find('first', array(
       'recursive' => -1,
       'conditions' => array('Producto.id' => $idProducto),
       'fields' => array('Producto.nombre')
     ));
-    $this->set(compact('producto','precios','idProducto','persona','fecha_ini','fecha_fin'));
+    $this->set(compact('producto', 'precios', 'idProducto', 'persona', 'fecha_ini', 'fecha_fin'));
+  }
+
+  public function reporte_ventas_dist() {
+    if (!empty($this->request->data)) {
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $persona = $this->request->data['Dato']['persona_id'];
+      $persona_sql = "mo.persona_id = $persona AND";
+      $persona_sql2 = "mov.persona_id = $persona AND";
+      $sql1 = "(SELECT IF(ISNULL(mo.total),0,mo.total) FROM totales mo WHERE $persona_sql Producto.id = mo.producto_id LIMIT 1)";
+      $sql2 = "(SELECT CONCAT(SUM(mov.ingreso)+SUM(mov.salida)) FROM movimientos mov WHERE $persona_sql2 mov.created > '$fecha_fin' AND Producto.id = mov.producto_id GROUP BY mov.producto_id)";
+
+      $this->Productosprecio->virtualFields = array(
+        'total_s' => "CONCAT($sql1-(IF(ISNULL($sql2),0,$sql2)))"
+      );
+      $productos = $this->Productosprecio->find('all', array(
+        'recurisve' => 0,
+        'conditions' => array(
+          'Productosprecio.tipousuario_id' => 3,
+          'Producto.id !=' => NULL
+        ),
+        'fields' => array('Producto.nombre', 'Producto.id', 'total_s'),
+        'group' => 'Producto.id'
+      ));
+      $porcentajes = $this->Porcentaje->find('all', array(
+        'recursive' => -1,
+        'fields' => array('Porcentaje.nombre', 'Porcentaje.id')
+      ));
+      $distribuidor = $this->User->find('first', array(
+        'recurisve' => -1,
+        'conditions' => array('User.persona_id' => $persona),
+        'fields' => array('User.id')
+      ));
+    }
+    $this->User->virtualFields = array(
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+    $personas = $this->User->find('list',array(
+      'recursive' => 0,
+      'conditions' => array('User.group_id' => 2),
+      'fields' => array('Persona.id','User.nombre_completo')
+    ));
+    //debug($productos);exit;
+    $this->set(compact('productos', 'fecha_ini', 'fecha_fin', 'persona', 'porcentajes', 'distribuidor','personas'));
   }
 
 }

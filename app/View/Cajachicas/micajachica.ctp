@@ -35,6 +35,10 @@
                                <?php echo $this->Form->text('Cajadetalle.nombre', array('class' => 'input full-width', 'id' => 'input_detalle', 'placeholder' => 'Detalle','value' => '')); ?>
                     </p>
                     <p class="inline-label">
+                        <label class="label">Banco</label>
+                        <?php echo $this->Form->select('banco_id',$bancos, array('class' => 'select expandable-list anthracite-gradient glossy full-width validate[required]', 'empty' => 'Seleccione Banco')); ?>
+                    </p>
+                    <p class="inline-label">
                         <label class="label">Monto</label>
                         <?php echo $this->Form->text('monto', array('class' => 'input full-width validate[required]', 'placeholder' => 'Monto', 'type' => 'numer', 'step' => 'any')); ?>
                     </p>

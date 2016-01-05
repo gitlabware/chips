@@ -44,6 +44,13 @@ class Cajachica extends AppModel {
 			'conditions' => '',
 			'fields' => '',
 			'order' => ''
+		),
+		'Distribuidorpago' => array(
+			'className' => 'Distribuidorpago',
+			'foreignKey' => 'distribuidorpago_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
 		)
 	);
 }

@@ -56,7 +56,7 @@
               <td style="text-align: center;"><?php echo $venta_prec_total ?></td>
               <td style="text-align: center;"><?php echo $pro['Productosprecio']['total_s'] ?></td>
               <td style="text-align: center;">
-                  <a href="javascript:" class="button green-gradient compact icon-page-list" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'ajax_venta', $fecha_ini, $fecha_fin, $persona, $pro['Producto']['id'])); ?>')" title="Rutas"></a>
+                  <a href="javascript:" class="button green-gradient compact icon-page-list" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'ajax_venta', $fecha_ini, $fecha_fin, $persona, $pro['Producto']['id'])); ?>')" title="Registrar Venta"></a>
                   <?php //echo $this->Html->link('Venta', array('controller' => 'Ventas', 'action' => 'listaentregas', $pro['Producto']['nombre'], 0), array('class' => 'button green-gradient compact icon-mailbox', 'title' => 'Registrar Venta')); ?>
               </td>
           </tr>
@@ -67,8 +67,10 @@
         $chips_r = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_chips_dist', $fecha_ini, $fecha_fin, $distribuidor['User']['id']));
         $c_ingresos = 0;
         $c_total_s = 0;
+        $c_vendidos = 0;
         if (!empty($chips_r)) {
           $c_ingresos = $chips_r[0]['Chip']['ingresado'];
+          $c_vendidos = $chips_r[0]['Chip']['vendidos_t'];
           $c_total_s = $chips_r[0][0]['total_S'];
         }
         $precios_c = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_precios_ven'));
@@ -76,36 +78,34 @@
         <tr>
             <td style="text-align: center;">Chips</td>
 
-            <td style="text-align: center;"><?php echo $c_total_s - $c_ingresos ?></td>
+            <td style="text-align: center;"><?php echo $c_total_s - $c_vendidos - $c_ingresos ?></td>
             <td style="text-align: center;"><?php echo $c_ingresos ?></td>
             <td style="text-align: center;">
                 <table style="width: 100%">
-                    <tr>
-                        <?php foreach ($precios_c as $preci): ?>
-                          <td><?php echo $preci['Precio']['monto'] . ' Bs.' ?></td>
-                        <?php endforeach; ?>
-                    </tr>
-                    <tr>
+                    <?php
+                    $num_chips_p_t = 0.00;
+                    foreach ($precios_c as $preci):
+                      ?>
+                      <tr>
 
-                        <?php
-                        $num_chips_p_t = 0.00;
-                        foreach ($precios_c as $preci):
-                          ?>
+                          <td style="text-align: center;"><?php echo $preci['Precio']['monto'] . ' Bs.' ?></td>
                           <?php
                           $num_chips = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_vent_d', $fecha_ini, $fecha_fin, $distribuidor['User']['id'], $preci['Precio']['monto']));
                           $num_chips_p_t = $num_chips_p_t + ($num_chips * $preci['Precio']['monto']);
                           ?>
-                          <td><?php echo $num_chips ?></td>
-                        <?php endforeach; ?>
-                    </tr>
+                          <td style="text-align: center;"><?php echo $num_chips ?></td>
+                      </tr>
+                    <?php endforeach; ?>
+
                 </table>
             </td>
             <td style="text-align: center;"><?php echo $num_chips_p_t; ?></td>
-            <td style="text-align: center;"><?php echo $c_total_s ?></td>
+            <td style="text-align: center;"><?php echo $c_total_s - $c_vendidos ?></td>
             <td style="text-align: center;">
-
+                <a href="javascript:" class="button green-gradient compact icon-page-list" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'ajax_ventas_chips', $fecha_ini, $fecha_fin, $distribuidor['User']['id'])); ?>')" title="Registrar Venta"></a>
 
             </td>
+            <?php $total_bs = $total_bs + $num_chips_p_t; ?>
         </tr>
         <tr>
             <td>Recarga</td>
@@ -117,32 +117,29 @@
                         <td style="width: 50%; text-align: center;">
                             OFICINA
                             <table style="width: 100%;">
-                                <tr>
-                                    <?php foreach ($porcentajes as $por): ?>
+                                <?php foreach ($porcentajes as $por): ?>
+                                  <tr>
+
                                       <td><?php echo $por['Porcentaje']['nombre'] . '%' ?></td>
-                                    <?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <?php foreach ($porcentajes as $por): ?>
-                                      <?php $total_recarga = $total_recarga + $rec_por = $this->requestAction(array('controller' => 'Recargados', 'action' => 'get_recargas_dist', $fecha_ini, $fecha_fin, $persona, $por['Porcentaje']['id'])) ?>
-                                      <td><?php echo $rec_por ?></td>
-                                    <?php endforeach; ?>
-                                </tr>
+                                      <?php $total_recarga = $total_recarga + $rec_por = $this->requestAction(array('controller' => 'Recargados', 'action' => 'get_recargas_dist', $fecha_ini, $fecha_fin, $persona, $por['Porcentaje']['id'], '2')) ?>
+                                      <td><?php echo $rec_por ?> Bs</td>
+
+                                  </tr>
+                                <?php endforeach; ?>
                             </table>
                         </td>
                         <td style="width: 50%; text-align: center;">
                             DISTRIBUIDOR
                             <table style="width: 100%;">
-                                <tr>
-                                    <?php foreach ($porcentajes as $por): ?>
+                                <?php foreach ($porcentajes as $por): ?>
+                                  <tr>
+
                                       <td><?php echo $por['Porcentaje']['nombre'] . '%' ?></td>
-                                    <?php endforeach; ?>
-                                </tr>
-                                <tr>
-                                    <?php foreach ($porcentajes as $por): ?>
-                                      <td><?php //echo $por['Porcentaje']['nombre'].'%'              ?></td>
-                                    <?php endforeach; ?>
-                                </tr>
+                                      <?php $total_recarga = $total_recarga + $rec_por = $this->requestAction(array('controller' => 'Recargados', 'action' => 'get_recargas_dist', $fecha_ini, $fecha_fin, $persona, $por['Porcentaje']['id'], '3')) ?>
+                                      <td><?php echo $rec_por ?> Bs</td>
+
+                                  </tr>
+                                <?php endforeach; ?>
                             </table>
                         </td>
                     </tr>
@@ -166,10 +163,42 @@
         </tr>
     </tbody>
 </table>
+<?php $pagos = $this->requestAction(array('controller' => 'Cajachicas', 'action' => 'get_pagos_dist', $fecha_ini, $fecha_fin, $distribuidor['User']['id'])) ?>
 
-
+<?php if (!empty($pagos)): ?>
+  <table class="simple-table responsive-table" style="width: 50%;">
+      <tr>
+          <td>TOTAL VENTAS</td>
+          <td><?php echo $total_bs + $total_recarga ?> Bs</td>
+      </tr>
+      <?php foreach ($pagos['bancos'] as $ba): ?>
+        <tr>
+            <td><?php echo $ba['nombre'] ?> Bs</td>
+            <td><?php echo $ba['monto'] ?> Bs</td>
+        </tr>
+      <?php endforeach; ?>
+      <tr>
+          <td>FALTANTE</td>
+          <td><?php echo $pagos['faltante'] ?> Bs</td>
+      </tr>
+      <tr>
+          <td>OTROS INGRESOS</td>
+          <td><?php echo $pagos['otro_ingreso'] ?> Bs</td>
+      </tr>
+      <tr>
+          <td>OBSERVACIONES</td>
+          <td><?php echo $pagos['observaciones'] ?></td>
+      </tr>
+      <tr>
+          <td>TOTAL</td>
+          <td><?php echo $total_bs + $total_recarga + $pagos['otro_ingreso'] ?> Bs</td>
+      </tr>
+  </table>
+<?php endif; ?>
 
 <script>
+  total_pa_d = <?php echo $total_bs + $total_recarga ?>;
+  fecha_ini_d_v = '<?php echo $fecha_ini; ?>';
   function mensaje_nota(titulo, texto) {
       notify(titulo, texto, {
           system: true,

@@ -101,6 +101,13 @@
                                 <li><a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Marcas', 'action' => 'marca')); ?>', 'Formulario Marca', 200);">Nueva Marca</a></li>                                
                             </ul>
                         </li>
+                        <li class="with-right-arrow">
+                            <span>Bancos</span>
+                            <ul class="big-menu">
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'index')); ?>">Listado de Bancos</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Bancos', 'action' => 'add')); ?>" >Nuevo Banco</a></li>                                
+                            </ul>
+                        </li>
                         <!--<li class="with-right-arrow">
                             <span>Almacenes</span>
                             <ul class="big-menu">

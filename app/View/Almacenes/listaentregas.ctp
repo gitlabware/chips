@@ -33,6 +33,14 @@
         <?php endif; ?>
 
         <?php if ($almacen == 0): ?>
+          <script>
+            var total_pa_d = 0.00;
+            var fecha_ini_d_v = '<?php echo date('Y-m-d') ?>';
+            function open_pago_d() {
+                cargarmodal('<?php echo $this->Html->url(array('controller' => 'Cajachicas', 'action' => 'pago_dist', $distribuidor['User']['id'])); ?>/' + total_pa_d + '/' + fecha_ini_d_v);
+
+            }
+          </script>
           <div class="columns">
               <div class="twelve-columns">
                   <h3 class="thin">Listado de Ventas</h3>
@@ -68,8 +76,13 @@
                   <script>
                     $("#form-ventas").submit(function (e)
                     {
-                        var postData = $(this).serializeArray();
-                        var formURL = $(this).attr("action");
+                        carga_ventas_d_a();
+                        e.preventDefault(); //STOP default action
+                        //e.unbind(); //unbind. to stop multiple form submit.
+                    });
+                    function carga_ventas_d_a() {
+                        var postData = $("#form-ventas").serializeArray();
+                        var formURL = $("#form-ventas").attr("action");
                         $.ajax(
                                 {
                                     url: formURL,
@@ -92,27 +105,25 @@
                                         alert("error");
                                     }
                                 });
-                        e.preventDefault(); //STOP default action
-                        //e.unbind(); //unbind. to stop multiple form submit.
-                    });
+                    }
                   </script>
                   <div id="div-ventas">
 
                   </div>
-                  
+
                   <div class="columns">
                       <div class="four-columns new-row-mobile twelve-columns-mobile">
                           <p class="block-label button-height">
-                              <?php echo $this->Html->link("ASIGNARLE CHIPS",array('controller' => 'Chips','action' => 'asigna_distrib',$distribuidor['User']['id']),array('class' => 'button blue-gradient full-width','target' => '_blank'))?>
+                              <?php echo $this->Html->link("ASIGNARLE CHIPS", array('controller' => 'Chips', 'action' => 'asigna_distrib', $distribuidor['User']['id']), array('class' => 'button blue-gradient full-width', 'target' => '_blank')) ?>
                           </p>
                       </div>
                       <div class="four-columns new-row-mobile twelve-columns-mobile">
                           <p class="block-label button-height">
-                              <button class="button orange-gradient full-width" type="button">REGISTRAR PAGOS</button>
+                              <button class="button orange-gradient full-width" type="button" onclick="open_pago_d();">REGISTRAR PAGOS</button>
                           </p>
                       </div>
                   </div>
-                  
+
               </div>
           </div>
         <?php endif; ?>
