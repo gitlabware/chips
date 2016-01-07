@@ -42,9 +42,9 @@
                   <table style="width: 100%;">
                       <?php foreach ($datos2 as $dato): ?>
                         <tr>
-                            <td> <?php echo $dato['Productosprecio']['precio'] ?> Bs. </td>
-                            <td> <?php echo $dato[0]['vendidos'] ?> vendidos</td>
-                            <td> <?php echo $dato[0]['precio_total'] ?> Bs</td>
+                            <td style="width: 33%;"> <?php echo $dato['Productosprecio']['precio'] ?> Bs. </td>
+                            <td style="width: 33%;"> <?php echo $dato[0]['vendidos'] ?> vendidos</td>
+                            <td style="width: 33%;"> <?php echo $dato[0]['precio_total'] ?> Bs</td>
                         </tr>
 
                       <?php endforeach; ?>
@@ -77,10 +77,9 @@
         ?>
         <tr>
             <td style="text-align: center;">Chips</td>
-
             <td style="text-align: center;"><?php echo $c_total_s - $c_vendidos - $c_ingresos ?></td>
             <td style="text-align: center;"><?php echo $c_ingresos ?></td>
-            <td style="text-align: center;">
+            <td>
                 <table style="width: 100%">
                     <?php
                     $num_chips_p_t = 0.00;
@@ -88,12 +87,14 @@
                       ?>
                       <tr>
 
-                          <td style="text-align: center;"><?php echo $preci['Precio']['monto'] . ' Bs.' ?></td>
+                          <td style="width: 33%;"><?php echo $preci['Precio']['monto'] . ' Bs.' ?></td>
                           <?php
                           $num_chips = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_vent_d', $fecha_ini, $fecha_fin, $distribuidor['User']['id'], $preci['Precio']['monto']));
                           $num_chips_p_t = $num_chips_p_t + ($num_chips * $preci['Precio']['monto']);
                           ?>
-                          <td style="text-align: center;"><?php echo $num_chips ?></td>
+                          <td style="width: 33%;"><?php echo $num_chips ?> vendidos</td>
+                          <td style="width: 33%;"><?php echo ($num_chips * $preci['Precio']['monto']) ?> Bs</td>
+                          
                       </tr>
                     <?php endforeach; ?>
 

@@ -69,6 +69,7 @@
         border-width:0px 0px 0px 0px;
     }
 </style>
+<?php $tipos = array(2 => 'Recarga', 1 => 'Carga', 3 => 'Recarga del Distribuidor'); ?>
 <link rel="stylesheet" href="<?php echo $this->webroot; ?>js/libs/glDatePicker/developr.fixed.css?v=1">
 <div id="main" class="contenedor">
     <hgroup id="main-title" class="thin">
@@ -96,7 +97,19 @@
                     </span>
                 </p>
             </div>
-            <div class="three-columns new-row-mobile twelve-columns-mobile">
+            <div class="two-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Tipo</label>
+                    <?php echo $this->Form->select('Dato.tipo', array(2 => 'Recarga', 1 => 'Carga', 3 => 'Recarga del Distribuidor'), array('class' => 'select full-width validate[required]', 'empty' => 'Seleccione el tipo de recarga')); ?>
+                </p>
+            </div>
+            <div class="two-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Distribuidores</label>
+                    <?php echo $this->Form->select('Dato.tipo', array(2 => 'Recarga', 1 => 'Carga', 3 => 'Recarga del Distribuidor'), array('class' => 'select full-width validate[required]', 'empty' => 'Seleccione el tipo de recarga')); ?>
+                </p>
+            </div>
+            <div class="two-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <button class="button green-gradient full-width" type="submit">GENERAR</button>
@@ -109,6 +122,7 @@
             <tr>
                 <td>Distribuidor</td>
                 <td>Celular</td>
+                <td>Tipo</td>
                 <td>Ingreso</td>
                 <td>Monto</td>
                 <td>%</td>
@@ -119,17 +133,18 @@
               <tr>
                   <td><?php echo $rec['Persona']['nombre'] . ' ' . $rec['Persona']['ap_paterno'] . ' ' . $rec['Persona']['ap_materno'] ?></td>
                   <td><?php echo $rec['Recargado']['num_celular'] ?></td>
+                  <td><?php echo $tipos[$rec['Recargado']['tipo']] ?></td>
                   <td><?php echo $rec['Recargado']['entrada'] ?></td>
                   <td><?php echo $rec['Recargado']['salida'] ?></td>
                   <td><?php echo $rec['Porcentaje']['nombre'] ?></td>
                   <?php
-                  $total_rec = $rec['Recargado']['salida'] + ($rec['Recargado']['salida'] * ((float) $rec['Porcentaje']['nombre'] / 100));
-                  $total_total = $total_total + $total_rec;
+                  $total_total = $total_total + $rec['Recargado']['monto'];
                   ?>
-                  <td><?php echo $total_rec ?></td>
+                  <td><?php echo $rec['Recargado']['monto'] ?></td>
               </tr>
             <?php endforeach; ?>
             <tr>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>

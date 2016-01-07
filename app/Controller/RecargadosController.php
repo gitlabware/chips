@@ -432,7 +432,7 @@ class RecargadosController extends AppController {
       'recursive' => -1,
       'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin, 'Recargado.persona_id' => $idPersona, 'Recargado.porcentaje_id' => $idPorcentaje, 'Recargado.tipo' => $tipo),
       'group' => array('Recargado.porcentaje_id'),
-      'fields' => array('SUM(Recargado.monto) monto_total')
+      'fields' => array('SUM(Recargado.salida) monto_total')
     ));
     if (!empty($recargas)) {
       return $recargas[0][0]['monto_total'];

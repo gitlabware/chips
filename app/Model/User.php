@@ -20,7 +20,7 @@ App::uses('AppModel', 'Model');
 class User extends AppModel {
   
   
-  public $validate = array(
+  /*public $validate = array(
         'username' => array(
             'limitDuplicateusername' => array(
                 'rule' => array('limitDuplicateusername', 1),
@@ -51,7 +51,7 @@ class User extends AppModel {
             return TRUE;
         }
         
-    }
+    }*/
 
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
