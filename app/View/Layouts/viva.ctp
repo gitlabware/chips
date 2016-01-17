@@ -124,6 +124,8 @@
           <?php echo $this->element('menu/adminalmacen'); ?>    
         <?php elseif ($this->Session->read('Auth.User.group_id') == 4): ?>          
           <?php echo $this->element('menu/adminrecargas'); ?>  
+        <?php elseif ($this->Session->read('Auth.User.group_id') == 4): ?>          
+          <?php echo $this->element('menu/impulsador'); ?>  
         <?php endif; ?>
 
         <!-- JavaScript at the bottom for fast page loading -->
@@ -142,7 +144,7 @@
 
         <?php echo $this->element('jsvalidador') ?>
         <!-- Plugins -->
-        <script src="<?php echo $this->webroot; ?>js/libs/jquery.tablesorter.min.js"></script>
+        <!--<script src="<?php echo $this->webroot; ?>js/libs/jquery.tablesorter.min.js"></script>-->
         <script src="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.min.js"></script>
         <!--<script src="https://jquery-datatables-column-filter.googlecode.com/svn/trunk/media/js/jquery.dataTables.js"></script>-->
 
@@ -171,7 +173,7 @@
               },
               'sPaginationType': 'full_numbers',
               'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
-              "order": [],
+              "aaSorting": [],
               'fnInitComplete': function (oSettings)
               {
                   // Style length select
@@ -205,7 +207,7 @@
                   'bProcessing': true,
                   'sAjaxSource': urljsontabla,
                   "bServerSide": true,
-                  "order": [],
+                  "aaSorting": [],
                   'fnInitComplete': function (oSettings)
                   {
                       // Style length select

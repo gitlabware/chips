@@ -21,7 +21,7 @@
                       <td><?php echo $ent['Chip']['nombre_dist'] ?></td>
                       <td><?php echo $ent[0]['num_chips'] ?></td>
                       <td>
-                          <?php //echo $this->Html->link('Detalle', array('action' => 'detalle_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id']), array('class' => 'tag blue-bg')); ?>
+                          <?php echo $this->Html->link('Detalle', array('action' => 'detalle_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id']), array('class' => 'tag blue-bg')); ?>
                           <?php //echo $this->Html->link('Descargar Excel', array('action' => 'genera_excel_1', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id']), array('class' => 'tag green-bg')); ?>
                           <?php echo $this->Html->link('Detalle excel', array('action' => 'excel', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id']), array('class' => 'tag green-bg')); ?>
                           <a href="javascript:" class="tag red-bg" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'cancela_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Chip']['distribuidor_id'])); ?>');">Cancelar</a>

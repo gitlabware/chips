@@ -23,16 +23,16 @@ class Ventasimpulsadore extends AppModel {
       'fields' => '',
       'order' => ''
     ),
-    'Premio' => array(
-      'className' => 'Premio',
-      'foreignKey' => 'premio_id',
+    'Producto' => array(
+      'className' => 'Producto',
+      'foreignKey' => 'producto_id',
       'conditions' => '',
       'fields' => '',
       'order' => ''
     ),
-    'Persona' => array(
-      'className' => 'Persona',
-      'foreignKey' => 'persona_id',
+    'User' => array(
+      'className' => 'User',
+      'foreignKey' => 'user_id',
       'conditions' => '',
       'fields' => '',
       'order' => ''

@@ -9,26 +9,26 @@
         <div class="columns">
             <div class="new-row four-columns">
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Distribuidor</label>
+                    <label for="block-label-1" class="label">Distribuidor/Impulsador</label>
                     <?php echo $this->Form->select('Dato.distribuidor_id', $distribuidores, array('class' => 'input validate[required] full-width select')); ?>
                 </p>
             </div>
             <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Inicial</label>
-                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'input validate[required] full-width input', 'id' => 'rinicio')); ?>
+                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'input validate[required] full-width input clase-form', 'id' => 'rinicio' )); ?>
                 </p>
             </div>            
             <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Final</label>
-                    <?php echo $this->Form->text('Dato.rango_fin', array('onkeyup' => 'calcula()', 'class' => 'full-width input', 'id' => 'rfin', 'value' => 0)); ?>
+                    <?php echo $this->Form->text('Dato.rango_fin', array('onkeyup' => 'calcula()', 'class' => 'full-width input clase-form', 'id' => 'rfin', 'value' => 0)); ?>
                 </p>
             </div>            
             <div class="two-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Cantidad</label>
-                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'input validate[required] full-width input', 'id' => 'rtotal')); ?>
+                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'input validate[required] full-width input clase-form', 'id' => 'rtotal')); ?>
                 </p>
             </div>
             <div class="two-columns-columns">
@@ -38,8 +38,13 @@
                 </p>
             </div>
         </div>
-        <br>
         <?php echo $this->Form->end(); ?>
+        <div class="columns">
+            <div class="new-row twelve-columns" id="div-numeros" style="font-weight: bold; color: green;">
+        
+            </div>
+        </div>
+
         <table class="table responsive-table" id="tabla-json">
 
             <thead>
@@ -94,5 +99,33 @@
 
 
   });
+  $('.clase-form').keyup(function () {
+      var postData = $('#formID').serializeArray();
+      var formURL = '<?php echo $this->Html->url(array('action' => 'rango_nuemros'));?>';
+      $.ajax(
+              {
+                  url: formURL,
+                  type: "POST",
+                  data: postData,
+                  beforeSend:function (XMLHttpRequest) {
+                   $("#div-numeros").html("<span class='loader big working'></span>");
+                   },
+                   /*complete:function (XMLHttpRequest, textStatus) {
+                   alert('despues de enviar');
+                   },*/
+                  success: function (data, textStatus, jqXHR)
+                  {
+                      //data: return data from server
+                      $("#div-numeros").html(data);
+                  },
+                  error: function (jqXHR, textStatus, errorThrown)
+                  {
+                      //if fails   
+                      alert("error");
+                  }
+              });
+  });
+
+
 </script>
 <!-- End sidebar/drop-down menu -->

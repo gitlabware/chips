@@ -7,7 +7,7 @@ App::uses('AppController', 'Controller');
 
 class ImpulsadoresController extends AppController {
 
-  var $uses = array('User', 'Minievento', 'Ventasimpulsadore', 'Premio', 'Movimientospremio', 'Precio');
+  var $uses = array('User', 'Minievento', 'Movimiento', 'Ventasimpulsadore', 'Producto', 'Premio', 'Movimientospremio', 'Precio', 'Totale', 'Chip', 'Productosprecio');
   public $layout = 'viva';
 
   public function minievento($idMini = null) {
@@ -19,7 +19,16 @@ class ImpulsadoresController extends AppController {
   public function minieventos() {
     $minieventos = $this->Minievento->find('all', array(
       'recursive' => -1,
-      'order' => array('Minievento.id DESC')
+      'order' => array('Minievento.fecha DESC')
+    ));
+    $this->set(compact('minieventos'));
+  }
+
+  public function lista_minieventos() {
+    $minieventos = $this->Minievento->find('all', array(
+      'recursive' => -1,
+      'order' => array('Minievento.fecha DESC'),
+      'conditions' => array('Minievento.estado' => 1)
     ));
     $this->set(compact('minieventos'));
   }
@@ -35,19 +44,79 @@ class ImpulsadoresController extends AppController {
     $this->redirect(array('action' => 'minieventos'));
   }
 
-  public function ventas_minievento($idMini = null) {
-    $minievento = $this->Minievento->findByid($idMini, null, null, -1);
-    $ventas = $this->Ventasimpulsadore->find('all', array(
-      'conditions' => array('Ventasimpulsadore.minievento_id' => $idMini),
-      'recursive' => -1
-    ));
-    $this->Premio->virtualFields = array(
-      'nombre_total' => "CONCAT(Premio.nombre,' (',Premio.total,')')"
+  public function ventas_minievento($idMiniEvento = null) {
+    $minievento = $this->Minievento->findByid($idMiniEvento, null, null, -1);
+    $idPersona = $this->Session->read('Auth.User.persona_id');
+    //debug($idPersona);exit;
+
+    $sql1 = "(SELECT SUM(movimientos.salida) FROM movimientos WHERE movimientos.minievento_id = $idMiniEvento AND movimientos.persona_id = $idPersona AND movimientos.salida != 0 AND  !ISNULL(movimientos.salida) AND movimientos.producto_id = Totale.producto_id)";
+    $sql2 = "(SELECT SUM(movimientos.salida*movimientos.precio_uni) FROM movimientos WHERE movimientos.minievento_id = $idMiniEvento AND movimientos.persona_id = $idPersona AND movimientos.salida != 0 AND  !ISNULL(movimientos.salida) AND movimientos.producto_id = Totale.producto_id)";
+    $this->Totale->virtualFields = array(
+      'vendidos' => "IF(ISNULL($sql1),0,$sql1)",
+      'precio_vendidos' => "IF(ISNULL($sql2),0,$sql2)"
     );
-    $premios = $this->Premio->find('list', array('fields' => 'Premio.nombre_total', 'conditions' => array('Premio.total >' => 0)));
-    $precios = $this->Precio->find('list', array('fields' => array('Precio.monto', 'Precio.monto')));
-    //debug($minievento);exit;
-    $this->set(compact('minievento', 'ventas', 'premios', 'precios'));
+    $productos = $this->Totale->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Totale.persona_id' => $idPersona, 'Totale.total !=' => 0, ''),
+      'fields' => array('Totale.*', 'Producto.nombre', 'Producto.tipo_producto', 'Producto.id')
+    ));
+    $idUser = $this->Session->read('Auth.User.id');
+    //debug($idUser);exit;
+    $chips = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.distribuidor_id' => $idUser, 'Chip.estado !=' => 'Vendido'),
+    ));
+    //debug($chips);exit;
+
+    $ventas_i = $this->Ventasimpulsadore->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Ventasimpulsadore.minievento_id' => $idMiniEvento, 'Ventasimpulsadore.user_id' => $idUser),
+      'fields' => array('Ventasimpulsadore.*', 'Producto.nombre')
+    ));
+
+
+
+    $this->set(compact('minievento', 'productos', 'chips', 'idMiniEvento', 'ventas_i'));
+  }
+
+  public function ventas_minievento2($idMiniEvento = null, $idUser = null) {
+    $minievento = $this->Minievento->findByid($idMiniEvento, null, null, -1);
+    $ususario = $this->User->find('first', array(
+      'recursive' => 0,
+      'conditions' => array('User.id' => $idUser),
+      'fields' => array('Persona.*')
+    ));
+    $idPersona = $ususario['Persona']['id'];
+    //debug($idPersona);exit;
+
+    $sql1 = "(SELECT SUM(movimientos.salida) FROM movimientos WHERE movimientos.minievento_id = $idMiniEvento AND movimientos.persona_id = $idPersona AND movimientos.salida != 0 AND  !ISNULL(movimientos.salida) AND movimientos.producto_id = Totale.producto_id)";
+    $sql2 = "(SELECT SUM(movimientos.salida*movimientos.precio_uni) FROM movimientos WHERE movimientos.minievento_id = $idMiniEvento AND movimientos.persona_id = $idPersona AND movimientos.salida != 0 AND  !ISNULL(movimientos.salida) AND movimientos.producto_id = Totale.producto_id)";
+    $this->Totale->virtualFields = array(
+      'vendidos' => "IF(ISNULL($sql1),0,$sql1)",
+      'precio_vendidos' => "IF(ISNULL($sql2),0,$sql2)"
+    );
+    $productos = $this->Totale->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Totale.persona_id' => $idPersona, 'Totale.total !=' => 0, ''),
+      'fields' => array('Totale.*', 'Producto.nombre', 'Producto.tipo_producto', 'Producto.id')
+    ));
+    //$idUser = $this->Session->read('Auth.User.id');
+    //debug($idUser);exit;
+    $chips = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.distribuidor_id' => $idUser, 'Chip.estado !=' => 'Vendido'),
+    ));
+    //debug($chips);exit;
+
+    $ventas_i = $this->Ventasimpulsadore->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Ventasimpulsadore.minievento_id' => $idMiniEvento, 'Ventasimpulsadore.user_id' => $idUser),
+      'fields' => array('Ventasimpulsadore.*', 'Producto.nombre')
+    ));
+
+
+
+    $this->set(compact('minievento', 'productos', 'chips', 'idMiniEvento', 'ventas_i', 'ususario', 'idUser'));
   }
 
   public function registra_venta() {
@@ -92,6 +161,12 @@ class ImpulsadoresController extends AppController {
     }
     $this->Ventasimpulsadore->delete($idVenta);
     $this->Session->setFlash("Se elimino correctamente la venta!!", 'msgbueno');
+    $this->redirect($this->referer());
+  }
+
+  public function elimina_minievento($idMiniEvento = null) {
+    $this->Minievento->delete($idMiniEvento);
+    $this->Session->setFlash("Se ha eliminado correctamente!!!", 'msgbueno');
     $this->redirect($this->referer());
   }
 
@@ -253,6 +328,189 @@ class ImpulsadoresController extends AppController {
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
     $objWriter->save('php://output');
     exit;
+  }
+
+  public function ajax_venta_chips($idMiniEvento = null, $idChip = null, $idPersona = null) {
+    $this->layout = 'ajax';
+    if (!empty($this->request->data)) {
+      /* debug($this->request->data);
+        exit; */
+      if (empty($idPersona)) {
+        $idPersona = $this->Session->read('Auth.User.persona_id');
+        $idUser = $this->Session->read('Auth.User.id');
+      } else {
+        $usuario = $this->User->find('first', array(
+          'recursive' => 0,
+          'conditions' => array('User.persona_id' => $idPersona),
+          'fields' => array('User.*')
+        ));
+        $idUser = $usuario['User']['id'];
+      }
+
+      if (!empty($this->request->data['Ventasimpulsadore']['producto_id'])) {
+
+        $producto = $this->Totale->find('first', array(
+          'recursive' => 0,
+          'conditions' => array('Totale.producto_id' => $this->request->data['Ventasimpulsadore']['producto_id'], 'Totale.persona_id' => $idPersona),
+          'fields' => array('Producto.nombre', 'Totale.total', 'Totale.id')
+        ));
+        if ($producto['Totale']['total'] > 0) {
+
+
+          $this->Chip->id = $this->request->data['Ventasimpulsadore']['chip_id'];
+          $dchip['estado'] = 'Vendido';
+          $this->Chip->save($dchip);
+          $this->request->data['Ventasimpulsadore']['user_id'] = $idUser;
+          $this->Ventasimpulsadore->create();
+          $this->Ventasimpulsadore->save($this->request->data['Ventasimpulsadore']);
+
+
+          $d_mov['user_id'] = $idUser;
+          $d_mov['producto_id'] = $this->request->data['Ventasimpulsadore']['producto_id'];
+          $d_mov['cliente_id'] = 0;
+          $d_mov['nombre_prod'] = $producto['Producto']['nombre'];
+          $d_mov['escala'] = 'MAYOR';
+          $d_mov['precio_uni'] = $this->request->data['Ventasimpulsadore']['precio_producto'];
+          $d_mov['persona_id'] = $idPersona;
+          $d_mov['minievento_id'] = $idMiniEvento;
+          $d_mov['ventasimpulsadore_id'] = $this->Ventasimpulsadore->getLastInsertID();
+          $d_mov['salida'] = 1;
+          $this->Movimiento->create();
+          $this->Movimiento->save($d_mov);
+          $this->Totale->id = $producto['Totale']['id'];
+          $d_total['total'] = $producto['Totale']['total'] - 1;
+          $this->Totale->save($d_total);
+
+          $this->Session->setFlash("Se ha registrado correctamente la venta!!", 'msgbueno');
+          $this->redirect($this->referer());
+        } else {
+          $this->Session->setFlash("No se ha podido registrar la venta debido a que no tiene para descontar!!", 'msgerror');
+          $this->redirect($this->referer());
+        }
+      } else {
+        $this->Chip->id = $this->request->data['Ventasimpulsadore']['chip_id'];
+        $dchip['estado'] = 'Vendido';
+        $this->Chip->save($dchip);
+        $this->request->data['Ventasimpulsadore']['user_id'] = $idUser;
+        $this->Ventasimpulsadore->create();
+        $this->Ventasimpulsadore->save($this->request->data['Ventasimpulsadore']);
+        $this->Session->setFlash("Se ha registrado correctamente la venta!!", 'msgbueno');
+        $this->redirect($this->referer());
+      }
+    }
+
+
+    $precios_chip = $this->Precio->find('list', array(
+      'fields' => array('Precio.monto', 'Precio.monto'),
+      'conditions' => array('Precio.descripcion' => 'Chips')
+    ));
+    $chip = $this->Chip->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.id' => $idChip)
+    ));
+    if (empty($idPersona)) {
+      $idPersona = $this->Session->read('Auth.User.persona_id');
+    }
+    $sql = "(SELECT productos.nombre,productos.id,pro.precio, tot.total FROM productosprecios pro,totales tot LEFT JOIN productos ON (productos.id = tot.producto_id) WHERE tot.persona_id = $idPersona AND tot.total != 0 AND productos.tipo_producto = 'PREMIOS' AND tot.producto_id = pro.producto_id AND pro.tipousuario_id = 4)";
+    $premios = $this->Productosprecio->query($sql);
+    /* debug($premios);
+      exit; */
+    $this->set(compact('precios_chip', 'chip', 'premios', 'idMiniEvento'));
+  }
+
+  public function ajax_venta($idMiniEvento = null, $idProducto = null, $persona = null) {
+    if (empty($persona)) {
+      $persona = $this->Session->read('Auth.User.persona_id');
+      $idUser = $this->Session->read('Auth.User.id');
+    } else {
+      $usuario = $this->User->find('first', array(
+        'recursive' => 0,
+        'conditions' => array('User.persona_id' => $persona),
+        'fields' => array('User.*')
+      ));
+      $idUser = $usuario['User']['id'];
+    }
+
+    $this->layout = 'ajax';
+    //debug($idProducto);exit;
+    $fecha = date('Y-m-d');
+    //$this->request->data['Movimiento']['created'] = date('Y-m-d');
+    $precios = $this->Productosprecio->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Productosprecio.producto_id' => $idProducto, 'Productosprecio.tipousuario_id' => 4),
+      'fields' => array('Productosprecio.precio')
+    ));
+    $producto = $this->Producto->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Producto.id' => $idProducto),
+      'fields' => array('Producto.nombre')
+    ));
+    $movimientos = $this->Movimiento->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Movimiento.minievento_id' => $idMiniEvento, 'Movimiento.persona_id' => $persona, 'Movimiento.salida !=' => 0, 'Movimiento.salida !=' => NULL, 'Movimiento.producto_id' => $idProducto, 'Movimiento.ventasimpulsadore_id' => NULL),
+      'fields' => array('Movimiento.id', 'Movimiento.modified', 'Movimiento.precio_uni', 'Movimiento.salida')
+    ));
+    $this->set(compact('producto', 'precios', 'idProducto', 'persona', 'fecha', 'movimientos', 'idMiniEvento', 'idUser'));
+  }
+
+  public function cancela_venta_chip($idVentaImp = null) {
+    $venta = $this->Ventasimpulsadore->find('first', array(
+      'recursive' => 0,
+      'conditions' => array('Ventasimpulsadore.id' => $idVentaImp),
+      'fields' => array('Ventasimpulsadore.*', 'User.persona_id')
+    ));
+    if (!empty($venta['Ventasimpulsadore']['producto_id'])) {
+      $this->Movimiento->deleteAll(array('ventasimpulsadore_id' => $idVentaImp));
+      $total = $this->Totale->find('first', array(
+        'recursive' => -1,
+        'conditions' => array('Totale.producto_id' => $venta['Ventasimpulsadore']['producto_id'], 'Totale.persona_id' => $venta['User']['persona_id'])
+      ));
+      $this->Totale->id = $total;
+      $d_total['total'] = $total['Totale']['total'] + 1;
+      $this->Totale->save($d_total);
+    }
+    $this->Chip->id = $venta['Ventasimpulsadore']['chip_id'];
+    $d_chip['estado'] = '';
+    $this->Chip->save($d_chip);
+    $this->Ventasimpulsadore->delete($idVentaImp);
+    $this->Session->setFlash("Se ha eliminado correctamente la venta", 'msgbueno');
+    $this->redirect($this->referer());
+  }
+
+  public function elimina_venta_dis($idMovimiento = null) {
+    $movimiento = $this->Movimiento->find('first', array(
+      'recursive' => 0,
+      'conditions' => array('Movimiento.id' => $idMovimiento),
+      'fields' => array('Movimiento.salida', 'Almacene.id', 'Almacene.central', 'Movimiento.producto_id', 'Movimiento.persona_id')
+    ));
+    //debug($movimiento);exit;
+    $total = $this->Totale->find('first', array(
+      'recursive' => -1,
+      'conditions' => array('Totale.producto_id' => $movimiento['Movimiento']['producto_id'], 'Totale.persona_id' => $movimiento['Movimiento']['persona_id'])
+    ));
+
+    //$total_p = $this->get_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id']);
+    //debug($total_p);exit;
+    $this->Movimiento->delete($idMovimiento);
+    //$this->set_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id'], ($total_p + $movimiento['Movimiento']['salida']));
+    $this->Totale->id = $total['Totale']['id'];
+    $d_total['total'] = $total['Totale']['total'] + $movimiento['Movimiento']['salida'];
+    $this->Totale->save($d_total);
+    $this->Session->setFlash("Se ha eliminado correctamente el movimiento!!", 'msgbueno');
+    $this->redirect($this->referer());
+  }
+
+  public function cambiopass() {
+    $this->layout = 'ajax';
+    $idUser = $this->Session->read('Auth.User.id');
+
+    if (!empty($this->request->data['Dato']['password'])) {
+      $this->User->id = $idUser;
+      $this->request->data['User']['password'] = $this->request->data['Dato']['password'];
+      $this->User->save($this->request->data['User']);
+      $this->Session->setFlash("Se ha cambiado el password con exito!!", 'msgbueno');
+      $this->redirect($this->referer());
+    }
   }
 
 }

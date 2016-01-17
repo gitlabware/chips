@@ -1,10 +1,11 @@
 <section role="main" id="main">
-
     <hgroup id="main-title" class="thin">
-        <h1>Minievento <?php echo $minievento['Minievento']['direccion'] ?></h1>
+        <h1>Minievento <?php echo $minievento['Minievento']['direccion'] ?> </h1>
     </hgroup>
-
     <div class="with-padding">
+        <h4><?php echo 'Impulsador: ' . $ususario['Persona']['nombre'] . ' ' . $ususario['Persona']['ap_paterno'] . ' ' . $ususario['Persona']['ap_materno'] ?> </h4>
+        <!--<a class="button black-gradient full-width"  href="<?php //echo $this->Html->url(array('action' => 'reporte_ventas_dist', $persona, $fecha_ini, $fecha_fin));    ?>" target="_blank">IMPRIMIR</a>-->
+        <br><br>
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
                 <tr>                      
@@ -14,8 +15,7 @@
                     <th>Factura</th>
                     <th>Accion</th>
                 </tr>
-            </thead>          
-
+            </thead>
             <tbody>
                 <?php foreach ($chips as $chip): ?>
                   <tr>
@@ -24,7 +24,7 @@
                       <td><?php echo $chip['Chip']['telefono'] ?></td>
                       <td><?php echo $chip['Chip']['factura'] ?></td>
                       <td>
-                          <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'ajax_venta_chips', $minievento['Minievento']['id'], $chip['Chip']['id'])); ?>')" class="button green-gradient glossy">Venta</a>
+                          <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'ajax_venta_chips', $minievento['Minievento']['id'], $chip['Chip']['id'], $ususario['Persona']['id'])); ?>')" class="button green-gradient glossy">Venta</a>
                       </td>
                   </tr>
                 <?php endforeach; ?>
@@ -54,7 +54,7 @@
                       <td><?php echo $pro['Totale']['vendidos'] ?></td>
                       <td><?php echo $pro['Totale']['precio_vendidos'] . ' Bs.' ?></td>
                       <td>
-                          <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'ajax_venta', $minievento['Minievento']['id'], $pro['Producto']['id'])); ?>')" class="button green-gradient glossy">Venta</a>
+                          <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'ajax_venta', $minievento['Minievento']['id'], $pro['Producto']['id'], $ususario['Persona']['id'])); ?>')" class="button green-gradient glossy">Venta</a>
                       </td>
                   </tr>
                 <?php endforeach; ?>
@@ -111,6 +111,71 @@
                 </tr>
             </tbody>
         </table>
+        <br>
+        <div class="columns">
+            <div class="four-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <button class="button orange-gradient full-width" type="button" onclick="open_pago_d();">REGISTRAR PAGOS</button>
+                </p>
+            </div>
+            <div class="four-columns new-row-mobile twelve-columns-mobile">
+                <p class="block-label button-height">
+                    <button class="button green-gradient full-width" type="button" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Cajachicas','action' => 'ajax_pagos_dist',$idUser)); ?>');">PAGOS</button>
+                </p>
+            </div>
+        </div>
+        <br>
+        <?php $pagos = $this->requestAction(array('controller' => 'Cajachicas', 'action' => 'get_pagos_imp', $idUser, $minievento['Minievento']['id'])) ?>
+
+        <?php if (!empty($pagos)): ?>
+          <div class="columns">
+              <div class="six-columns">
+                  <table class="simple-table responsive-table" style="width: 100%;">
+                      <tr>
+                          <td>TOTAL VENTAS</td>
+                          <td><?php echo $p_total_c + $precio_v ?> Bs</td>
+                      </tr>
+                      <?php foreach ($pagos['bancos'] as $ba): ?>
+                        <tr>
+                            <td><?php echo $ba['nombre'] ?> Bs</td>
+                            <td><?php echo $ba['monto'] ?> Bs</td>
+                        </tr>
+                      <?php endforeach; ?>
+                      <tr>
+                          <td>FALTANTE</td>
+                          <td><?php echo $pagos['faltante'] ?> Bs</td>
+                      </tr>
+                      <tr>
+                          <td>OTROS INGRESOS</td>
+                          <td><?php echo $pagos['otro_ingreso'] ?> Bs</td>
+                      </tr>
+                      <tr>
+                          <td>OBSERVACIONES</td>
+                          <td><?php echo $pagos['observaciones'] ?></td>
+                      </tr>
+                      <tr>
+                          <td>TOTAL</td>
+                          <td><?php echo $p_total_c + $precio_v + $pagos['otro_ingreso'] ?> Bs</td>
+                      </tr>
+                  </table>
+              </div>
+              <div class="six-columns">
+                  <p class="block-label button-height">
+                      <label for="block-label-1" class="label">&nbsp;</label>
+
+
+                  </p>
+              </div>
+          </div>
+
+        <?php endif; ?>
     </div>
 </section>	
-<?php echo $this->element('sidebar/impulsador'); ?>
+<?php echo $this->element('sidebar/administrador'); ?>
+
+
+<script>
+  function open_pago_d() {
+      cargarmodal('<?php echo $this->Html->url(array('controller' => 'Cajachicas', 'action' => 'pago_dist', $idUser, ($p_total_c + $precio_v), date('Y-m-d'), $idMiniEvento)); ?>');
+  }
+</script>

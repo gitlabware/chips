@@ -52,6 +52,7 @@
             <button class="button green-gradient full-width" type="submit">Registrar</button>
         </div>
     </fieldset>
+    <?php echo $this->Form->hidden("Distribuidorpago.minievento_id", array('value' => $idMiniEvento)) ?>
     <?php echo $this->Form->hidden("Distribuidorpago.distribuidor_id", array('value' => $idDistribuidor)) ?>
     <?php echo $this->Form->hidden("Distribuidorpago.fecha", array('value' => $fecha_ini)) ?>
     <?php echo $this->Form->hidden("Distribuidorpago.total", array('class' => 'input', 'type' => 'number', 'step' => 'any', 'value' => $total, 'id' => 'idtotal-p')) ?>
@@ -137,8 +138,8 @@
   $('.to-monto').keyup(function () {
       calcula_suma();
   });
-  $('#idotro-i-p').keyup(function () {
+  /*$('#idotro-i-p').keyup(function () {
       calcula_suma();
-  });
+  });*/
 
 </script>

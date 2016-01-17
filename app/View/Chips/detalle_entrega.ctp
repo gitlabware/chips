@@ -1,7 +1,4 @@
 <section role="main" id="main">
-
-    <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
-
     <hgroup id="main-title" class="thin">
         <h1>Entregas a <?php echo $distribuidor['Persona']['nombre'] . ' ' . $distribuidor['Persona']['ap_paterno'] . ' ' . $distribuidor['Persona']['ap_materno'] ?> de <?php echo $fecha; ?></h1>
     </hgroup>

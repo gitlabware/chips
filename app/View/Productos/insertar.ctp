@@ -63,19 +63,19 @@
             <div id="divplus-escala" style="display: none;" class="new-row four-columns">
                 <p class="block-label button-height">
                     <label class="label">Escala</label>
-                    <?php echo $this->Form->select('Productosprecio.escala', array('DISTRIBUIDOR' => 'DISTRIBUIDOR', 'TIENDA' => 'TIENDA'), array('class' => 'select full-width input validate[required]')); ?>
+                    <?php echo $this->Form->select('Productosprecio.escala', array('DISTRIBUIDOR' => 'DISTRIBUIDOR', 'TIENDA' => 'TIENDA'), array('class' => 'select full-width input')); ?>
                 </p>
             </div>
             <div id="divplus-precio" style="display: none;" class="four-columns">
                 <p class="block-label button-height">
                     <label class="label">Precio de venta ($u$)</label>
-                    <?php echo $this->Form->text('precio_venta', array('class' => 'input full-width input validate[required]', 'type' => 'number', 'step' => 'any')); ?>
+                    <?php echo $this->Form->text('precio_venta', array('class' => 'input full-width input ', 'type' => 'number', 'step' => 'any')); ?>
                 </p>
             </div>
             <div id="divplus-cantidad" style="display: none;" class="four-columns">
                 <p class="block-label button-height">
                     <label class="label">Cantidad en Almacen central</label>
-                    <?php echo $this->Form->text('cantidad_central', array('class' => 'input full-width input validate[required]', 'type' => 'number', 'min' => 0)); ?>
+                    <?php echo $this->Form->text('cantidad_central', array('class' => 'input full-width input', 'type' => 'number', 'min' => 0)); ?>
                 </p>
             </div>
             

@@ -21,7 +21,7 @@ class AlmacenesController extends AppController {
     'Detalle', 'User', 'Deposito', 'Movimientosrecarga', 'Sucursal',
     'Banco', 'Ventascelulare', 'Pedido', 'Productosprecio',
     'Devuelto', 'Recargado',
-    'Totale', 'Excel', 'Distribucione', 'Porcentaje'
+    'Totale', 'Excel', 'Distribucione', 'Porcentaje', 'Minievento'
   );
   public $components = array('Session', 'Fechasconvert', 'RequestHandler', 'DataTable');
   public $layout = 'viva';
@@ -133,7 +133,7 @@ class AlmacenesController extends AppController {
    * */
   public function listadistribuidores() {
     $distribuidores = $this->User->find('all', array(
-      'conditions' => array('User.group_id' => '2')
+      'conditions' => array('OR' => array(array('User.group_id' => '2'), array('User.group_id' => '7')))
       )
     );
     $this->set(compact('distribuidores'));
@@ -155,9 +155,15 @@ class AlmacenesController extends AppController {
       $condiciones['Totale.persona_id'] = $idPersona;
       $distribuidor = $this->User->find('first', array(
         'recursive' => 0,
-        'fields' => array('User.id', 'Persona.nombre', 'Persona.ap_paterno', 'Persona.ap_materno'),
+        'fields' => array('User.id', 'Persona.nombre', 'Persona.ap_paterno', 'Persona.ap_materno', 'User.group_id'),
         'conditions' => array('User.persona_id' => $idPersona)
       ));
+      if ($distribuidor['User']['group_id'] == 7) {
+        $minieventos = $this->Minievento->find('all', array(
+          'recursive' => -1,
+          'conditions' => array('Minievento.estado' => 1)
+        ));
+      }
       /* debug($distribuidor);
         exit; */
       $nombre = " a " . $distribuidor['Persona']['nombre'] . " " . $distribuidor['Persona']['ap_paterno'] . " " . $distribuidor['Persona']['ap_materno'];
@@ -175,13 +181,16 @@ class AlmacenesController extends AppController {
     $this->Totale->virtualFields = array(
       'marca' => "(SELECT ma.nombre FROM marcas ma WHERE ma.id = Producto.marca_id)"
     );
+    if ($this->Session->read('Auth.User.group_id') == 8) {
+      $condiciones["Producto.tipo_producto"] = 'TARJETAS';
+    }
     $entregas = $this->Totale->find('all', array(
       'recursive' => 0,
       'conditions' => $condiciones,
       'fields' => array('Producto.nombre', 'Producto.tipo_producto', 'Totale.marca', 'Totale.total', 'Totale.producto_id', 'Producto.marca_id')
     ));
 
-    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos', 'distribuidor'));
+    $this->set(compact('entregas', 'idPersona', 'nombre', 'almacen', 'pedidos', 'distribuidor', 'minieventos'));
   }
 
   public function ajaxrepartir($idPersona = null, $almacen = null) {
@@ -189,8 +198,18 @@ class AlmacenesController extends AppController {
     $cent = $cen['Almacene']['central'];
 
     $this->layout = 'ajax';
-    $categorias = $this->Tiposproducto->find('all', array('recursive' => -1));
-    $productos = $this->Producto->find('all', array('recursive' => 0));
+    $condiciones = array();
+    if ($this->Session->read('Auth.User.group_id') == 8) {
+      $condiciones['Tiposproducto.nombre'] = 'TARJETAS';
+    }
+    $categorias = $this->Tiposproducto->find('all', array(
+      'recursive' => -1,
+      'conditions' => $condiciones
+    ));
+
+    $productos = $this->Producto->find('all', array(
+      'recursive' => 0
+    ));
 
     if (!empty($this->request->data)) {
       /* debug($idPersona);
@@ -956,8 +975,8 @@ class AlmacenesController extends AppController {
     $total_p = $this->get_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id']);
     //debug($total_p);exit;
     $this->Movimiento->delete($idMovimiento);
-    $this->set_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id'], ($total_p+$movimiento['Movimiento']['salida']));
-    $this->Session->setFlash("Se ha eliminado correctamente el movimiento!!",'msgbueno');
+    $this->set_total($movimiento['Movimiento']['producto_id'], 0, $movimiento['Movimiento']['persona_id'], ($total_p + $movimiento['Movimiento']['salida']));
+    $this->Session->setFlash("Se ha eliminado correctamente el movimiento!!", 'msgbueno');
     $this->redirect($this->referer());
   }
 
@@ -1718,8 +1737,8 @@ class AlmacenesController extends AppController {
     $this->set(compact('producto', 'precios', 'idProducto', 'persona', 'fecha_ini', 'fecha_fin', 'movimientos'));
   }
 
-  public function reporte_ventas_dist($persona = null,$fecha_ini = null,$fecha_fin = null) {
-    if(!empty($persona)){
+  public function reporte_ventas_dist($persona = null, $fecha_ini = null, $fecha_fin = null) {
+    if (!empty($persona)) {
       $this->request->data['Dato']['fecha_ini'] = $fecha_ini;
       $this->request->data['Dato']['fecha_fin'] = $fecha_fin;
       $this->request->data['Dato']['persona_id'] = $persona;
@@ -1752,7 +1771,7 @@ class AlmacenesController extends AppController {
       $distribuidor = $this->User->find('first', array(
         'recurisve' => 0,
         'conditions' => array('User.persona_id' => $persona),
-        'fields' => array('User.id','Persona.*')
+        'fields' => array('User.id', 'Persona.*')
       ));
     }
     $this->User->virtualFields = array(
@@ -1765,6 +1784,12 @@ class AlmacenesController extends AppController {
     ));
     //debug($productos);exit;
     $this->set(compact('productos', 'fecha_ini', 'fecha_fin', 'persona', 'porcentajes', 'distribuidor', 'personas'));
+  }
+
+  public function ajax_entrega($idPersona = null, $esAlmacen = NULL, $idProducto = null) {
+    $this->layout = 'ajax';
+    
+    
   }
 
 }

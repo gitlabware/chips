@@ -3,7 +3,7 @@
 <section role="main" id="main">
     <hgroup id="main-title" class="thin">
         <h1>Caja chica
-            </h1>
+        </h1>
     </hgroup>
 
     <div class="with-padding">       
@@ -36,7 +36,7 @@
                     </p>
                     <p class="inline-label">
                         <label class="label">Banco</label>
-                        <?php echo $this->Form->select('banco_id',$bancos, array('class' => 'select expandable-list anthracite-gradient glossy full-width validate[required]', 'empty' => 'Seleccione Banco')); ?>
+                        <?php echo $this->Form->select('banco_id', $bancos, array('class' => 'select expandable-list anthracite-gradient glossy full-width validate[required]', 'empty' => 'Seleccione Banco')); ?>
                     </p>
                     <p class="inline-label">
                         <label class="label">Monto</label>
@@ -58,7 +58,7 @@
                     <p class="button-height">
                         <button type="submit" class="button green-gradient glossy full-width">REGISTRAR</button>
                     </p>
-                    <?php echo $this->Form->hidden("sucursal_id",array('value' => $this->Session->read('Auth.User.sucursal_id')))?>
+                    <?php echo $this->Form->hidden("sucursal_id", array('value' => $this->Session->read('Auth.User.sucursal_id'))) ?>
                     <?php echo $this->Form->end(); ?>
                 </fieldset>
 
@@ -73,7 +73,7 @@
                         <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input two-columns datepicker')); ?>
                         <label class="label two-columns">hasta</label>
                         <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input two-columns datepicker')); ?>
-                        <?php echo $this->Form->select('Dato.banco_id',$bancos, array('class' => 'select three-columns')); ?>
+                        <?php echo $this->Form->select('Dato.banco_id', $bancos, array('class' => 'select three-columns')); ?>
                         <button type="submit" class="button black-gradient two-columns">GENERAR</button>
                     </div>
                     </p>
@@ -88,7 +88,7 @@
                               <thead>
                                   <tr>
                                       <th>Fecha</th>
-                                      <th>Nota</th>
+                                      <th>Banco</th>
                                       <th>Detalle</th>
                                       <th>Monto</th>
                                       <th>Accion</th>
@@ -100,11 +100,13 @@
                                     <?php $total = $total + $ca['Cajachica']['monto']; ?>
                                     <tr>
                                         <td><?php echo $ca['Cajachica']['fecha'] ?></td>
-                                        <td><?php echo $ca['Cajachica']['nota'] ?></td>
+                                        <td><?php echo $ca['Banco']['nombre'] ?></td>
                                         <td><?php echo $ca['Cajadetalle']['nombre'] ?></td>
                                         <td><?php echo $ca['Cajachica']['monto'] ?></td>
                                         <td>
-                                            <?php echo $this->Html->link("ELiminar", array('action' => 'elimina', $ca['Cajachica']['id'], 'Ingreso'), array('confirm' => 'Esta seguro de eliminar??', 'class' => 'button red-gradient glossy')) ?>
+                                            <?php if (empty($ca['Cajachica']['distribuidorpago_id'])): ?>
+                                              <?php echo $this->Html->link("ELiminar", array('action' => 'elimina', $ca['Cajachica']['id'], 'Ingreso'), array('confirm' => 'Esta seguro de eliminar??', 'class' => 'button red-gradient glossy')) ?>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                   <?php endforeach; ?>

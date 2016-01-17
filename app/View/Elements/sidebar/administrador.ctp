@@ -192,6 +192,7 @@
                             <ul class="big-menu">
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_detallado_precio_dist')); ?>">Ventas</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_cliente_dist')); ?>">Cliente</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Cajachicas', 'action' => 'reporte_vent_dis')); ?>">Pagos Ventas</a></li>
                             </ul>
                         </li>  
 

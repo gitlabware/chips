@@ -30,44 +30,46 @@
 
             </tbody>
         </table>     <br>    
-        <div class="columns">
-            <div class="twelve-columns">
-                <?php echo $this->Form->create('Producto', array('action' => 'registra_excel_pro', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
-                <div class="field-block button-height">							
-                    <label for="login" class="label"><b>Seleccionar Excel:</b></label>
-                    <span class="input file">
-                        <span class="file-text"></span>
-                        <span class="button compact blue-gradient">Seleccione</span>
-                        <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
-                    </span>
-                    <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
-                    <button type="button" class="button glossy mid-margin-right" onclick="openModal2();">
-                        <span class="button-icon"><span class="icon-search"></span></span>
-                        Ver Formato Productos
-                    </button>
-                    <a href="<?= $this->webroot; ?>formatos/productos.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
-                </div> 
-                <?php echo $this->Form->end(); ?>
-            </div>
-            <div class="new-row twelve-columns">
-                <?php echo $this->Form->create('Producto', array('action' => 'registra_excel_cel', 'id' => 'formActicel', 'enctype' => 'multipart/form-data')); ?>
-                <div class="field-block button-height">							
-                    <label for="login" class="label"><b>Seleccionar Excel:</b></label>
-                    <span class="input file">
-                        <span class="file-text"></span>
-                        <span class="button compact green-gradient">Seleccione</span>
-                        <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
-                    </span>
-                    <button type="submit" class="button green-gradient glossy">SUBIR EXCEL</button> 
-                    <button type="button" class="button glossy mid-margin-right" onclick="openModal3();">
-                        <span class="button-icon green-gradient"><span class="icon-search"></span></span>
-                        Ver Formato Celulares
-                    </button>
-                    <a href="<?= $this->webroot; ?>formatos/celulares.xlsx" class="button"><span class="button-icon green-gradient"><span class="icon-download"></span></span> Formato</a>
-                </div> 
-                <?php echo $this->Form->end(); ?>
-            </div>
-        </div>
+        <?php if ($this->Session->read('Auth.User.group_id') == 1): ?>
+          <div class="columns">
+              <div class="twelve-columns">
+                  <?php echo $this->Form->create('Producto', array('action' => 'registra_excel_pro', 'id' => 'formActi', 'enctype' => 'multipart/form-data')); ?>
+                  <div class="field-block button-height">							
+                      <label for="login" class="label"><b>Seleccionar Excel:</b></label>
+                      <span class="input file">
+                          <span class="file-text"></span>
+                          <span class="button compact blue-gradient">Seleccione</span>
+                          <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
+                      </span>
+                      <button type="submit" class="button blue-gradient glossy">SUBIR EXCEL</button> 
+                      <button type="button" class="button glossy mid-margin-right" onclick="openModal2();">
+                          <span class="button-icon"><span class="icon-search"></span></span>
+                          Ver Formato Productos
+                      </button>
+                      <a href="<?= $this->webroot; ?>formatos/productos.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
+                  </div> 
+                  <?php echo $this->Form->end(); ?>
+              </div>
+              <div class="new-row twelve-columns">
+                  <?php echo $this->Form->create('Producto', array('action' => 'registra_excel_cel', 'id' => 'formActicel', 'enctype' => 'multipart/form-data')); ?>
+                  <div class="field-block button-height">							
+                      <label for="login" class="label"><b>Seleccionar Excel:</b></label>
+                      <span class="input file">
+                          <span class="file-text"></span>
+                          <span class="button compact green-gradient">Seleccione</span>
+                          <input type="file" name="data[Excel][excel]" id="special-input-1" value="" class="file withClearFunctions" required="" />
+                      </span>
+                      <button type="submit" class="button green-gradient glossy">SUBIR EXCEL</button> 
+                      <button type="button" class="button glossy mid-margin-right" onclick="openModal3();">
+                          <span class="button-icon green-gradient"><span class="icon-search"></span></span>
+                          Ver Formato Celulares
+                      </button>
+                      <a href="<?= $this->webroot; ?>formatos/celulares.xlsx" class="button"><span class="button-icon green-gradient"><span class="icon-download"></span></span> Formato</a>
+                  </div> 
+                  <?php echo $this->Form->end(); ?>
+              </div>
+          </div>
+        <?php endif; ?>
     </div>
 </section>
 <script>
@@ -125,6 +127,8 @@
   <!-- End sidebar/drop-down menu --> 
 <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
   <?php echo $this->element('sidebar/administrador'); ?>
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'TARJETAS'): ?>
+  <?php echo $this->element('sidebar/tarjetas'); ?>
 <?php endif; ?>
 <!-- End sidebar/drop-down menu --> 
 <script>
@@ -172,9 +176,9 @@
       });
   }
   function ingresar_ap(idProducto) {
-      cargarmodal('<?= $this->Html->url(array('controller' => 'Productos','action' => 'ajax_ing_alm_p')); ?>/'+idProducto,'Ingreso A Almacen Principal',300);
+      cargarmodal('<?= $this->Html->url(array('controller' => 'Productos', 'action' => 'ajax_ing_alm_p')); ?>/' + idProducto, 'Ingreso A Almacen Principal', 300);
   }
   function ingresar_a(idProducto) {
-      cargarmodal('<?= $this->Html->url(array('controller' => 'Productos','action' => 'ajax_ing_alm')); ?>/'+idProducto,'Ingreso A Almacen',300);
+      cargarmodal('<?= $this->Html->url(array('controller' => 'Productos', 'action' => 'ajax_ing_alm')); ?>/' + idProducto, 'Ingreso A Almacen', 300);
   }
 </script>

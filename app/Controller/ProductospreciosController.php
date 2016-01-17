@@ -147,6 +147,10 @@ class ProductospreciosController extends AppController {
         $this->request->data['Productosprecio']['tipousuario_id'] = 2;
         $this->request->data['Productosprecio']['escala'] = 'TIENDA';
         $this->request->data['Productosprecio']['escala_id'] = 3;
+      }elseif ($this->request->data['Productosprecio']['aux_escala'] == 4) {
+        $this->request->data['Productosprecio']['tipousuario_id'] = 4;
+        $this->request->data['Productosprecio']['escala'] = 'MAYOR';
+        $this->request->data['Productosprecio']['escala_id'] = 1;
       }
       $this->Productosprecio->create();
       if ($this->Productosprecio->save($this->request->data['Productosprecio'])) {

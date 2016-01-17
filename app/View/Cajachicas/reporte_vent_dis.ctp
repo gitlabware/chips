@@ -76,7 +76,7 @@
         <h1>REPORTE DE RECARGAS</h1>
     </hgroup>
     <div class="with-padding">
-        <?php echo $this->Form->create('Recargado'); ?>
+        <?php echo $this->Form->create('Cajachica'); ?>
 
         <div class="columns ocultar_impresion">
             <div class="three-columns twelve-columns-mobile">
@@ -84,7 +84,7 @@
                     <label for="block-label-1" class="label">Fecha Inicial</label>
                     <span class="input">
                         <span class="icon-calendar"></span>
-                        <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input-unstyled datepicker', 'value' => date('Y-m-d'))); ?>
+                        <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input-unstyled datepicker')); ?>
                     </span>
                 </p>
             </div>
@@ -93,20 +93,14 @@
                     <label for="block-label-1" class="label">Fecha Final</label>
                     <span class="input">
                         <span class="icon-calendar"></span>
-                        <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input-unstyled datepicker', 'value' => date('Y-m-d'))); ?>
+                        <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input-unstyled datepicker')); ?>
                     </span>
                 </p>
             </div>
             <div class="two-columns new-row-mobile twelve-columns-mobile">
                 <p class="block-label button-height">
-                    <label for="block-label-1" class="label">Tipo</label>
-                    <?php echo $this->Form->select('Dato.tipo', array(2 => 'Recarga', 1 => 'Carga', 3 => 'Recarga del Distribuidor'), array('class' => 'select full-width validate[required]', 'empty' => 'Seleccione el tipo de recarga')); ?>
-                </p>
-            </div>
-            <div class="two-columns new-row-mobile twelve-columns-mobile">
-                <p class="block-label button-height">
                     <label for="block-label-1" class="label">Distribuidores</label>
-                    <?php echo $this->Form->select('Dato.tipo', $distribuidores, array('class' => 'select full-width validate[required]', 'empty' => 'Seleccione el tipo de recarga')); ?>
+                    <?php echo $this->Form->select('Dato.distribuidor_id', $distribuidores, array('class' => 'select full-width validate[required]', 'empty' => 'Seleccione el tipo de recarga')); ?>
                 </p>
             </div>
             <div class="two-columns new-row-mobile twelve-columns-mobile">
@@ -120,39 +114,59 @@
         <?php echo $this->Form->end(); ?>
         <table class="CSSTableGenerator" >
             <tr>
+                <td>Fecha</td>
                 <td>Distribuidor</td>
-                <td>Celular</td>
-                <td>Tipo</td>
-                <td>Ingreso</td>
-                <td>Salida</td>
-                <td>%</td>
-                <td>Recarga</td>
+                <td>Ingresos</td>
+                <td>Faltantes</td>
+                <td>Otros Ingresos</td>
+                <td>Observaciones</td>
             </tr>
-            <?php $total_sal = $total_ing = $total_total = 0; ?>
-            <?php foreach ($recargas as $rec): ?>
+            <?php $total_fal = $total_o_ing = $total_ing = 0; ?>
+            <?php foreach ($pagosdis as $pa): ?>
               <tr>
-                  <td><?php echo $rec['Persona']['nombre'] . ' ' . $rec['Persona']['ap_paterno'] . ' ' . $rec['Persona']['ap_materno'] ?></td>
-                  <td><?php echo $rec['Recargado']['num_celular'] ?></td>
-                  <td><?php echo $tipos[$rec['Recargado']['tipo']] ?></td>
-                  <td><?php echo $rec['Recargado']['entrada'] ?></td>
-                  <td><?php echo $rec['Recargado']['salida'] ?></td>
-                  <td><?php echo $rec['Porcentaje']['nombre'] ?></td>
+                  <td><?php echo $pa['Distribuidorpago']['fecha'] ?></td>
+                  <td><?php echo $pa['Distribuidorpago']['nombre_dis'] ?></td>
                   <?php
-                  $total_sal = $total_sal + $rec['Recargado']['salida'];
-                  $total_ing = $total_ing + $rec['Recargado']['entrada'];
-                  $total_total = $total_total + $rec['Recargado']['monto'];
+                  $cajachicas = $this->requestAction(array('action' => 'get_caja_dis', $pa['Distribuidorpago']['id']));
                   ?>
-                  <td><?php echo $rec['Recargado']['monto'] ?></td>
+                  <td>
+                      <table style="width: 100%;">
+                          <?php foreach ($cajachicas as $ca): ?>
+                            <tr>
+                                <td><?php echo $ca['Banco']['nombre'] ?></td>
+                                <td><?php echo $ca['Cajachica']['monto'] ?></td>
+                            </tr>
+                          <?php endforeach; ?>
+                      </table>
+                  </td>
+                  <td><?php echo $pa['Distribuidorpago']['faltante'] ?></td>
+                  <td><?php echo $pa['Distribuidorpago']['otro_ingreso'] ?></td>
+                  <td><?php echo $pa['Distribuidorpago']['observaciones'] ?></td>
               </tr>
+              <?php
+              $total_fal = $total_fal + $pa['Distribuidorpago']['faltante'];
+              $total_o_ing = $total_o_ing + $pa['Distribuidorpago']['otro_ingreso'];
+              ?>
             <?php endforeach; ?>
+              <?php 
+              $cajas = $this->requestAction(array('action' => 'get_caja_d_t',$this->request->data['Dato']['fecha_ini'],$this->request->data['Dato']['fecha_fin'],$this->request->data['Dato']['distribuidor_id']));
+              ?>
             <tr>
                 <td></td>
                 <td></td>
-                <td>TOTAL</td>
-                <td><?php echo $total_ing; ?></td>
-                <td><?php echo $total_sal; ?></td>
+                <td>
+                    <table style="width: 100%;">
+                        <?php foreach ($cajas as $ca): ?>
+                          <tr>
+                              <td><?php echo $ca['Banco']['nombre'] ?></td>
+                              <td><?php echo $ca[0]['monto_total'] ?></td>
+                          </tr>
+                        <?php endforeach; ?>
+                    </table>
+                </td>
+                <td><?php echo $total_fal; ?></td>
+                <td><?php echo $total_o_ing; ?></td>
                 <td></td>
-                <td><?php echo $total_total; ?></td>
             </tr>
         </table> 
     </div>

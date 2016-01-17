@@ -169,7 +169,7 @@ class RecargadosController extends AppController {
 
     $sql_p = "(SELECT recargados.total_distribuidor FROM recargados WHERE recargados.persona_id = Persona.id ORDER BY recargados.id DESC LIMIT 1)";
     $this->User->virtualFields = array(
-      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno, '(',( IF( ISNULL($sql_p),0,$sql_p ) ),')')"
+      'nombre_completo' => "CONCAT('(',( IF( ISNULL($sql_p),0,$sql_p ) ),') ',Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
     );
     $distribuidor = $this->User->find('list', array(
       'recursive' => 0,
@@ -423,7 +423,15 @@ class RecargadosController extends AppController {
         'conditions' => array('DATE(Recargado.created) >=' => $fecha_ini, 'DATE(Recargado.created) <=' => $fecha_fin)
       ));
     }
-    $this->set(compact('recargas'));
+    $this->User->virtualFields = array(
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+    $distribuidores = $this->User->find('list', array(
+      'recursive' => 0,
+      'fields' => array('User.id', 'User.nombre_completo'),
+      'conditions' => array('Group.name' => 'Distribuidores'),
+    ));
+    $this->set(compact('recargas','distribuidores'));
   }
 
   public function get_recargas_dist($fecha_ini = null, $fecha_fin = null, $idPersona = null, $idPorcentaje = null, $tipo = null) {
@@ -440,5 +448,7 @@ class RecargadosController extends AppController {
       return 0;
     }
   }
+  
+  
 
 }

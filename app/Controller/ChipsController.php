@@ -330,40 +330,42 @@ class ChipsController extends AppController {
       $this->request->data = "";
       $i = 0;
       foreach ($array_data as $d) {
-        $this->request->data[$i]['Activado']['ciudad_nro_tel'] = $d['A'];
-        $this->request->data[$i]['Activado']['fecha_act'] = $d['B'];
-        $this->request->data[$i]['Activado']['fecha_doc'] = $d['C'];
-        $this->request->data[$i]['Activado']['plan_code'] = $d['D'];
-        $this->request->data[$i]['Activado']['description'] = $d['E'];
-        $this->request->data[$i]['Activado']['phone_number'] = $d['F'];
-        $this->request->data[$i]['Activado']['dealer_code'] = $d['G'];
-        $this->request->data[$i]['Activado']['dealer'] = $d['H'];
-        $this->request->data[$i]['Activado']['dealer_nom_act'] = $d['I'];
-        $this->request->data[$i]['Activado']['subdealer_code'] = $d['J'];
-        $this->request->data[$i]['Activado']['subdealer'] = $d['K'];
-        $this->request->data[$i]['Activado']['subdealer_nom_act'] = $d['L'];
-        $this->request->data[$i]['Activado']['canal_m'] = $d['M'];
-        $this->request->data[$i]['Activado']['canal_n'] = $d['N'];
-        $this->request->data[$i]['Activado']['excel_id'] = $ultimoExcel;
+        if (!empty($d['F'])) {
+          $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $d['F'])));
+          if (!empty($verifica_tel)) {
+            $this->Activado->deleteAll(array('Activado.excel_id' => $ultimoExcel));
+            $this->Excel->delete($ultimoExcel);
+            $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
+            $this->redirect(array('action' => 'subirexcel'));
+          }
+        } else {
+          break;
+        }
+
+        $da_acti['ciudad_nro_tel'] = $d['A'];
+        $da_acti['fecha_act'] = $d['B'];
+        $da_acti['fecha_doc'] = $d['C'];
+        $da_acti['plan_code'] = $d['D'];
+        $da_acti['description'] = $d['E'];
+        $da_acti['phone_number'] = $d['F'];
+        $da_acti['dealer_code'] = $d['G'];
+        $da_acti['dealer'] = $d['H'];
+        $da_acti['dealer_nom_act'] = $d['I'];
+        $da_acti['subdealer_code'] = $d['J'];
+        $da_acti['subdealer'] = $d['K'];
+        $da_acti['subdealer_nom_act'] = $d['L'];
+        $da_acti['canal_m'] = $d['M'];
+        $da_acti['canal_n'] = $d['N'];
+        $da_acti['excel_id'] = $ultimoExcel;
+        $this->Activado->create();
+        $this->Activado->save($da_acti);
         $i++;
       }
-      //debug($this->request->data);die;
-      if (!empty($this->request->data[0]['Activado']['phone_number'])) {
-        $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $this->request->data[0]['Activado']['phone_number'])));
-        if (!empty($verifica_tel)) {
-          $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
-          $this->redirect(array('action' => 'subirexcel'));
-        }
-      }
+      $this->Session->setFlash('se Guardo correctamente el Excel', 'msgbueno');
+      //debug($paraActivar);die;
+      $this->redirect(array('action' => 'subirexcel'));
 
-      if ($this->Activado->saveMany($this->data)) {
-        $this->Session->setFlash('se Guardo correctamente el Excel', 'msgbueno');
-        //debug($paraActivar);die;
-        $this->redirect(array('action' => 'subirexcel'));
-        //$verificaActivados = $this
-      } else {
-        echo 'no se pudo guardar';
-      }
+
       //fin funciones del excel
     } else {
 
@@ -581,21 +583,26 @@ class ChipsController extends AppController {
     $sql2 = "SELECT fecha_entrega_d FROM chips WHERE distribuidor_id = User.id ORDER BY fecha_entrega_d DESC LIMIT 1";
     $sql = "SELECT COUNT(*) FROM chips ch,activados ac WHERE ch.telefono = ac.phone_number AND ch.distribuidor_id = User.id AND ch.fecha_entrega_d = ($sql2)";
     $this->User->virtualFields = array(
-      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno,' (',($sql),')')"
+      'nombre_completo' => "CONCAT('(',($sql),') ',Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
     );
-    $distribuidores = $this->User->find('list', array('recursive' => 0, 'fields' => 'User.nombre_completo', array('Conditions' => array('User.group_id' => 2))));
+    $distribuidores = $this->User->find('list', array(
+      'recursive' => 0,
+      'fields' => array('User.id', 'User.nombre_completo', 'Group.name'),
+      'conditions' => array('User.group_id' => array(2, 7))
+    ));
+    //debug($distribuidores);exit;
     if ($this->RequestHandler->responseType() == 'json') {
       /* $editar = '<button class="button orange-gradient compact icon-pencil" type="button" onclick="editarc(' . "',Cliente.id,'" . ')">Editar</button>';
         $elimina = '<button class="button red-gradient compact icon-cross-round" type="button" onclick="eliminarc(' . "',Cliente.id,'" . ')">Eliminar</button>';
         $acciones = "$editar $elimina";
         $this->Chip->virtualFields = array(
-        'acciones' => "CONCAT('$acciones')"
+        'activacion' => ""
         ); */
       $this->paginate = array(
         'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja'),
         'recursive' => 0,
         'order' => 'Chip.created'
-        , 'conditions' => array('Chip.distribuidor_id' => NULL)
+        , 'conditions' => array('Chip.distribuidor_id' => NULL, 'Chip.cliente_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))')
       );
       $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
@@ -606,13 +613,13 @@ class ChipsController extends AppController {
   }
 
   public function registra_asignado() {
-    if (!empty($this->request->data['Dato'])) {
+    if (!empty($this->request->data['Dato']['rango_ini']) && !empty($this->request->data['Dato']['cantidad'])) {
       $rango_ini = $this->request->data['Dato']['rango_ini'];
       $cantidad = $this->request->data['Dato']['cantidad'];
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id'),
-        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => NULL)
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))','Chip.cliente_id' => NULL)
       ));
       /* debug($chips);
         exit; */
@@ -627,6 +634,33 @@ class ChipsController extends AppController {
       $this->Session->setFlash('No se pudo asignar!!', 'msgerror');
     }
     $this->redirect(array('action' => 'asigna_distrib'));
+  }
+
+  public function rango_nuemros() {
+    $this->layout = 'ajax';
+
+    $numeros = "";
+    if (!empty($this->request->data['Dato']['rango_ini']) && !empty($this->request->data['Dato']['cantidad'])) {
+      $rango_ini = $this->request->data['Dato']['rango_ini'];
+      $cantidad = $this->request->data['Dato']['cantidad'];
+      $chips = $this->Chip->find('all', array(
+        'recursive' => -1,
+        'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id', 'Chip.telefono'),
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))','Chip.cliente_id' => NULL)
+      ));
+      /* debug($chips);
+        exit; */
+      //debug($chips);exit;
+      foreach ($chips as $ch) {
+        if (empty($numeros)) {
+          $numeros = $ch['Chip']['telefono'];
+        } else {
+          $numeros = "$numeros, " . $ch['Chip']['telefono'];
+        }
+      }
+    }
+
+    $this->set(compact('numeros'));
   }
 
   public function asignados() {
@@ -646,11 +680,11 @@ class ChipsController extends AppController {
     $this->set(compact('entregados'));
   }
 
-  public function detalle_entrega($idExcel = null, $fecha = null, $idDistribuidor = null) {
+  public function detalle_entrega( $fecha = null, $idDistribuidor = null) {
     $distribuidor = $this->User->findByid($idDistribuidor, null, null, 0);
     $entregados = $this->Chip->find('all', array(
       'recursive' => -1,
-      'conditions' => array('Chip.fecha_entrega_d' => $fecha, 'Chip.distribuidor_id' => $idDistribuidor, 'Chip.excel_id' => $idExcel)
+      'conditions' => array('Chip.fecha_entrega_d' => $fecha, 'Chip.distribuidor_id' => $idDistribuidor)
     ));
     $this->set(compact('entregados', 'fecha', 'distribuidor', 'idDistribuidor'));
   }
@@ -1068,6 +1102,128 @@ class ChipsController extends AppController {
     exit;
   }
 
+  public function genera_excel_3($idExcel = null) {
+    $nombre_excel = "asignados.xlsx";
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
+    header('Cache-Control: max-age=0');
+    $borders = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        //,'color' => array('argb' => 'FFFF0000')
+        )
+      ),
+      'font' => array(
+        'size' => 12
+        , 'bold' => true
+      //,'color' => array('argb' => 'FFFF0000')
+      ),
+      'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+        'color' => array('rgb' => 'FF7E00')
+      )
+    );
+    $borders3 = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        //,'color' => array('argb' => 'FFFF0000')
+        )
+      ),
+      'font' => array(
+        'size' => 12
+        , 'bold' => true
+      //,'color' => array('argb' => 'FFFF0000')
+      ),
+      'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+        'color' => array('rgb' => '7dc35b')
+      )
+    );
+    $borders2 = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        )
+      )
+    );
+    $prueba = new PHPExcel();
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(8);
+    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(15);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(12);
+    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(12);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('I')->setWidth(15);
+    $prueba->getActiveSheet()->getColumnDimension('J')->setWidth(10);
+    $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(13);
+    $prueba->getActiveSheet()->getColumnDimension('L')->setWidth(15);
+    $prueba->getActiveSheet()->getColumnDimension('M')->setWidth(17);
+
+    $prueba->getActiveSheet()->getStyle('A1:J1')->applyFromArray($borders);
+    $prueba->getActiveSheet()->getStyle('K1:M1')->applyFromArray($borders3);
+    $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "CANTIDAD");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B1", "SIM");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C1", "NUM-TELEFONO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("D1", "FECHA");
+    $prueba->setActiveSheetIndex(0)->setCellValue("E1", "Fecha de entrega");
+    $prueba->setActiveSheetIndex(0)->setCellValue("F1", "COD.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("G1", "SUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("H1", "COD.MERC");
+    $prueba->setActiveSheetIndex(0)->setCellValue("I1", "DIST.");
+    $prueba->setActiveSheetIndex(0)->setCellValue("J1", "CIUDAD");
+    $prueba->setActiveSheetIndex(0)->setCellValue("K1", "ACTIVACION");
+    $prueba->setActiveSheetIndex(0)->setCellValue("L1", "C.DEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("M1", "C.SUBDEALER");
+
+    $prueba->getActiveSheet()->setTitle("LISTADO de SIM'S ASIGNADOS");
+
+    $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
+    $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
+    $this->Chip->virtualFields = array(
+      'nom_distribuidor' => "CONCAT(($sql))",
+      'ciudad_dist' => "CONCAT(($sql2))",
+      'fecha_activacion' => "(SELECT activados.fecha_act FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
+      'ac_cod_dealer' => "(SELECT activados.dealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
+      'ac_cod_subdealer' => "(SELECT activados.subdealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)"
+    );
+    $chips = $this->Chip->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Chip.excel_id' => $idExcel),
+      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f",
+        'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado', 'Chip.fecha_activacion', 'Chip.ac_cod_dealer', 'Chip.ac_cod_subdealer')
+    ));
+    //debug($chips);exit;
+    $cont = 1;
+    foreach ($chips as $ch) {
+      $cont++;
+      $prueba->getActiveSheet()->getStyle("A$cont:M$cont")->applyFromArray($borders2);
+      //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
+      $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $ch['Chip']['cantidad']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['sim'] . " ");
+      $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $ch['Chip']['telefono']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $ch[0]['fecha_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $ch[0]['fecha_entrega_d_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $ch['Cliente']['cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $ch['Cliente']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $ch['Cliente']['cod_mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("I" . $cont, $ch['Chip']['nom_distribuidor']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("J" . $cont, $ch['Chip']['ciudad_dist']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['fecha_activacion']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("L" . $cont, $ch['Chip']['ac_cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("M" . $cont, $ch['Chip']['ac_cod_subdealer']);
+      //$prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['cantidad']);
+    }
+    $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
+    $objWriter->save('php://output');
+    exit;
+  }
+
   public function regulariza_excel_mercado() {
     //$excelSubido = $nombreExcel;
     $objLector = new PHPExcel_Reader_Excel2007();
@@ -1140,9 +1296,11 @@ class ChipsController extends AppController {
 
   public function info_chip($idChip = null) {
     $this->layout = 'ajax';
+
     $this->Chip->virtualFields = array(
       'distribuidor' => "(SELECT CONCAT(pe.nombre,' ',pe.ap_paterno,' ',pe.ap_materno) FROM personas pe WHERE Distribuidor.persona_id = pe.id)"
     );
+
     $chip = $this->Chip->find('first', array(
       'recursive' => 0,
       'conditions' => array('Chip.id' => $idChip)
@@ -1150,9 +1308,11 @@ class ChipsController extends AppController {
 
     $activacion = $this->Activado->find('first', array(
       'recursive' => -1,
-      'conditions' => array('Activado.phone_number' => $chip['Chip.telefono']),
-      'fields' => array('Activado.fecha_act')
+      'conditions' => array('Activado.phone_number' => $chip['Chip']['telefono'])
+      , 'fields' => array('Activado.fecha_act')
     ));
+    //debug($activacion);exit;
+
     $this->set(compact('chip', 'activacion'));
   }
 
@@ -1242,6 +1402,13 @@ class ChipsController extends AppController {
     $this->redirect($this->referer());
   }
 
+  public function eliminar_as($idExcel = null) {
+    $this->Excel->delete($idExcel);
+    $this->Chip->deleteAll(array('Chip.excel_id' => $idExcel));
+    $this->Session->setFlash("Se elimino correctamente el excel y sus registros!!", 'msgbueno');
+    $this->redirect($this->referer());
+  }
+
   public function get_num_venciendo() {
     /* $chip_pr = $this->Chip->find('first',array(
       'recursive' => -1,
@@ -1323,17 +1490,17 @@ class ChipsController extends AppController {
         )
       )
     ));
-    
-    $ventas = $this->Ventaschip->find('all',array(
+
+    $ventas = $this->Ventaschip->find('all', array(
       'recurisive' => -1,
-      'conditions' => array('Ventaschip.fecha' => $fecha_ini,'Ventaschip.distribuidor_id' => $idDistribuidor)
+      'conditions' => array('Ventaschip.fecha' => $fecha_ini, 'Ventaschip.distribuidor_id' => $idDistribuidor)
     ));
-    $this->set(compact('precios', 'idDistribuidor', 'fecha_ini','ventas'));
+    $this->set(compact('precios', 'idDistribuidor', 'fecha_ini', 'ventas'));
   }
-  
-  public function elimina_chip_dis($idVentaChip = null){
+
+  public function elimina_chip_dis($idVentaChip = null) {
     $this->Ventaschip->delete($idVentaChip);
-    $this->Session->setFlash("Se ha eliminado correctamente la venta de chip!!",'msgbueno');
+    $this->Session->setFlash("Se ha eliminado correctamente la venta de chip!!", 'msgbueno');
     $this->redirect($this->referer());
   }
 
@@ -1365,14 +1532,120 @@ class ChipsController extends AppController {
             $this->Ventaschip->save($ven);
           }
         }
-        $this->Session->setFlash('Se ha registrado correctamente la venta','msgbueno');
+        $this->Session->setFlash('Se ha registrado correctamente la venta', 'msgbueno');
       } else {
-        $this->Session->setFlash('No hay suficiente para descontar!!','msgerror');
+        $this->Session->setFlash('No hay suficiente para descontar!!', 'msgerror');
       }
     } else {
-      $this->Session->setFlash('No hay suficiente para descontar!!','msgerror');
+      $this->Session->setFlash('No hay suficiente para descontar!!', 'msgerror');
     }
     $this->redirect($this->referer());
+  }
+
+  public function get_estado_chips_exc($idExcel = null) {
+    $sql = "(SELECT COUNT(chips.id) cantidad_total, COUNT(chips.distribuidor_id) distribuidor_total, COUNT(chips.cliente_id) asignados_total, COUNT(activados.id) activados_total FROM chips LEFT JOIN activados ON (activados.phone_number = chips.telefono) WHERE chips.excel_id = $idExcel)";
+    $chips = $this->Chip->query($sql);
+    if (!empty($chips)) {
+      return 'D: ' . $chips[0][0]['distribuidor_total'] . ' SD: ' . $chips[0][0]['asignados_total'] . '| AC: ' . $chips[0][0]['activados_total'] . ' | T:' . $chips[0][0]['cantidad_total'];
+    }
+    //debug($chips);exit;
+  }
+
+  public function regulariza_chips_act($idExcel = null) {
+    $sql = "(SELECT COUNT(activados.id) numero_total FROM activados LEFT JOIN chips ON (chips.telefono = activados.phone_number) WHERE activados.excel_id = $idExcel AND ISNULL(chips.id))";
+    $n_chips = $this->Chip->find('count', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.excel_id' => $idExcel)
+    ));
+
+    $numero = $this->Activado->query($sql);
+    if (empty($numero)) {
+      $array['numero'] = 0;
+      $array['total'] = $n_chips;
+    } else {
+      $array['numero'] = $numero[0][0]['numero_total'];
+      $array['total'] = $n_chips + $array['numero'];
+    }
+    //debug($array);exit;
+    /* debug($numero[0][0]['numero_total']);
+      exit; */
+    $sql1 = "(SELECT activados.* FROM activados LEFT JOIN chips ON (chips.telefono = activados.phone_number) WHERE activados.excel_id = $idExcel AND ISNULL(chips.id) LIMIT 1)";
+    $activado = $this->Activado->query($sql1);
+    if (!empty($activado[0]['activados']['phone_number'])) {
+      $d_chips['excel_id'] = $idExcel;
+      $d_chips['factura'] = 0;
+      $d_chips['cantidad'] = 0;
+      $d_chips['sim'] = 0;
+      $d_chips['telefono'] = $activado[0]['activados']['phone_number'];
+      $d_chips['fecha'] = $activado[0]['activados']['fecha_doc'];
+      $cliente = $this->Cliente->find('first', array(
+        'recursive' => -1,
+        'conditions' => array(
+          'OR' => array(
+            'Cliente.cod_dealer' => $activado[0]['activados']['subdealer_code'],
+            'Cliente.num_registro' => $activado[0]['activados']['subdealer_code']
+          )
+        ),
+        'fields' => array('Cliente.id')
+      ));
+      if (!empty($cliente['Cliente']['id'])) {
+        $d_chips['cliente_id'] = $cliente['Cliente']['id'];
+      }
+      $this->Chip->create();
+      $this->Chip->save($d_chips);
+    }
+    //debug($activado);exit;
+
+    $this->respond($array, true);
+  }
+
+  public function asignados_imp($idDistribuidor = null) {
+    if (!empty($idDistribuidor) && empty($this->request->data['Dato'])) {
+      $this->request->data['Dato']['fecha_ini'] = date('Y-m-d');
+      $this->request->data['Dato']['fecha_fin'] = date('Y-m-d');
+      $this->request->data['Dato']['distribuidor_id'] = $idDistribuidor;
+      $this->request->data['Dato']['tipo'] = '';
+    }
+    if (!empty($this->request->data['Dato'])) {
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $idDistribuidor = $this->request->data['Dato']['distribuidor_id'];
+      $tipo = $this->request->data['Dato']['tipo'];
+      $distribuidor = $this->User->find('first', array(
+        'recursive' => 0,
+        'conditions' => array('User.id' => $idDistribuidor)
+      ));
+
+      $condiciones = array();
+      $condiciones['Chip.fecha_entrega_d >='] = $fecha_ini;
+      $condiciones['Chip.fecha_entrega_d <='] = $fecha_fin;
+      $condiciones['Chip.distribuidor_id'] = $idDistribuidor;
+      //debug($tipo);exit;
+      if ($tipo == 'VENDIDOS') {
+        $condiciones['ISNULL( (SELECT ventasimpulsadores.id FROM ventasimpulsadores WHERE ventasimpulsadores.chip_id = Chip.id) )'] = '';
+      } elseif ($tipo == 'NO VENDIDOS') {
+        $condiciones['(SELECT ventasimpulsadores.id FROM ventasimpulsadores WHERE ventasimpulsadores.chip_id = Chip.id) IS NOT NULL'] = '';
+      }
+      $this->Chip->virtualFields = array(
+        'cliente' => "(SELECT ventasimpulsadores.nombre_cliente FROM ventasimpulsadores WHERE ventasimpulsadores.chip_id = Chip.id)",
+        'precio_chip' => "(SELECT ventasimpulsadores.precio_chip FROM ventasimpulsadores WHERE ventasimpulsadores.chip_id = Chip.id)",
+        'regalo' => "(SELECT productos.nombre FROM ventasimpulsadores LEFT JOIN productos ON (ventasimpulsadores.producto_id = productos.id) WHERE ventasimpulsadores.chip_id = Chip.id)",
+        'referencia' => "(SELECT ventasimpulsadores.tel_referencia FROM ventasimpulsadores WHERE ventasimpulsadores.chip_id = Chip.id)"
+      );
+      $chips = $this->Chip->find('all', array(
+        'recursive' => -1,
+        'conditions' => $condiciones
+      ));
+    }
+    $this->User->virtualFields = array(
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno)"
+    );
+    $distribuidores = $this->User->find('list', array(
+      'recursive' => 0,
+      'conditions' => array('User.group_id' => 7),
+      'fields' => array('User.id', "nombre_completo", 'Group.name')
+    ));
+    $this->set(compact('distribuidores', 'chips', 'distribuidor'));
   }
 
 }

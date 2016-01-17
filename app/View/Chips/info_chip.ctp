@@ -57,7 +57,7 @@
                     </tr>
                     <tr>
                         <th scope="row">Fecha Activacion</th>
-                        <td><?php echo $activacion['Activo']['fecha_act']?></td>
+                        <td><?php echo $activacion['Activado']['fecha_act']?></td>
                     </tr>
                 </tbody>
             </table>

@@ -12,7 +12,13 @@
         <div class="new-row twelve-columns">
             <p class="block-label button-height">
                 <label for="block-label-1" class="label">Fecha <small>(requerido)</small></label>         
-            <?php echo $this->Form->date('Minievento.fecha', array('class' => 'input full-width', 'placeholder' => 'Fecha 2015-05+29', 'value' => date("Y-m-d"))); ?>
+            <?php echo $this->Form->date('Minievento.fecha', array('class' => 'input full-width', 'placeholder' => 'Fecha 2015-05+29')); ?>
+            </p>
+        </div>
+        <div class="new-row twelve-columns">
+            <p class="block-label button-height">
+                <label for="block-label-1" class="label">Estado <small>(requerido)</small></label>         
+            <?php echo $this->Form->select('Minievento.estado',array(1 => 'Activo' ,0 => 'Inactivo'), array('class' => 'select full-width', 'empty' => 'Seleccione Estado','required')); ?>
             </p>
         </div>
         <div class="new-row twelve-columns">

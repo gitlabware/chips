@@ -14,28 +14,15 @@
         </div>
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
-            <li><a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minieventos')) ?>" title="Minieventos"><span class="icon-gear"></span></span></a></li>
+            <li><a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'lista_minieventos')) ?>" title="Minieventos"><span class="icon-gear"></span></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'salir')) ?>" title="Cerrar Session"><span class="icon-user"></span></a></li>
         </ul>
 
         <section class="navigable">            
             <ul class="big-menu">    
-                <li><a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'cambiopass', $this->Session->read('Auth.User.id'))); ?>">Cambiar Password</a></li>
-
-                <li class="with-right-arrow">
-                    <span>Minievento</span>
-                    <ul class="big-menu">
-                        <li>
-                            <a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minieventos')); ?>">Listado de Minieventos</a>
-                        </li>
-                        <li>
-                            <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento')); ?>','Minievento')">Nuevo Minievento</a>
-                        </li>
-                    </ul>
-                </li> 
-
+                <li><a onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'cambiopass')); ?>');" href="javascript:">Cambiar Password</a></li>
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'lista_minieventos')); ?>">MINIEVENTOS</a></li>
             </ul>
         </section>
     </div>
-
 </section>

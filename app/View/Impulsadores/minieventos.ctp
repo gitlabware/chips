@@ -17,16 +17,18 @@
             </thead>
             <tbody>
                 <?php foreach ($minieventos as $mi): ?>
+                  <?php
+                  $clase = '';
+                  if ($mi['Minievento']['estado'] == 1) {
+                    $clase = 'style="background-color: lightgreen;"';
+                  }
+                  ?>
                   <tr>
-                      <td><?php echo $mi['Minievento']['fecha']; ?></td>
-                      <td><?php echo $mi['Minievento']['direccion']; ?></td>
-                      <td>
-                          <?php if ($this->Session->read('Auth.User.group_id') == 1): ?>
-                            <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento', $mi['Minievento']['id'])); ?>', 'Minievento')" class="button orange-gradient glossy">Editar</a>
-                            <?php echo $this->Html->link("Excel", ['action' => 'genera_excel', $mi['Minievento']['id']], ['class' => 'button green-gradient glossy']); ?>
-                          <?php else: ?>
-                            <?php echo $this->Html->link("Ventas", array('action' => 'ventas_minievento', $mi['Minievento']['id']), ['class' => 'button green-gradient glossy']); ?>
-                          <?php endif; ?>
+                      <td <?php echo $clase; ?>><?php echo $mi['Minievento']['fecha']; ?></td>
+                      <td <?php echo $clase; ?>><?php echo $mi['Minievento']['direccion']; ?></td>
+                      <td <?php echo $clase; ?>>
+                          <a href="javascript:" onclick="cargarmodal('<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minievento', $mi['Minievento']['id'])); ?>', 'Minievento')" class="button orange-gradient glossy">Editar</a>
+                          <?php echo $this->Html->link("Eliminar", array('action' => 'elimina_minievento', $mi['Minievento']['id']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el Minievento???')) ?>
                       </td>
                   </tr>
                 <?php endforeach; ?>
@@ -35,9 +37,5 @@
     </div>
 </section>
 <?php
-if ($this->Session->read('Auth.User.group_id') == 1) {
-  echo $this->element('sidebar/administrador');
-} else {
-  echo $this->element('sidebar/distribuidor');
-}
+echo $this->element('sidebar/administrador');
 ?>

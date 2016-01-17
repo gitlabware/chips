@@ -61,6 +61,10 @@ class UsersController extends AppController {
             break;
           case '6': $this->redirect(array('controller' => 'Tiendas', 'action' => 'lista_celulares'));
             break;
+          case '7': $this->redirect(array('controller' => 'Impulsadores', 'action' => 'lista_minieventos'));
+            break;
+          case '8': $this->redirect(array('controller' => 'Users', 'action' => 'index'));
+            break;
           default :$this->redirect(array('controller' => 'Tiendas', 'action' => 'index'));
             break;
         }
@@ -81,7 +85,14 @@ class UsersController extends AppController {
   }
 
   public function index() {
-    $users = $this->User->find('all', array('order' => array('User.estado', 'User.id DESC')));
+    $condiciones = array();
+    if($this->Session->read('Auth.User.group_id') == 8){
+      $condiciones['User.group_id'] = array(2,7);
+    }
+    $users = $this->User->find('all', array(
+      'order' => array('User.estado', 'User.id DESC'),
+      'conditions' => $condiciones
+      ));
     $this->set(compact('users'));
   }
 
@@ -303,8 +314,8 @@ class UsersController extends AppController {
         } else {
           $this->Session->setFlash('no se pudo modificar!!', 'msgerror');
         }
-      }else{
-        $this->Session->setFlash($valida,'msgerror');
+      } else {
+        $this->Session->setFlash($valida, 'msgerror');
       }
       //debug($this->request->data);die;
     }
@@ -417,8 +428,18 @@ class UsersController extends AppController {
   }
 
   public function registra_precios() {
+    /*debug($this->request->data);
+    exit;*/
     $dat = $this->request->data['Precio'];
-    $this->Precio->saveAll($dat);
+    foreach ($dat as $pre) {
+      if (!empty($pre['monto'])) {
+        $this->Precio->create();
+        $this->Precio->save($pre);
+      }elseif (!empty ($pre['id'])) {
+        $this->Precio->delete($pre['id']);
+      }
+    }
+    //$this->Precio->saveAll($dat);
     $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
     $this->redirect($this->referer());
   }

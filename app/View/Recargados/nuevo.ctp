@@ -71,13 +71,12 @@
                 <table class="table responsive-table">
                     <thead>
                         <tr>
-                            <th scope="col" width="5">Id.</th>
-                            <th scope="col" width="18%" class="align-center hide-on-mobile">Distribuidor</th>
-                            <th scope="col" width="16%" class="align-center hide-on-mobile">Celular</th>                            
-                            <th scope="col" width="10" class="align-center hide-on-mobile">Ing.</th>
-                            <th scope="col" width="12%" class="align-center hide-on-mobile">Monto</th>
-                            <th scope="col" width="8%" class="align-center hide-on-mobile">%</th>
-                            <th scope="col" width="10" class="align-center hide-on-mobile">Rec</th>
+                            <th scope="col" class="align-center hide-on-mobile">Distribuidor</th>
+                            <th scope="col" class="align-center hide-on-mobile">Celular</th>                            
+                            <th scope="col" class="align-center hide-on-mobile">Ing.</th>
+                            <th scope="col" class="align-center hide-on-mobile">Sal.</th>
+                            <th scope="col" class="align-center hide-on-mobile">%</th>
+                            <th scope="col"  class="align-center hide-on-mobile">Rec</th>
                             <!--<th scope="col" width="10" class="align-center hide-on-mobile">Total</th>-->
                             <th scope="col" width="8%" class="align-center">Eliminar</th>
                         </tr>
@@ -93,7 +92,6 @@
                           }
                           ?>
                           <tr>
-                              <td><?php echo $rec['Recargado']['id']; ?></td>
                               <td><?php echo $rec['Persona']['nombre']; ?></td>
                               <td><?php echo $rec['Recargado']['num_celular']; ?></td>                                
                               <td><?php echo $this->Number->currency($rec['Recargado']['entrada'], ''); ?></td>

@@ -23,12 +23,19 @@ class ProductosController extends AppController {
   function index() {
     $idAlmacen = $this->get_id_alm_cent();
     if ($this->RequestHandler->responseType() == 'json') {
+
       $sql = '(SELECT COUNT(id) FROM productosprecios WHERE (productosprecios.producto_id = Producto.id))';
-      $editar = '<a href="javascript:" class="button orange-gradient compact icon-pencil" title="Editar" onclick="editar_p(' . "',Producto.id,'" . ')"></a>';
-      $precios = '<a href="javascript:" class="button anthracite-gradient compact icon-page-list" title="Precios" onclick="precios_productos(' . "',Producto.id,'" . ')"></a>';
+      if ($this->Session->read('Auth.User.group_id') == 1) {
+        $editar = '<a href="javascript:" class="button orange-gradient compact icon-pencil" title="Editar" onclick="editar_p(' . "',Producto.id,'" . ')"></a>';
+        $precios = '<a href="javascript:" class="button anthracite-gradient compact icon-page-list" title="Precios" onclick="precios_productos(' . "',Producto.id,'" . ')"></a>';
+        $elimina = '<button class="button red-gradient compact icon-cross-round" type="button" title="eliminar" onclick="elimina_p(' . "',Producto.id,'" . ')"></button>';
+      }elseif ($this->Session->read('Auth.User.group_id') == 8) {
+        $condiciones['Producto.tipo_producto'] = 'TARJETAS';
+      }
+
       $ingresar_ap = '<a href="javascript:" class="button green-gradient compact icon-down-fat" title="Ingresar a almacen principal" onclick="ingresar_ap(' . "',Producto.id,'" . ')"></a>';
       $ingresar_a = '<a href="javascript:" class="button blue-gradient compact icon-down-fat" title="Ingresar a almacen" onclick="ingresar_a(' . "',Producto.id,'" . ')"></a>';
-      $elimina = '<button class="button red-gradient compact icon-cross-round" type="button" title="eliminar" onclick="elimina_p(' . "',Producto.id,'" . ')"></button>';
+
       $acciones = "$editar $precios $elimina $ingresar_ap $ingresar_a";
       $small_r = '<small class="tag red-bg" id="idproducto-' . "',Producto.id,'" . '"> ' . "',$sql,'" . ' </small></td>';
       $small_n = '<small class="tag " id="idproducto-' . "',Producto.id,'" . '"> ' . "',$sql,'" . ' </small></td>';
@@ -41,7 +48,8 @@ class ProductosController extends AppController {
       $this->paginate = array(
         'fields' => array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.total_aln_cen', 'Producto.acciones'),
         'recursive' => 0,
-        'order' => 'Producto.id DESC'
+        'order' => 'Producto.id DESC',
+        'conditions' => $condiciones
       );
       $this->DataTable->fields = array('Producto.precios', 'Producto.imagen', 'Producto.tipo_producto', 'Producto.nombre', 'Marca.nombre', 'Colore.nombre', 'Producto.precio_compra', 'Producto.total_aln_cen', 'Producto.acciones');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
@@ -569,9 +577,9 @@ class ProductosController extends AppController {
       $this->request->data = "";
       $duplicados = '';
       foreach ($array_data as $d) {
-        /*if ($d['A'] == '' || $d['B'] == '' || $d['C'] == '' || $d['D'] == '' || $d['E'] == '' || $d['F'] == '') {
+        /* if ($d['A'] == '' || $d['B'] == '' || $d['C'] == '' || $d['D'] == '' || $d['E'] == '' || $d['F'] == '') {
           break;
-        }*/
+          } */
         // ------ Marca -------
         $marca = $this->Marca->find('first', array(
           'recursive' => -1,

@@ -10,6 +10,7 @@
                 $op_excalas[1] = 'DISTRIBUIDOR (MAYOR)';
                 $op_excalas[2] = 'TIENDA (MAYOR)';
                 $op_excalas[3] = 'TIENDA (TIENDA)';
+                $op_excalas[4] = 'IMPULSADOR';
                 ?>
                 <?php echo $this->Form->hidden('producto_id', array('value' => $idProducto)) ?>
                 <?php echo $this->Form->select('aux_escala', $op_excalas, array('class' => 'select full-width')); ?>
