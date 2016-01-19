@@ -171,8 +171,17 @@
         <?php endif; ?>
     </div>
 </section>	
-<?php echo $this->element('sidebar/administrador'); ?>
-
+<?php if ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
+  <!-- Sidebar/drop-down menu -->
+  <?php echo $this->element('sidebar/almacenero'); ?>
+  <!-- End sidebar/drop-down menu -->
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'TARJETAS'): ?>
+  <?php echo $this->element('sidebar/tarjetas'); ?>
+  <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
+  <?php echo $this->element('sidebar/recargas'); ?>
+<?php endif; ?>
 
 <script>
   function open_pago_d() {

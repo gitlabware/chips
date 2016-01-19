@@ -18,6 +18,7 @@
         </ul>
         <section class="navigable">            
             <ul class="big-menu">    
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'index')); ?>">Usuarios</a></li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Recargados', 'action' => 'nuevo')); ?>">Nueva Recarga</a></li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Recargados', 'action' => 'reporte')); ?>">Reporte</a></li>
             </ul>

@@ -7,7 +7,7 @@
     </hgroup>
 
     <div class="with-padding">
-        <?php if ($this->Session->read('Auth.User.Group.id') == 1): ?>
+        <?php if ($this->Session->read('Auth.User.Group.id') == 1 || $this->Session->read('Auth.User.Group.id') == 4): ?>
           <?php if (!empty($pedidos)): ?>
             <div class="columns">
                 <div class="twelve-columns">
@@ -222,7 +222,7 @@
                                   ?>
                                   <a href="javascript:" class="button anthracite-gradient" onclick="cargarmodal('<?php echo $this->Html->url(array('action' => 'detalle_mov', $idProducto, $idPersona, $almacen)); ?>', 'Detalle de <?php echo $entrega['Producto']['nombre']; ?>')">Detalle</a>
                                   <?php //echo $this->Html->link('Entregas', array('action' => 'verentregas', $idPersona, $almacen, $idProducto)); ?>
-                                  <a href="javascript:" class="button orange-gradient" title="Entregar"><span class="icon-up"></span></a>
+                                  <!--<a href="javascript:" class="button orange-gradient" title="Entregar"><span class="icon-up"></span></a>-->
                               </td>
                           </tr>
                         <?php endforeach; ?>
@@ -264,6 +264,8 @@
   <?php echo $this->element('sidebar/administrador'); ?>
 <?php elseif ($this->Session->read('Auth.User.Group.name') == 'TARJETAS'): ?>
   <?php echo $this->element('sidebar/tarjetas'); ?>
+  <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
+  <?php echo $this->element('sidebar/recargas'); ?>
 <?php endif; ?>
 <?php echo $this->element('jsvalidador'); ?>
 

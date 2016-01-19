@@ -31,7 +31,13 @@
                     <?php echo $this->Form->text('Dato.cantidad', array('class' => 'input validate[required] full-width input clase-form', 'id' => 'rtotal')); ?>
                 </p>
             </div>
-            <div class="two-columns-columns">
+            <div class="two-columns">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">Cantidad</label>
+                    <?php echo $this->Form->date('Dato.fecha_entrega_d', array('class' => 'input validate[required] full-width input clase-form','value' => date('Y-m-d'))); ?>
+                </p>
+            </div>
+            <div class="new-row twelve-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <button class="button green-gradient full-width" type="submit">REGISTRAR</button>
@@ -70,7 +76,17 @@
   //urljsontabla = '<?php echo $this->Html->url(array('action' => 'asigna_distrib.json')); ?>';
 </script>
 <!-- Sidebar/drop-down menu -->
-<?php echo $this->element('sidebar/administrador'); ?>
+<?php if ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
+  <!-- Sidebar/drop-down menu -->
+  <?php echo $this->element('sidebar/almacenero'); ?>
+  <!-- End sidebar/drop-down menu -->
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'TARJETAS'): ?>
+  <?php echo $this->element('sidebar/tarjetas'); ?>
+  <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
+  <?php echo $this->element('sidebar/recargas'); ?>
+<?php endif; ?>
 <script>
   function calcula() {
       console.log('digito');

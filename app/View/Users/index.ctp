@@ -80,13 +80,17 @@
 </section>	
 
 <!-- Sidebar/drop-down menu -->
-<?php
-if ($this->Session->read('Auth.User.group_id') == 1) {
-  echo $this->element('sidebar/administrador');
-} elseif ($this->Session->read('Auth.User.group_id') == 8) {
-  echo $this->element('sidebar/tarjetas');
-}
-?>
+<?php if ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
+  <!-- Sidebar/drop-down menu -->
+  <?php echo $this->element('sidebar/almacenero'); ?>
+  <!-- End sidebar/drop-down menu -->
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
+  <?php echo $this->element('sidebar/administrador'); ?>
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'TARJETAS'): ?>
+  <?php echo $this->element('sidebar/tarjetas'); ?>
+  <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
+  <?php echo $this->element('sidebar/recargas'); ?>
+<?php endif; ?>
 <?php //echo $this->element('sidebar/administrador'); ?>
 <!-- End sidebar/drop-down menu --> 
 <script>

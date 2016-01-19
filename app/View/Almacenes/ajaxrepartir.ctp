@@ -20,6 +20,12 @@
         </legend>
         <p class="button-height inline-label">
             <label for="validation-select" class="label">
+                Fecha
+            </label>
+            <?php echo $this->Form->date('Movimiento.created', array("class" => 'input full-width validate[required]', 'value' => date('Y-m-d'))); ?>
+        </p> 
+        <p class="button-height inline-label">
+            <label for="validation-select" class="label">
                 Categor&iacute;as
             </label>
             <select id="validation-select1" name="data[Movimiento][categoria]" class="select validate[required]" style="width: 200px">
@@ -87,26 +93,26 @@
 
 <script>
   $(document).ready(function () {
-
+      
       $("#formID").validationEngine();
-
+      
       $("#validation-select1").change(function () {
           if (this.value == 1) {
               $('#rangos').show();
-
+              
           } else {
               $('#rangos').hide();
           }
           console.log('cambia productos');
           $('#validation-select2').load('<?php echo $this->Html->url(array('action' => 'ajaxproductos')) ?>/' + this.value + '/<?php echo $cent; ?>');
       });
-
+      
       //para la segunda parte....
       /*$("#validation-select12").change(function () {
-          console.log('cambia productos');
-          $('#validation-select22').load('<?php //echo $this->Html->url(array('action' => 'ajaxproductos2')) ?>/' + this.value + '/<?php echo $cent; ?>');
-      });*/
-
-
+       console.log('cambia productos');
+       $('#validation-select22').load('<?php //echo $this->Html->url(array('action' => 'ajaxproductos2'))   ?>/' + this.value + '/<?php echo $cent; ?>');
+       });*/
+      
+      
   });
 </script>

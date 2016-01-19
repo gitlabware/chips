@@ -86,7 +86,7 @@ class UsersController extends AppController {
 
   public function index() {
     $condiciones = array();
-    if($this->Session->read('Auth.User.group_id') == 8){
+    if($this->Session->read('Auth.User.group_id') == 8 || $this->Session->read('Auth.User.group_id') == 4){
       $condiciones['User.group_id'] = array(2,7);
     }
     $users = $this->User->find('all', array(

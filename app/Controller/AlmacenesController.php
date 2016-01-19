@@ -218,6 +218,7 @@ class AlmacenesController extends AppController {
         exit; */
       $idProducto = $this->request->data['Movimiento']['producto_id'];
       $cantidad = $this->request->data['Movimiento']['ingreso'];
+      $created = $this->request->data['Movimiento']['created'];
       $producto = $this->Producto->find('first', array('conditions' => array('Producto.id' => $idProducto)));
       $productoNombre = $producto['Producto']['nombre'];
 
@@ -237,6 +238,7 @@ class AlmacenesController extends AppController {
           $datos['ingreso'] = $cantidad;
           $datos['salida'] = 0;
           $datos['transaccion'] = $num_transaccion;
+          $datos['created'] = $created;
           $this->Movimiento->create();
           $this->Movimiento->save($datos);
           $this->set_total($idProducto, 1, $idPersona, ($totalProducto + $cantidad));
@@ -250,6 +252,7 @@ class AlmacenesController extends AppController {
             $datos['ingreso'] = $cantidad;
             $datos['salida'] = 0;
             $datos['transaccion'] = $num_transaccion;
+            $datos['created'] = $created;
             $this->Movimiento->create();
             $this->Movimiento->save($datos);
             $this->set_total($idProducto, 1, $idPersona, ($this->get_total($idProducto, 1, $idPersona) + $cantidad));
@@ -261,6 +264,7 @@ class AlmacenesController extends AppController {
             $datos['ingreso'] = 0;
             $datos['salida'] = $cantidad;
             $datos['transaccion'] = $num_transaccion;
+            $datos['created'] = $created;
             $this->Movimiento->create();
             $this->Movimiento->save($datos);
             $this->set_total($idProducto, 1, $idAlmacenCentral, ($totalProducto - $cantidad));
@@ -278,6 +282,7 @@ class AlmacenesController extends AppController {
           $datos['ingreso'] = $cantidad;
           $datos['salida'] = 0;
           $datos['transaccion'] = $num_transaccion;
+          $datos['created'] = $created;
           $this->Movimiento->create();
           $this->Movimiento->save($datos);
           $this->set_total($idProducto, 0, $idPersona, ($this->get_total($idProducto, 0, $idPersona) + $cantidad));
@@ -289,6 +294,7 @@ class AlmacenesController extends AppController {
           $datos['ingreso'] = 0;
           $datos['salida'] = $cantidad;
           $datos['transaccion'] = $num_transaccion;
+          $datos['created'] = $created;
           $this->Movimiento->create();
           $this->Movimiento->save($datos);
           $this->set_total($idProducto, 1, $idAlmacenCentral, ($totalProducto - $cantidad));

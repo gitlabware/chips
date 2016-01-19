@@ -294,7 +294,7 @@ class ChipsController extends AppController {
         'Excel.id' => $idExcel
       )
     ));
-    if ($excel['Excel']['puntero'] == 'asignacion'){
+    if ($excel['Excel']['tipo'] == 'asignacion'){
       $puntero = ($excel['Excel']['puntero'] + 3);
     }else{
       $puntero = ($excel['Excel']['puntero'] + 2);
@@ -578,7 +578,7 @@ class ChipsController extends AppController {
         exit; */
       foreach ($chips as $ch) {
         $this->Chip->id = $ch['Chip']['id'];
-        $dato['Chip']['fecha_entrega_d'] = date('Y-m-d');
+        $dato['Chip']['fecha_entrega_d'] = $this->request->data['Dato']['fecha_entrega_d'];
         $dato['Chip']['distribuidor_id'] = $this->request->data['Dato']['distribuidor_id'];
         $this->Chip->save($dato['Chip']);
       }
@@ -1115,9 +1115,10 @@ class ChipsController extends AppController {
     $prueba->getActiveSheet()->getColumnDimension('K')->setWidth(13);
     $prueba->getActiveSheet()->getColumnDimension('L')->setWidth(15);
     $prueba->getActiveSheet()->getColumnDimension('M')->setWidth(17);
+    $prueba->getActiveSheet()->getColumnDimension('N')->setWidth(26);
 
     $prueba->getActiveSheet()->getStyle('A1:J1')->applyFromArray($borders);
-    $prueba->getActiveSheet()->getStyle('K1:M1')->applyFromArray($borders3);
+    $prueba->getActiveSheet()->getStyle('K1:N1')->applyFromArray($borders3);
     $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
 
     $prueba->setActiveSheetIndex(0)->setCellValue("A1", "CANTIDAD");
@@ -1133,6 +1134,7 @@ class ChipsController extends AppController {
     $prueba->setActiveSheetIndex(0)->setCellValue("K1", "ACTIVACION");
     $prueba->setActiveSheetIndex(0)->setCellValue("L1", "C.DEALER");
     $prueba->setActiveSheetIndex(0)->setCellValue("M1", "C.SUBDEALER");
+    $prueba->setActiveSheetIndex(0)->setCellValue("N1", "SUBDEALER");
 
     $prueba->getActiveSheet()->setTitle("LISTADO de SIM'S ASIGNADOS");
 
@@ -1143,19 +1145,20 @@ class ChipsController extends AppController {
       'ciudad_dist' => "CONCAT(($sql2))",
       'fecha_activacion' => "(SELECT activados.fecha_act FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
       'ac_cod_dealer' => "(SELECT activados.dealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
-      'ac_cod_subdealer' => "(SELECT activados.subdealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)"
+      'ac_cod_subdealer' => "(SELECT activados.subdealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
+      'ac_subdealer' => "(SELECT activados.subdealer FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)"
     );
     $chips = $this->Chip->find('all', array(
       'recursive' => 0,
       'conditions' => array('Chip.excel_id' => $idExcel),
       'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f",
-        'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado', 'Chip.fecha_activacion', 'Chip.ac_cod_dealer', 'Chip.ac_cod_subdealer')
+        'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado', 'Chip.fecha_activacion', 'Chip.ac_cod_dealer', 'Chip.ac_cod_subdealer', 'Chip.ac_subdealer')
     ));
     //debug($chips);exit;
     $cont = 1;
     foreach ($chips as $ch) {
       $cont++;
-      $prueba->getActiveSheet()->getStyle("A$cont:M$cont")->applyFromArray($borders2);
+      $prueba->getActiveSheet()->getStyle("A$cont:N$cont")->applyFromArray($borders2);
       //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
       $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $ch['Chip']['cantidad']);
       $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['sim'] . " ");
@@ -1170,6 +1173,7 @@ class ChipsController extends AppController {
       $prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['fecha_activacion']);
       $prueba->setActiveSheetIndex(0)->setCellValue("L" . $cont, $ch['Chip']['ac_cod_dealer']);
       $prueba->setActiveSheetIndex(0)->setCellValue("M" . $cont, $ch['Chip']['ac_cod_subdealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("N" . $cont, $ch['Chip']['ac_subdealer']);
       //$prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['cantidad']);
     }
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');

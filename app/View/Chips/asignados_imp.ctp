@@ -218,5 +218,9 @@ echo $this->Html->script(array('libs/glDatePicker/glDatePicker.min.js?v=1', 'ini
   <!-- End sidebar/drop-down menu -->
 <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Administradores'): ?>
   <?php echo $this->element('sidebar/administrador'); ?>
+<?php elseif ($this->Session->read('Auth.User.Group.name') == 'TARJETAS'): ?>
+  <?php echo $this->element('sidebar/tarjetas'); ?>
+  <?php elseif ($this->Session->read('Auth.User.Group.name') == 'Recargas'): ?>
+  <?php echo $this->element('sidebar/recargas'); ?>
 <?php endif; ?>
 <!-- End sidebar/drop-down menu -->
