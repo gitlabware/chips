@@ -234,143 +234,24 @@ class ChipsController extends AppController {
         $this->request->data['Excelg']['nombre_original'] = $nombreOriginal;
         $this->request->data['Excelg']['direccion'] = "";
         $this->request->data['Excelg']['tipo'] = "activacion";
-      }
-    }
-
-    if ($this->Excel->save($this->data['Excelg'])) {
-      $ultimoExcel = $this->Excel->getLastInsertID();
-      //debug($ultimoExcel);die;
-      $excelSubido = $nombreExcel;
-      $objLector = new PHPExcel_Reader_Excel2007();
-      //debug($objLector);die;
-      $objPHPExcel = $objLector->load("../webroot/files/$excelSubido");
-      //debug($objPHPExcel);die;
-
-      $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
-
-      $array_data = array();
-      foreach ($rowIterator as $row) {
-        $cellIterator = $row->getCellIterator();
-
-        $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
-
-        if (1 == $row->getRowIndex()) //a partir de la 1
-          continue; //skip first row
-
-        $rowIndex = $row->getRowIndex();
-
-        $array_data[$rowIndex] = array(
-          'A' => '',
-          'B' => '',
-          'C' => '',
-          'D' => '',
-          'E' => '',
-          'F' => '',
-          'G' => '',
-          'H' => '',
-          'I' => '',
-          'J' => '',
-          'K' => '',
-          'L' => '',
-          'M' => '',
-          'N' => '');
-
-        foreach ($cellIterator as $cell) {
-
-          if ('A' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('B' == $cell->getColumn()) {
-            $fechaExcel = explode('/', $cell->getCalculatedValue());
-            if (count($fechaExcel) > 1) {
-              $array_data[$rowIndex][$cell->getColumn()] = $fechaExcel[2] . '-' . $fechaExcel[0] . '-' . $fechaExcel[1];
-            } else {
-              $array_data[$rowIndex][$cell->getColumn()] = date('Y-m-d', (($cell->getCalculatedValue() - 25568) * 86400));
-            }
-          } elseif ('C' == $cell->getColumn()) {
-            $fechaExcel = explode('/', $cell->getCalculatedValue());
-            if (count($fechaExcel) > 1) {
-              /* if(strlen($fechaExcel[0]) == 1){
-                $fechaExcel[0] = '0'.$fechaExcel[0];
-                }
-                if(strlen($fechaExcel[1]) == 1){
-                $fechaExcel[1] = '0'.$fechaExcel[1];
-                } */
-              $array_data[$rowIndex][$cell->getColumn()] = $fechaExcel[2] . '-' . $fechaExcel[0] . '-' . $fechaExcel[1];
-            } else {
-              $array_data[$rowIndex][$cell->getColumn()] = date('Y-m-d', (($cell->getCalculatedValue() - 25568) * 86400));
-            }
-          } elseif ('D' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('E' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('F' == $cell->getColumn()) {
-
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('G' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('H' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('I' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('J' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('K' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('L' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('M' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          } elseif ('N' == $cell->getColumn()) {
-            $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-          }
-        }
-      }
-
-      $datos = array();
-      $this->request->data = "";
-      $i = 0;
-      foreach ($array_data as $d) {
-        if (!empty($d['F'])) {
-          $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $d['F'])));
-          if (!empty($verifica_tel)) {
-            $this->Activado->deleteAll(array('Activado.excel_id' => $ultimoExcel));
-            $this->Excel->delete($ultimoExcel);
-            $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
-            $this->redirect(array('action' => 'subirexcel'));
-          }
+        
+        
+        
+        $objLector = new PHPExcel_Reader_Excel2007();
+        $objPHPExcel = $objLector->load("../webroot/files/$nombreExcel");
+        $total_rows = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
+        if ($total_rows >= 2) {
+          $total_filas = $total_rows - 1;
         } else {
-          break;
+          $total_filas = 0;
         }
 
-        $da_acti['ciudad_nro_tel'] = $d['A'];
-        $da_acti['fecha_act'] = $d['B'];
-        $da_acti['fecha_doc'] = $d['C'];
-        $da_acti['plan_code'] = $d['D'];
-        $da_acti['description'] = $d['E'];
-        $da_acti['phone_number'] = $d['F'];
-        $da_acti['dealer_code'] = $d['G'];
-        $da_acti['dealer'] = $d['H'];
-        $da_acti['dealer_nom_act'] = $d['I'];
-        $da_acti['subdealer_code'] = $d['J'];
-        $da_acti['subdealer'] = $d['K'];
-        $da_acti['subdealer_nom_act'] = $d['L'];
-        $da_acti['canal_m'] = $d['M'];
-        $da_acti['canal_n'] = $d['N'];
-        $da_acti['excel_id'] = $ultimoExcel;
-        $this->Activado->create();
-        $this->Activado->save($da_acti);
-        $i++;
+        $this->request->data['Excelg']['total_registros'] = $total_filas;
+        $this->request->data['Excelg']['puntero'] = 0;
       }
-      $this->Session->setFlash('se Guardo correctamente el Excel', 'msgbueno');
-      //debug($paraActivar);die;
-      $this->redirect(array('action' => 'subirexcel'));
-
-
-      //fin funciones del excel
-    } else {
-
-      //echo 'no';
     }
+    $this->Excel->save($this->data['Excelg']);
+    $this->redirect($this->referer());
   }
 
   public function guardaexcel() {
@@ -387,94 +268,166 @@ class ChipsController extends AppController {
         $this->request->data['Excelg']['nombre_original'] = $nombreOriginal;
         $this->request->data['Excelg']['direccion'] = "";
         $this->request->data['Excelg']['tipo'] = "asignacion";
+
+        $objLector = new PHPExcel_Reader_Excel2007();
+        $objPHPExcel = $objLector->load("../webroot/files/$nombreExcel");
+        $total_rows = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
+        if ($total_rows >= 3) {
+          $total_filas = $total_rows - 2;
+        } else {
+          $total_filas = 0;
+        }
+
+        $this->request->data['Excelg']['total_registros'] = $total_filas;
+        $this->request->data['Excelg']['puntero'] = 0;
       }
     }
 
-    if ($this->Excel->save($this->data['Excelg'])) {
-      $ultimoExcel = $this->Excel->getLastInsertID();
-      //debug($ultimoExcel);die;
-      $excelSubido = $nombreExcel;
-      $objLector = new PHPExcel_Reader_Excel2007();
-      //debug($objLector);die;
-      $objPHPExcel = $objLector->load("../webroot/files/$excelSubido");
-      //debug($objPHPExcel);die;
+    $this->Excel->save($this->data['Excelg']);
+    $this->redirect($this->referer());
+  }
 
-      $rowIterator = $objPHPExcel->getActiveSheet()->getRowIterator();
+  public function registra_reg_chips($idExcel = null) {
+    $excel = $this->Excel->find('first', array(
+      'recurisve' => -1,
+      'conditions' => array(
+        'Excel.id' => $idExcel
+      )
+    ));
+    if ($excel['Excel']['puntero'] == 'asignacion'){
+      $puntero = ($excel['Excel']['puntero'] + 3);
+    }else{
+      $puntero = ($excel['Excel']['puntero'] + 2);
+    }
+    $nombre_ex = $excel['Excel']['nombre'];
+    $objLector = new PHPExcel_Reader_Excel2007();
+    //debug($objLector);die;
+    $objPHPExcel = $objLector->load("../webroot/files/$nombre_ex");
+    //debug($objPHPExcel);die;
+    $row = $objPHPExcel->getActiveSheet()->getRowIterator($puntero)->current();
+    $cellIterator = $row->getCellIterator();
+    $cellIterator->setIterateOnlyExistingCells(false);
 
-      $array_data = array();
+    $array_data = array();
 
-      foreach ($rowIterator as $row) {
-        $cellIterator = $row->getCellIterator();
-
-        $cellIterator->setIterateOnlyExistingCells(false); // Loop all cells, even if it is not set
-
-        if ($row->getRowIndex() >= 3) { //a partir de la 1
-          $rowIndex = $row->getRowIndex();
-
-          $array_data[$rowIndex] = array(
-            'A' => '',
-            'B' => '',
-            'C' => '',
-            'D' => '',
-            'E' => '',
-            'F' => '');
-
-          foreach ($cellIterator as $cell) {
-            if ('A' == $cell->getColumn()) {
-              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-            } elseif ('B' == $cell->getColumn()) {
-              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-            } elseif ('C' == $cell->getColumn()) {
-              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-            } elseif ('D' == $cell->getColumn()) {
-              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-            } elseif ('E' == $cell->getColumn()) {
-              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-            } elseif ('F' == $cell->getColumn()) {
-              $array_data[$rowIndex][$cell->getColumn()] = $cell->getCalculatedValue();
-            } elseif ('G' == $cell->getColumn()) {
-              $fechaExcel = $cell->getCalculatedValue();
-              $array_data[$rowIndex][$cell->getColumn()] = date('Y-m-d', (($fechaExcel - 25568) * 86400));
-            }
-          }
+    if ($excel['Excel']['tipo'] == 'asignacion') {
+      foreach ($cellIterator as $cell) {
+        if ('A' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('B' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('C' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('D' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('E' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('F' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('G' == $cell->getColumn()) {
+          $fechaExcel = $cell->getCalculatedValue();
+          $array_data[$cell->getColumn()] = date('Y-m-d', (($fechaExcel - 25568) * 86400));
         }
       }
-      $i = 0;
-      $this->request->data = "";
-      foreach ($array_data as $d) {
-        $this->request->data[$i]['Chip']['excel_id'] = $ultimoExcel;
-        $this->request->data[$i]['Chip']['cantidad'] = $d['A'];
-        $this->request->data[$i]['Chip']['tipo_sim'] = $d['B'];
-        $this->request->data[$i]['Chip']['sim'] = $d['C'];
-        $this->request->data[$i]['Chip']['imsi'] = $d['D'];
-        $this->request->data[$i]['Chip']['telefono'] = $d['E'];
-        $this->request->data[$i]['Chip']['fecha'] = $d['G'];
-        $i++;
-      }
-      if (!empty($this->request->data[0]['Chip']['telefono'])) {
-        $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $this->request->data[0]['Chip']['telefono'])));
-        if (!empty($verifica_tel)) {
-          $this->Session->setFlash("Ya se registro el excel verifique!!", 'msgerror');
-          $this->redirect(array('action' => 'subirexcel'));
+      if (!empty($array_data['E'])) {
+        $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $array_data['E'])));
+        if (empty($verifica_tel)) {
+          $this->request->data['Chip']['excel_id'] = $idExcel;
+          $this->request->data['Chip']['cantidad'] = $array_data['A'];
+          $this->request->data['Chip']['tipo_sim'] = $array_data['B'];
+          $this->request->data['Chip']['sim'] = $array_data['C'];
+          $this->request->data['Chip']['imsi'] = $array_data['D'];
+          $this->request->data['Chip']['telefono'] = $array_data['E'];
+          $this->request->data['Chip']['fecha'] = $array_data['G'];
+          $this->Chip->create();
+          $this->Chip->save($this->request->data['Chip']);
         }
       }
-
-      //debug($this->data);
-      //exit;
-
-      if ($this->Chip->saveMany($this->data)) {
-        //echo 'registro corectamente';
-        //$this->Chip->deleteAll(array('Chip.sim' => '')); //limpiamos el excel con basuras
-        $this->Session->setFlash('se Guardo correctamente el EXCEL', 'msgbueno');
-        $this->redirect(array('action' => 'subirexcel'));
-      } else {
-        echo 'no se pudo guardar';
-      }
-      //fin funciones del excel
     } else {
+      foreach ($cellIterator as $cell) {
 
-      //echo 'no';
+        if ('A' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('B' == $cell->getColumn()) {
+          $fechaExcel = explode('/', $cell->getCalculatedValue());
+          if (count($fechaExcel) > 1) {
+            $array_data[$cell->getColumn()] = $fechaExcel[2] . '-' . $fechaExcel[0] . '-' . $fechaExcel[1];
+          } else {
+            $array_data[$cell->getColumn()] = date('Y-m-d', (($cell->getCalculatedValue() - 25568) * 86400));
+          }
+        } elseif ('C' == $cell->getColumn()) {
+          $fechaExcel = explode('/', $cell->getCalculatedValue());
+          if (count($fechaExcel) > 1) {
+            /* if(strlen($fechaExcel[0]) == 1){
+              $fechaExcel[0] = '0'.$fechaExcel[0];
+              }
+              if(strlen($fechaExcel[1]) == 1){
+              $fechaExcel[1] = '0'.$fechaExcel[1];
+              } */
+            $array_data[$cell->getColumn()] = $fechaExcel[2] . '-' . $fechaExcel[0] . '-' . $fechaExcel[1];
+          } else {
+            $array_data[$cell->getColumn()] = date('Y-m-d', (($cell->getCalculatedValue() - 25568) * 86400));
+          }
+        } elseif ('D' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('E' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('F' == $cell->getColumn()) {
+
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('G' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('H' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('I' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('J' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('K' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('L' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('M' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        } elseif ('N' == $cell->getColumn()) {
+          $array_data[$cell->getColumn()] = $cell->getCalculatedValue();
+        }
+      }
+
+
+      if (!empty($array_data['F'])) {
+        $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $array_data['F'])));
+        if (empty($verifica_tel)) {
+          $da_acti['ciudad_nro_tel'] = $array_data['A'];
+          $da_acti['fecha_act'] = $array_data['B'];
+          $da_acti['fecha_doc'] = $array_data['C'];
+          $da_acti['plan_code'] = $array_data['D'];
+          $da_acti['description'] = $array_data['E'];
+          $da_acti['phone_number'] = $array_data['F'];
+          $da_acti['dealer_code'] = $array_data['G'];
+          $da_acti['dealer'] = $array_data['H'];
+          $da_acti['dealer_nom_act'] = $array_data['I'];
+          $da_acti['subdealer_code'] = $array_data['J'];
+          $da_acti['subdealer'] = $array_data['K'];
+          $da_acti['subdealer_nom_act'] = $array_data['L'];
+          $da_acti['canal_m'] = $array_data['M'];
+          $da_acti['canal_n'] = $array_data['N'];
+          $da_acti['excel_id'] = $idExcel;
+          $this->Activado->create();
+          $this->Activado->save($da_acti);
+        }
+      }
     }
+
+    $d_excel['puntero'] = $excel['Excel']['puntero'] + 1;
+    $this->Excel->id = $idExcel;
+    $this->Excel->save($d_excel);
+
+    /* debug($row->getRowIndex());
+      exit; */
+    $array['numero'] = $d_excel['puntero'];
+    $array['total'] = $excel['Excel']['total_registros'];
+    $this->respond($array, true);
   }
 
   public function entregarsims($id = null) {
@@ -619,7 +572,7 @@ class ChipsController extends AppController {
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id'),
-        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))','Chip.cliente_id' => NULL)
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))', 'Chip.cliente_id' => NULL)
       ));
       /* debug($chips);
         exit; */
@@ -646,7 +599,7 @@ class ChipsController extends AppController {
       $chips = $this->Chip->find('all', array(
         'recursive' => -1,
         'order' => 'Chip.id', 'limit' => $cantidad, 'fields' => array('Chip.id', 'Chip.telefono'),
-        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))','Chip.cliente_id' => NULL)
+        'conditions' => array('Chip.id >=' => $rango_ini, 'Chip.distribuidor_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))', 'Chip.cliente_id' => NULL)
       ));
       /* debug($chips);
         exit; */
@@ -680,7 +633,7 @@ class ChipsController extends AppController {
     $this->set(compact('entregados'));
   }
 
-  public function detalle_entrega( $fecha = null, $idDistribuidor = null) {
+  public function detalle_entrega($fecha = null, $idDistribuidor = null) {
     $distribuidor = $this->User->findByid($idDistribuidor, null, null, 0);
     $entregados = $this->Chip->find('all', array(
       'recursive' => -1,

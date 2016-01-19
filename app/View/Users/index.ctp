@@ -9,7 +9,6 @@
     <div class="with-padding">       
 
         <table class="table responsive-table" id="sorting-advanced">
-
             <thead>
                 <tr>                      
                     <th scope="col" width="5%" class="align-center hide-on-mobile">ID</th>
@@ -19,8 +18,7 @@
                     <th scope="col" width="10%" class="align-center hide-on-mobile-portrait">Tipo Usuario</th>
                     <th scope="col" width="25%" class="align-center">Acciones</th>
                 </tr>
-            </thead>          
-
+            </thead>
             <tbody>
                 <?php
                 $i = 1;
@@ -33,7 +31,6 @@
                     $style1 = '';
                   }
                   ?>
-
                   <tr>                      
                       <td style="<?php echo $style1; ?>"><?php
                           echo $usu['User']['id'];
@@ -67,9 +64,7 @@
                                       return false;" class="button red-gradient compact icon-cross-round"></a>
                              <?php endif; ?>
                       </td>
-
-                  </tr> 
-
+                  </tr>
                 <?php endforeach; ?>
             </tbody>
         </table> <br>     
