@@ -121,6 +121,7 @@
                   $("#muestraFormActivaciones").show('slow');
                   $("#muestraFormAsignaciones").hide('slow');
               });
+
           });
 
           function openModal2()
@@ -220,7 +221,7 @@ echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), arr
                       handleData($.parseJSON(data).numero);
                       //alert(numero_chip);
 
-                      //$('#idmodal').load('<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'ajax_precios', $idProducto));               ?>');
+                      //$('#idmodal').load('<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'ajax_precios', $idProducto));                ?>');
                       //data: return data from server
                       //$("#parte").html(data);
                   },
@@ -293,13 +294,13 @@ echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), arr
                                        },*/
                                       success: function (data, textStatus, jqXHR)
                                       {
-                                        //alert('ssss');
+                                          //alert('ssss');
                                           var numero_chip = $.parseJSON(data).numero;
                                           var total_c = $.parseJSON(data).total;
                                           //alert(numero_chip + ' ---- ' + total_c);
                                           if (total_c != 0) {
                                               var n_chip = numero_chip;
-                                              
+
                                               loaded = parseInt((n_chip / total_c) * 100);
                                               //++loaded;
                                               //alert(loaded);
@@ -442,7 +443,7 @@ echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), arr
 
                                                   setTimeout(function () {
                                                       win.closeModal();
-                                                      
+
                                                   }, 1500);
                                               }
                                               else
@@ -465,7 +466,7 @@ echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), arr
                                                });*/
                                               setTimeout(function () {
                                                   win.closeModal();
-                                                  
+
                                               }, 1500);
                                           }
                                       },

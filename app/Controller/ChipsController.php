@@ -253,6 +253,7 @@ class ChipsController extends AppController {
     $this->Excel->save($this->data['Excelg']);
     $this->redirect($this->referer());
   }
+  
 
   public function guardaexcel() {
     //debug($this->request->data);die;
