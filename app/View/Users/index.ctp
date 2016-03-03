@@ -77,7 +77,7 @@
             </div>
         </div>
     </div>
-</section>	
+</section>
 
 <!-- Sidebar/drop-down menu -->
 <?php if ($this->Session->read('Auth.User.Group.name') == 'Almaceneros'): ?>
