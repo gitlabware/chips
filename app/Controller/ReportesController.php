@@ -15,7 +15,7 @@ class ReportesController extends Controller {
     'Chip',
     'Deposito',
     'Sucursal',
-    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto','Cajachica','Totale');
+    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto', 'Cajachica', 'Totale', 'Meta');
   public $layout = 'viva';
   public $components = array('Fechasconvert', 'Session');
 
@@ -1209,17 +1209,16 @@ class ReportesController extends Controller {
       'fields' => array('id', 'nombre'),
       'conditions' => array('tipo_producto' => 'CELULARES')
     ));
-    if(empty($this->request->data['Dato']['fecha_ini'])){
+    if (empty($this->request->data['Dato']['fecha_ini'])) {
       $this->request->data['Dato']['fecha_ini'] = date('Y-m-d');
     }
-    if(empty($this->request->data['Dato']['fecha_fin'])){
+    if (empty($this->request->data['Dato']['fecha_fin'])) {
       $this->request->data['Dato']['fecha_fin'] = date('Y-m-d');
     }
     $sucursales = $this->Sucursal->find('list', array('fields' => 'nombre'));
-    $this->set(compact('sucursales','datos_array', 'productos', 'datos', 'cmovimientos', 'inicial_c', 'ingresos_m', 'salidas_m', 'total_a_m', 'total_dolares', 'total_dolares_b'));
-
+    $this->set(compact('sucursales', 'datos_array', 'productos', 'datos', 'cmovimientos', 'inicial_c', 'ingresos_m', 'salidas_m', 'total_a_m', 'total_dolares', 'total_dolares_b'));
   }
-  
+
   public function get_total_caja($idSucursal = null) {
     $caja = $this->Cajachica->find('first', array(
       'recursive' => -1,
@@ -1233,6 +1232,45 @@ class ReportesController extends Controller {
     }
   }
 
+  public function chips_metas() {
+
+    $metas = array();
+    $dias_lab = '';
+    if (!empty($this->request->data)) {
+      $fecha_f = $this->request->data['Dato']['fecha_fin'];
+      $fecha_fin = explode('-', $this->request->data['Dato']['fecha_fin']);
+      $ano = $fecha_fin[0];
+      $mes = $fecha_fin[1];
+      //debug($fecha_f);exit;
+      $sql1 = "(SELECT COUNT(activados.id) FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
+      $sql2 = "(SELECT activados.inspector FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta LIMIT 1)";
+      $sql3 = "(SELECT COUNT(activados.id) FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta AND activados.comercial LIKE 'SI' GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
+      $this->Meta->virtualFields = array(
+        'inspector' => "($sql2)",
+        'ventas' => "($sql1)",
+        'comercial' => "($sql3)"
+      );
+      $metas = $this->Meta->find('all', array(
+        'recursive' => 0,
+        'conditions' => array('Meta.anyo' => $ano, 'Meta.mes' => $mes)
+      ));
+      $dias_lab = $this->countDays($ano, $mes, array(0));
+      
+    }
+    $this->set(compact('metas','dias_lab','mes','ano'));
+  }
+
+  function countDays($year, $month, $ignore) {
+    $count = 0;
+    $counter = mktime(0, 0, 0, $month, 1, $year);
+    while (date("n", $counter) == $month) {
+      if (in_array(date("w", $counter), $ignore) == false) {
+        $count++;
+      }
+      $counter = strtotime("+1 day", $counter);
+    }
+    return $count;
+  }
 }
 ?>
 

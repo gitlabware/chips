@@ -203,6 +203,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_chips')); ?>">General</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_chips_clientes')); ?>">Clientes</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_chips_c_total')); ?>">Totales</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'chips_metas')); ?>">Metas</a></li>
                             </ul>
                         </li>  
 
