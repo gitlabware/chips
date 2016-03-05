@@ -1309,6 +1309,26 @@ class ReportesController extends Controller {
         )
       )
     );
+
+    $meses = array(
+      1 => 'Enero',
+      2 => 'Febrero',
+      3 => 'Marzo',
+      4 => 'Abril',
+      5 => 'Mayo',
+      6 => 'Junio',
+      7 => 'Julio',
+      8 => 'Agosto',
+      9 => 'Sepetiembre',
+      10 => 'Octubre',
+      11 => 'Noviembre',
+      12 => 'Disciembre'
+    );
+
+    $fecha_fin = explode('-', $fecha_f);
+    $ano = $fecha_fin[0];
+    $mes = $fecha_fin[1];
+    $dias_lab = $this->countDays($ano, $mes, array(0));
     $prueba = new PHPExcel();
     $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(25);
     $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(25);
@@ -1334,6 +1354,9 @@ class ReportesController extends Controller {
 
     $prueba->getActiveSheet()->setTitle("REPORTE DE METAS SEGUN MERADOS");
 
+    $prueba->setActiveSheetIndex(0)->setCellValue("A1", "Dias de lunes a sabado en el mes " . $meses[$mes] . " de $ano : $dias_lab");
+
+    $prueba->getActiveSheet()->mergeCellsByColumnAndRow(0, 1, 7, 1);
     /* $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
       $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
       $this->Chip->virtualFields = array(
@@ -1374,9 +1397,6 @@ class ReportesController extends Controller {
       } */
 
     //$fecha_f = $this->request->data['Dato']['fecha_fin'];
-    $fecha_fin = explode('-', $fecha_f);
-    $ano = $fecha_fin[0];
-    $mes = $fecha_fin[1];
     //debug($fecha_f);exit;
     $sql1 = "(SELECT COUNT(activados.id) FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
     $sql2 = "(SELECT activados.inspector FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta LIMIT 1)";
@@ -1390,7 +1410,7 @@ class ReportesController extends Controller {
       'recursive' => 0,
       'conditions' => array('Meta.anyo' => $ano, 'Meta.mes' => $mes)
     ));
-    $dias_lab = $this->countDays($ano, $mes, array(0));
+    
 
     $to_ventas = 0;
     $to_metas = 0;
@@ -1418,11 +1438,11 @@ class ReportesController extends Controller {
     }
 
     if ($to_metas != 0) {
-      $cump =  round(($to_ventas / $to_metas) * 100, 2) . ' %';
+      $cump = round(($to_ventas / $to_metas) * 100, 2) . ' %';
     } else {
-      $cump =  '0 %';
+      $cump = '0 %';
     }
-    
+
     $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, "");
     $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, "TOTAL");
     $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $to_ventas);
@@ -1431,7 +1451,7 @@ class ReportesController extends Controller {
     $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $to_metas - $to_ventas);
     $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $to_comercial);
     $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $to_ventas - $to_comercial);
-    
+
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
     $objWriter->save('php://output');
     exit;
