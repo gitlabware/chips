@@ -66,9 +66,11 @@ $meses = array(
                 $to_comercial = 0;
                 ?>
                 <?php foreach ($metas as $me): ?>
-                  <?php $to_ventas = $to_ventas + $me['Meta']['ventas']; ?>
-                  <?php $to_metas = $to_metas + $me['Meta']['meta']; ?>
-                  <?php $to_comercial = $to_comercial + $me['Meta']['comercial']; ?>
+                  <?php
+                  $to_ventas = $to_ventas + $me['Meta']['ventas'];
+                  $to_metas = $to_metas + $me['Meta']['meta'];
+                  $to_comercial = $to_comercial + $me['Meta']['comercial'];
+                  ?>
                   <tr>
                       <td><?php echo $me['Meta']['inspector'] ?></td>
                       <td><?php echo $me['Ruta']['cod_ruta'] . '-' . $me['Ruta']['nombre'] ?></td>
@@ -87,13 +89,29 @@ $meses = array(
                     <td>TOTAL</td>
                     <td><?php echo $to_ventas; ?></td>
                     <td><?php echo $to_metas; ?></td>
-                    <td><?php echo round(($to_ventas / $to_metas) * 100, 2) . ' %' ?></td>
+                    <td>
+                        <?php
+                        if ($to_metas != 0) {
+                          echo round(($to_ventas / $to_metas) * 100, 2) . ' %';
+                        } else {
+                          echo '0 %';
+                        }
+                        ?>
+                    </td>
                     <td><?php echo $to_metas - $to_ventas ?></td>
                     <td><?php echo $to_comercial ?></td>
                     <td><?php echo $to_ventas - $to_comercial ?></td>
                 </tr>
             </tfoot>
         </table>
+
+        <div class="columns">
+            <div class="new-row twelve-columns">
+                <?php if (!empty($this->request->data['Dato']['fecha_fin'])): ?>
+                  <?php echo $this->Html->link("Excel", array('controller' => 'Reportes', 'action' => 'gen_exc_chips_metas', $this->request->data['Dato']['fecha_fin'])) ?>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
 

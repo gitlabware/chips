@@ -1,6 +1,10 @@
 
 <?php
 
+App::import('Vendor', 'PHPExcel', array('file' => 'PHPExcel.php'));
+App::import('Vendor', 'PHPExcel_Reader_Excel2007', array('file' => 'PHPExcel/Excel2007.php'));
+App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/IOFactory.php'));
+
 class ReportesController extends Controller {
 
   public $uses = array(
@@ -1255,9 +1259,182 @@ class ReportesController extends Controller {
         'conditions' => array('Meta.anyo' => $ano, 'Meta.mes' => $mes)
       ));
       $dias_lab = $this->countDays($ano, $mes, array(0));
-      
     }
-    $this->set(compact('metas','dias_lab','mes','ano'));
+    $this->set(compact('metas', 'dias_lab', 'mes', 'ano'));
+  }
+
+  public function gen_exc_chips_metas($fecha_f = null) {
+    $nombre_excel = "metaschips.xlsx";
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="' . $nombre_excel . '"');
+    header('Cache-Control: max-age=0');
+    $borders = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        //,'color' => array('argb' => 'FFFF0000')
+        )
+      ),
+      'font' => array(
+        'size' => 12
+        , 'bold' => true
+      //,'color' => array('argb' => 'FFFF0000')
+      ),
+      'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+        'color' => array('rgb' => '92D050')
+      )
+    );
+    $borders3 = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        //,'color' => array('argb' => 'FFFF0000')
+        )
+      ),
+      'font' => array(
+        'size' => 12
+        , 'bold' => true
+      //,'color' => array('argb' => 'FFFF0000')
+      ),
+      'fill' => array(
+        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+        'color' => array('rgb' => '7dc35b')
+      )
+    );
+    $borders2 = array(
+      'borders' => array(
+        'allborders' => array(
+          'style' => PHPExcel_Style_Border::BORDER_THIN
+        )
+      )
+    );
+    $prueba = new PHPExcel();
+    $prueba->getActiveSheet()->getColumnDimension('A')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('B')->setWidth(25);
+    $prueba->getActiveSheet()->getColumnDimension('C')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('D')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('E')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('F')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('G')->setWidth(11);
+    $prueba->getActiveSheet()->getColumnDimension('H')->setWidth(13);
+
+    $prueba->getActiveSheet()->getStyle('A3:H3')->applyFromArray($borders);
+    //$prueba->getActiveSheet()->getStyle('K1:N1')->applyFromArray($borders3);
+    $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("A3", "INSPECTOR");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B3", "MERCADO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C3", "VENTAS");
+    $prueba->setActiveSheetIndex(0)->setCellValue("D3", "META");
+    $prueba->setActiveSheetIndex(0)->setCellValue("E3", "CUMPLIMIENTO");
+    $prueba->setActiveSheetIndex(0)->setCellValue("F3", "RESTANTE");
+    $prueba->setActiveSheetIndex(0)->setCellValue("G3", "COMERCIAL");
+    $prueba->setActiveSheetIndex(0)->setCellValue("H3", "NO COMERCIAL");
+
+    $prueba->getActiveSheet()->setTitle("REPORTE DE METAS SEGUN MERADOS");
+
+    /* $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
+      $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
+      $this->Chip->virtualFields = array(
+      'nom_distribuidor' => "CONCAT(($sql))",
+      'ciudad_dist' => "CONCAT(($sql2))",
+      'fecha_activacion' => "(SELECT activados.fecha_act FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
+      'ac_cod_dealer' => "(SELECT activados.dealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
+      'ac_cod_subdealer' => "(SELECT activados.subdealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
+      'ac_subdealer' => "(SELECT activados.subdealer FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)"
+      );
+      $chips = $this->Chip->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Chip.excel_id' => $idExcel),
+      'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f",
+      'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado', 'Chip.fecha_activacion', 'Chip.ac_cod_dealer', 'Chip.ac_cod_subdealer', 'Chip.ac_subdealer')
+      ));
+      //debug($chips);exit;
+      $cont = 1;
+      foreach ($chips as $ch) {
+      $cont++;
+      $prueba->getActiveSheet()->getStyle("A$cont:N$cont")->applyFromArray($borders2);
+      //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
+      $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $ch['Chip']['cantidad']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $ch['Chip']['sim'] . " ");
+      $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $ch['Chip']['telefono']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $ch[0]['fecha_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $ch[0]['fecha_entrega_d_f']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $ch['Cliente']['cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $ch['Cliente']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $ch['Cliente']['cod_mercado']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("I" . $cont, $ch['Chip']['nom_distribuidor']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("J" . $cont, $ch['Chip']['ciudad_dist']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['fecha_activacion']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("L" . $cont, $ch['Chip']['ac_cod_dealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("M" . $cont, $ch['Chip']['ac_cod_subdealer']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("N" . $cont, $ch['Chip']['ac_subdealer']);
+      //$prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['cantidad']);
+      } */
+
+    //$fecha_f = $this->request->data['Dato']['fecha_fin'];
+    $fecha_fin = explode('-', $fecha_f);
+    $ano = $fecha_fin[0];
+    $mes = $fecha_fin[1];
+    //debug($fecha_f);exit;
+    $sql1 = "(SELECT COUNT(activados.id) FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
+    $sql2 = "(SELECT activados.inspector FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta LIMIT 1)";
+    $sql3 = "(SELECT COUNT(activados.id) FROM activados WHERE DATE(activados.fecha_act) <= '$fecha_f' AND YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta AND activados.comercial LIKE 'SI' GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
+    $this->Meta->virtualFields = array(
+      'inspector' => "($sql2)",
+      'ventas' => "($sql1)",
+      'comercial' => "($sql3)"
+    );
+    $metas = $this->Meta->find('all', array(
+      'recursive' => 0,
+      'conditions' => array('Meta.anyo' => $ano, 'Meta.mes' => $mes)
+    ));
+    $dias_lab = $this->countDays($ano, $mes, array(0));
+
+    $to_ventas = 0;
+    $to_metas = 0;
+    $to_comercial = 0;
+
+
+
+    $cont = 3;
+    foreach ($metas as $me) {
+      $to_ventas = $to_ventas + $me['Meta']['ventas'];
+      $to_metas = $to_metas + $me['Meta']['meta'];
+      $to_comercial = $to_comercial + $me['Meta']['comercial'];
+
+      $cont++;
+      $prueba->getActiveSheet()->getStyle("A$cont:H$cont")->applyFromArray($borders2);
+      //$prueba->getActiveSheet()->getStyle("D$cont")->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_DMYSLASH);
+      $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, $me['Meta']['inspector']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, $me['Ruta']['cod_ruta'] . '-' . $me['Ruta']['nombre']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $me['Meta']['ventas']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $me['Meta']['meta']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, round(($me['Meta']['ventas'] / $me['Meta']['meta']) * 100, 2) . ' %');
+      $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $me['Meta']['meta'] - $me['Meta']['ventas']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $me['Meta']['comercial']);
+      $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $me['Meta']['ventas'] - $me['Meta']['comercial']);
+    }
+
+    if ($to_metas != 0) {
+      $cump =  round(($to_ventas / $to_metas) * 100, 2) . ' %';
+    } else {
+      $cump =  '0 %';
+    }
+
+    $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, "");
+    $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, "TOTAL");
+    $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $to_ventas);
+    $prueba->setActiveSheetIndex(0)->setCellValue("D" . $cont, $to_metas);
+    $prueba->setActiveSheetIndex(0)->setCellValue("E" . $cont, $cump);
+    $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $to_metas - $to_ventas);
+    $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $to_comercial);
+    $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $to_ventas - $to_comercial);
+
+    $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
+    $objWriter->save('php://output');
+    exit;
   }
 
   function countDays($year, $month, $ignore) {
@@ -1271,6 +1448,7 @@ class ReportesController extends Controller {
     }
     return $count;
   }
+
 }
 ?>
 
