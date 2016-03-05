@@ -1422,7 +1422,7 @@ class ReportesController extends Controller {
     } else {
       $cump =  '0 %';
     }
-
+    
     $prueba->setActiveSheetIndex(0)->setCellValue("A" . $cont, "");
     $prueba->setActiveSheetIndex(0)->setCellValue("B" . $cont, "TOTAL");
     $prueba->setActiveSheetIndex(0)->setCellValue("C" . $cont, $to_ventas);
@@ -1431,7 +1431,7 @@ class ReportesController extends Controller {
     $prueba->setActiveSheetIndex(0)->setCellValue("F" . $cont, $to_metas - $to_ventas);
     $prueba->setActiveSheetIndex(0)->setCellValue("G" . $cont, $to_comercial);
     $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $to_ventas - $to_comercial);
-
+    
     $objWriter = PHPExcel_IOFactory::createWriter($prueba, 'Excel2007');
     $objWriter->save('php://output');
     exit;

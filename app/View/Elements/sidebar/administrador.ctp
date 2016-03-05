@@ -22,7 +22,7 @@
             $num_chips_v = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_venciendo'));
             ?>
             <?php if (empty($num_chips_v)): ?>
-              <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Productos"><span class="icon-clipboard"></span></a></li>
+              <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Listado de Productos"><span class="icon-clipboard"></span></a></li>
               <?php else:?>
               <li><a href="<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'get_venciendo')) ?>" title="Chips en Vencimiento"><span class="icon-warning"></span><span class="count"><?= $num_chips_v ?></span></a></li>
             <?php endif; ?>
