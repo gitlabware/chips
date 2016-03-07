@@ -245,7 +245,7 @@ echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), arr
           contentAlign: 'center',
           width: 240,
           title: 'Loading',
-          content: '<div style="line-height: 25px; padding: 0 0 10px"><span id="modal-status">Iniciando regularizacion...</span><br><span id="modal-progress">0%</span></div>',
+          content: '<div style="line-height: 25px; padding: 0 0 10px"><span id="modal-status">Iniciando Carga de registros...</span><br><span id="modal-progress">0%</span></div>',
           buttons: {},
           scrolling: false,
           actions: {
