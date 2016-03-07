@@ -1342,7 +1342,7 @@ class ReportesController extends Controller {
     $prueba->getActiveSheet()->getStyle('A3:H3')->applyFromArray($borders);
     //$prueba->getActiveSheet()->getStyle('K1:N1')->applyFromArray($borders3);
     $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
-
+      
     $prueba->setActiveSheetIndex(0)->setCellValue("A3", "INSPECTOR");
     $prueba->setActiveSheetIndex(0)->setCellValue("B3", "MERCADO");
     $prueba->setActiveSheetIndex(0)->setCellValue("C3", "VENTAS");

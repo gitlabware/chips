@@ -307,7 +307,7 @@ class ChipsController extends AppController {
 
       $objPHPExcel = $objLector->load("../webroot/files/$nombre_ex");
       $i = 0;
-      while ($excel['Excel']['total_registros'] > 0 && $excel['Excel']['total_registros'] > $excel['Excel']['puntero'] && $i < 40) {
+      while ($excel['Excel']['total_registros'] > 0 && $excel['Excel']['total_registros'] > $excel['Excel']['puntero'] && $i < 200) {
         $row = $objPHPExcel->getActiveSheet()->getRowIterator($puntero)->current();
         $cellIterator = $row->getCellIterator();
         $cellIterator->setIterateOnlyExistingCells(false);
@@ -331,7 +331,7 @@ class ChipsController extends AppController {
           }
         }
         if (!empty($array_data['E'])) {
-          $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $array_data['E'])));
+          $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $array_data['E'],'Chip.fecha' => $array_data['G'])));
           if (empty($verifica_tel)) {
             $this->request->data['Chip']['excel_id'] = $idExcel;
             $this->request->data['Chip']['cantidad'] = $array_data['A'];
@@ -366,7 +366,7 @@ class ChipsController extends AppController {
 
       $objPHPExcel = $objLector->load("../webroot/files/$nombre_ex");
       $i = 0;
-      while ($excel['Excel']['total_registros'] > 0 && $excel['Excel']['total_registros'] > $excel['Excel']['puntero'] && $i < 40) {
+      while ($excel['Excel']['total_registros'] > 0 && $excel['Excel']['total_registros'] > $excel['Excel']['puntero'] && $i < 200) {
         $row = $objPHPExcel->getActiveSheet()->getRowIterator($puntero)->current();
         $cellIterator = $row->getCellIterator();
         $cellIterator->setIterateOnlyExistingCells(false);
@@ -426,7 +426,7 @@ class ChipsController extends AppController {
 
 
         if (!empty($array_data['F'])) {
-          $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $array_data['F'])));
+          $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $array_data['F'],'Activado.fecha_act' => $array_data['B'])));
           if (empty($verifica_tel)) {
 
             $da_acti['ciudad_nro_tel'] = $array_data['A'];
