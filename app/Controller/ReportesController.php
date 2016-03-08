@@ -1268,8 +1268,8 @@ class ReportesController extends Controller {
 
     $datos = array();
     if (!empty($this->request->data)) {
-       //debug($this->request->data);
-        //exit; 
+      //debug($this->request->data);
+      //exit; 
       $fecha_ini = $this->request->data['Dato']['fecha_ini'];
       $fecha_fin = $this->request->data['Dato']['fecha_fin'];
       $cod_ruta = $this->request->data['Dato']['cod_ruta'];
@@ -1284,7 +1284,7 @@ class ReportesController extends Controller {
         'comerciales' => "$sql3"
       );
       $condiciones = array();
-      if(!empty($cod_ruta)){
+      if (!empty($cod_ruta)) {
         $condiciones['Cliente.cod_mercado'] = $cod_ruta;
       }
 
@@ -1293,7 +1293,6 @@ class ReportesController extends Controller {
         'conditions' => $condiciones
       ));
       //debug($datos);exit;
-      
     }
 
     $this->Ruta->virtualFields = array(
@@ -1306,7 +1305,25 @@ class ReportesController extends Controller {
       'fields' => array('Ruta.cod_ruta', 'Ruta.nombre_completo')
     ));
     //debug($mercados);exit;
-    $this->set(compact('mercados','datos'));
+    $this->set(compact('mercados', 'datos'));
+  }
+
+  public function det_chips_merca($idCliente = null, $fecha_ini = null, $fecha_fin = null) {
+    $this->layout = 'ajax';
+    
+    $sql1 = "(SELECT activados.fecha_act FROM activados WHERE activados.phone_number = Chip.telefono AND activados.fecha_act >= Chip.fecha)";
+    $sql2 = "(SELECT activados.comercial FROM activados WHERE activados.phone_number = Chip.telefono AND activados.fecha_act >= Chip.fecha)";
+    
+    $this->Chip->virtualFields = array(
+      'fecha_activacion' => "$sql1",
+      'comercial' => "$sql2"
+    );
+    $chips_entregados = $this->Chip->find('all', array(
+      'recursive' => -1,
+      'conditions' => array('Chip.cliente_id' => $idCliente, 'Chip.fecha_entrega_c >=' => $fecha_ini, 'Chip.fecha_entrega_c <=' => $fecha_fin)
+    ));
+    
+    $this->set(compact('chips_entregados','idCliente'));
   }
 
   public function gen_exc_chips_metas($fecha_f = null) {
