@@ -38,6 +38,14 @@ $meses = array(
                     <button class="button green-gradient full-width" type="submit">GENERAR</button>
                 </p>
             </div>
+            <div class="two-columns">
+                <p class="block-label button-height">
+                    <label for="block-label-1" class="label">&nbsp;</label>
+                    <?php if (!empty($this->request->data['Dato']['fecha_fin'])): ?>
+                      <?php echo $this->Html->link("Excel", array('controller' => 'Reportes', 'action' => 'gen_exc_chips_metas', $this->request->data['Dato']['fecha_fin']),array('class' => 'button blue-gradient full-width')) ?>
+                    <?php endif; ?>
+                </p>
+            </div>
         </div>
         <br>
         <?php echo $this->Form->end(); ?>
@@ -105,13 +113,6 @@ $meses = array(
             </tfoot>
         </table>
 
-        <div class="columns">
-            <div class="new-row twelve-columns">
-                <?php if (!empty($this->request->data['Dato']['fecha_fin'])): ?>
-                  <?php echo $this->Html->link("Excel", array('controller' => 'Reportes', 'action' => 'gen_exc_chips_metas', $this->request->data['Dato']['fecha_fin'])) ?>
-                <?php endif; ?>
-            </div>
-        </div>
     </div>
 </div>
 

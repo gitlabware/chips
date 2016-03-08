@@ -1296,6 +1296,7 @@ class VentasdistribuidorController extends AppController {
       foreach ($chips as $ch) {
         $this->Chip->id = $ch['Chip']['id'];
         $dato['Chip']['cliente_id'] = $datos['cliente_id'];
+        $dato['Chip']['fecha_entrega_c'] = date('Y-m-d');
         $this->Chip->save($dato['Chip']);
       }
       $this->Session->setFlash('Se asigno correctamente', 'msgbueno');

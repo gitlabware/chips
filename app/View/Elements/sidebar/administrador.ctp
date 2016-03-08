@@ -21,11 +21,12 @@
             <?php
             $num_chips_v = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_venciendo'));
             ?>
-            <?php if (empty($num_chips_v)): ?>
+            <?php /*if (empty($num_chips_v)): ?>
               <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Listado de Productos"><span class="icon-clipboard"></span></a></li>
               <?php else:?>
               <li><a href="<?php echo $this->Html->url(array('controller' => 'Chips', 'action' => 'get_venciendo')) ?>" title="Chips en Vencimiento"><span class="icon-warning"></span><span class="count"><?= $num_chips_v ?></span></a></li>
-            <?php endif; ?>
+            <?php endif; */?>
+              <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Listado de Productos"><span class="icon-clipboard"></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'users', 'action' => 'salir')) ?>" title="Salir"><span class="icon-extract"></span></a></li>            
         </ul>
 
@@ -35,7 +36,6 @@
                 <li class="with-right-arrow">
                     <span>Administracion</span>
                     <ul class="big-menu">
-
                         <li class="with-right-arrow">
                             <span>Usuarios</span>
                             <ul class="big-menu">
@@ -204,6 +204,7 @@
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_chips_clientes')); ?>">Clientes</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'reporte_chips_c_total')); ?>">Totales</a></li>
                                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'chips_metas')); ?>">Metas</a></li>
+                                <li><a href="<?php echo $this->Html->url(array('controller' => 'Reportes', 'action' => 'chips_mercados')); ?>">Mercados</a></li>
                             </ul>
                         </li>  
 

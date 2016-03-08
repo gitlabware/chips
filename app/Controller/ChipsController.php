@@ -1416,20 +1416,22 @@ class ChipsController extends AppController {
 
     $dia_actual = date('Y-m-d');
     $dia_20 = date('Y-m-d', strtotime($dia_actual . ' -20 day'));
-    //debug($dia_20);exit;
+    
 
     $sql3 = "(IF(EXISTS(SELECT id FROM activados ac WHERE ac.phone_number = Chip.telefono),1,0))";
     $this->Chip->virtualFields = array(
       'activado' => "CONCAT($sql3)"
     );
+    
 
     $condiciones = array();
     $condiciones['DATE_ADD(Chip.fecha, INTERVAL 60 DAY) >='] = $dia_20;
     $condiciones['Chip.activado'] = 0;
     //debug($condiciones);exit;
-    $datos = $this->Chip->find('count', array(
+    $datos = $this->Chip->find('all', array(
       'conditions' => $condiciones
     ));
+    //debug($datos);exit;
     return $datos;
     //debug($datos);exit;
   }

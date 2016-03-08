@@ -19,7 +19,7 @@ class ReportesController extends Controller {
     'Chip',
     'Deposito',
     'Sucursal',
-    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto', 'Cajachica', 'Totale', 'Meta');
+    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto', 'Cajachica', 'Totale', 'Meta','Ruta');
   public $layout = 'viva';
   public $components = array('Fechasconvert', 'Session');
 
@@ -1262,6 +1262,44 @@ class ReportesController extends Controller {
     }
     $this->set(compact('metas', 'dias_lab', 'mes', 'ano'));
   }
+  
+  public function chips_mercados(){
+    debug(number_format(5));exit;
+    if(!empty($this->request->data)){
+      debug($this->request->data);
+      exit;
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $cod_ruta = $this->request->data['Dato']['cod_ruta'];
+      
+      $sql1 = "(SELECT COUNT(chips.id) FROM chips WHERE chips WHERE chips.cliente_id = Cliente.id AND chips.fecha_entrega_c >= $fecha_ini AND chips.fecha_entrega_c <= $fecha_fin)";
+      $sql2 = "(SELECT COUNT(chips.id) FROM activados WHERE activados)";
+      
+      $this->Cliente->virtualFields = array(
+        'entregados' => "$sql1",
+        'activados' => "$sql2"
+      );
+      
+      $datos = $this->Cliente->find('all',array(
+        'recursive' => -1,
+        'conditions' => array('Cliente.cod_ruta' => $cod_ruta)
+      ));
+    }
+    
+    $this->Ruta->virtualFields = array(
+      'nombre_completo' => "CONCAT(Ruta.cod_ruta,'-',Ruta.nombre)"
+    );
+    
+    $mercados = $this->Ruta->find('list',array(
+      'recursive' => -1,
+      'conditions' => array('Ruta.cod_ruta <>' => ''),
+      'fields' => array('Ruta.cod_ruta','Ruta.nombre_completo')
+    ));
+    //debug($mercados);exit;
+    $this->set(compact('mercados'));
+  }
+
+
 
   public function gen_exc_chips_metas($fecha_f = null) {
     $nombre_excel = "metaschips.xlsx";
@@ -1468,6 +1506,8 @@ class ReportesController extends Controller {
     }
     return $count;
   }
+  
+  
 
 }
 ?>
