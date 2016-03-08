@@ -885,7 +885,7 @@ class ChipsController extends AppController {
     }
   }
 
-  public function excel($fecha_entrega = null, $idDistribuidor = null) {
+  public function excel($idExcel = null,$fecha_entrega = null, $idDistribuidor = null) {
     $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
     $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
     $this->Chip->virtualFields = array(
