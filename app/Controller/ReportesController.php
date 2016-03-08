@@ -19,7 +19,7 @@ class ReportesController extends Controller {
     'Chip',
     'Deposito',
     'Sucursal',
-    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto', 'Cajachica', 'Totale', 'Meta');
+    'Cliente', 'Ventascelulare', 'Pago', 'Tiposproducto', 'Cajachica', 'Totale', 'Meta', 'Ruta');
   public $layout = 'viva';
   public $components = array('Fechasconvert', 'Session');
 
@@ -46,6 +46,7 @@ class ReportesController extends Controller {
       'group' => array('Movimiento.producto_id'),
       'order' => array('Movimiento.producto_id')
     ));
+
 
     $stockAlmacen = $this->Movimiento->find('all', array(
       'fields' => array('MAX(Movimiento.id) as id'),
@@ -1263,6 +1264,51 @@ class ReportesController extends Controller {
     $this->set(compact('metas', 'dias_lab', 'mes', 'ano'));
   }
 
+  public function chips_mercados() {
+
+    $datos = array();
+    if (!empty($this->request->data)) {
+       //debug($this->request->data);
+        //exit; 
+      $fecha_ini = $this->request->data['Dato']['fecha_ini'];
+      $fecha_fin = $this->request->data['Dato']['fecha_fin'];
+      $cod_ruta = $this->request->data['Dato']['cod_ruta'];
+      $sql2_a = "(SELECT activados.id FROM activados WHERE activados.phone_number = chips.telefono AND activados.fecha_act >= chips.fecha LIMIT 1)";
+      $sql3_a = "(SELECT activados.id FROM activados WHERE activados.phone_number = chips.telefono AND activados.fecha_act >= chips.fecha AND activados.comercial LIKE 'SI' LIMIT 1)";
+      $sql1 = "(SELECT COUNT(chips.id) FROM chips WHERE chips.cliente_id = Cliente.id AND chips.fecha_entrega_c >= '$fecha_ini' AND chips.fecha_entrega_c <= '$fecha_fin')";
+      $sql2 = "(SELECT COUNT(chips.id) FROM chips WHERE chips.cliente_id = Cliente.id AND chips.fecha_entrega_c >= '$fecha_ini' AND chips.fecha_entrega_c <= '$fecha_fin' AND !ISNULL($sql2_a))";
+      $sql3 = "(SELECT COUNT(chips.id) FROM chips WHERE chips.cliente_id = Cliente.id AND chips.fecha_entrega_c >= '$fecha_ini' AND chips.fecha_entrega_c <= '$fecha_fin' AND !ISNULL($sql3_a))";
+      $this->Cliente->virtualFields = array(
+        'entregados' => "$sql1",
+        'activados' => "$sql2",
+        'comerciales' => "$sql3"
+      );
+      $condiciones = array();
+      if(!empty($cod_ruta)){
+        $condiciones['Cliente.cod_mercado'] = $cod_ruta;
+      }
+
+      $datos = $this->Cliente->find('all', array(
+        'recursive' => -1,
+        'conditions' => $condiciones
+      ));
+      //debug($datos);exit;
+      
+    }
+
+    $this->Ruta->virtualFields = array(
+      'nombre_completo' => "CONCAT(Ruta.cod_ruta,'-',Ruta.nombre)"
+    );
+
+    $mercados = $this->Ruta->find('list', array(
+      'recursive' => -1,
+      'conditions' => array('Ruta.cod_ruta <>' => ''),
+      'fields' => array('Ruta.cod_ruta', 'Ruta.nombre_completo')
+    ));
+    //debug($mercados);exit;
+    $this->set(compact('mercados','datos'));
+  }
+
   public function gen_exc_chips_metas($fecha_f = null) {
     $nombre_excel = "metaschips.xlsx";
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -1342,7 +1388,7 @@ class ReportesController extends Controller {
     $prueba->getActiveSheet()->getStyle('A3:H3')->applyFromArray($borders);
     //$prueba->getActiveSheet()->getStyle('K1:N1')->applyFromArray($borders3);
     $prueba->getActiveSheet()->getRowDimension(1)->setRowHeight(40);
-      
+
     $prueba->setActiveSheetIndex(0)->setCellValue("A3", "INSPECTOR");
     $prueba->setActiveSheetIndex(0)->setCellValue("B3", "MERCADO");
     $prueba->setActiveSheetIndex(0)->setCellValue("C3", "VENTAS");
@@ -1410,7 +1456,7 @@ class ReportesController extends Controller {
       'recursive' => 0,
       'conditions' => array('Meta.anyo' => $ano, 'Meta.mes' => $mes)
     ));
-    
+
 
     $to_ventas = 0;
     $to_metas = 0;

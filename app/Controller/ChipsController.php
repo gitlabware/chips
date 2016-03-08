@@ -674,7 +674,7 @@ class ChipsController extends AppController {
     $this->set(compact('entregados'));
   }
 
-  public function detalle_entrega($fecha = null, $idDistribuidor = null) {
+  public function detalle_entrega($idEcel = null,$fecha = null, $idDistribuidor = null) {
     $distribuidor = $this->User->findByid($idDistribuidor, null, null, 0);
     $entregados = $this->Chip->find('all', array(
       'recursive' => -1,
@@ -885,7 +885,7 @@ class ChipsController extends AppController {
     }
   }
 
-  public function excel($fecha_entrega = null, $idDistribuidor = null) {
+  public function excel($idExcel = null,$fecha_entrega = null, $idDistribuidor = null) {
     $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
     $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
     $this->Chip->virtualFields = array(
@@ -1416,20 +1416,22 @@ class ChipsController extends AppController {
 
     $dia_actual = date('Y-m-d');
     $dia_20 = date('Y-m-d', strtotime($dia_actual . ' -20 day'));
-    //debug($dia_20);exit;
+    
 
     $sql3 = "(IF(EXISTS(SELECT id FROM activados ac WHERE ac.phone_number = Chip.telefono),1,0))";
     $this->Chip->virtualFields = array(
       'activado' => "CONCAT($sql3)"
     );
+    
 
     $condiciones = array();
     $condiciones['DATE_ADD(Chip.fecha, INTERVAL 60 DAY) >='] = $dia_20;
     $condiciones['Chip.activado'] = 0;
     //debug($condiciones);exit;
-    $datos = $this->Chip->find('count', array(
+    $datos = $this->Chip->find('all', array(
       'conditions' => $condiciones
     ));
+    //debug($datos);exit;
     return $datos;
     //debug($datos);exit;
   }
