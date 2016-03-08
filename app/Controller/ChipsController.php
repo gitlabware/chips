@@ -674,7 +674,7 @@ class ChipsController extends AppController {
     $this->set(compact('entregados'));
   }
 
-  public function detalle_entrega($fecha = null, $idDistribuidor = null) {
+  public function detalle_entrega($idEcel = null,$fecha = null, $idDistribuidor = null) {
     $distribuidor = $this->User->findByid($idDistribuidor, null, null, 0);
     $entregados = $this->Chip->find('all', array(
       'recursive' => -1,

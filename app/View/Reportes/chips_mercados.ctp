@@ -28,7 +28,7 @@ $meses = array(
                     <label for="block-label-1" class="label">Fecha Inicial</label>
                     <span class="input">
                         <span class="icon-calendar"></span>
-                        <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input-unstyled datepicker')); ?>
+                        <?php echo $this->Form->text('Dato.fecha_ini', array('class' => 'input-unstyled datepicker','required')); ?>
                     </span>
                 </p>
             </div>
@@ -37,14 +37,14 @@ $meses = array(
                     <label for="block-label-1" class="label">Fecha Final</label>
                     <span class="input">
                         <span class="icon-calendar"></span>
-                        <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input-unstyled datepicker')); ?>
+                        <?php echo $this->Form->text('Dato.fecha_fin', array('class' => 'input-unstyled datepicker','required')); ?>
                     </span>
                 </p>
             </div>
             <div class="three-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Mercado</label>
-                    <?php echo $this->Form->select('Dato.cod_ruta', $mercados, array('class' => 'select')); ?>
+                    <?php echo $this->Form->select('Dato.cod_ruta', $mercados, array('class' => 'select','requied')); ?>
                 </p>
             </div>
             <div class="two-columns">
@@ -58,11 +58,6 @@ $meses = array(
         <?php echo $this->Form->end(); ?>
         <table class="table responsive-table">
             <thead>
-                <tr>
-                    <th colspan="8">
-                        <?php echo "Dias de lunes a sabado en el mes " . $meses[$mes] . " de $ano : $dias_lab"; ?>
-                    </th>
-                </tr>
                 <tr>
                     <th>Cliente</th>
                     <th>Entregado</th>
@@ -79,13 +74,13 @@ $meses = array(
                 ?>
                 <?php foreach ($datos as $da): ?>
                   <?php
-                  $entregados = $entregados + $da['Cliente']['entregado'];
+                  $entregados = $entregados + $da['Cliente']['entregados'];
                   $activados = $activados + $da['Cliente']['activados'];
                   $comerciales = $comerciales + $da['Cliente']['comerciales'];
                   ?>
                   <tr>
                       <td><?php echo $da['Cliente']['nombre'] ?></td>
-                      <td><?php echo $da['Cliente']['entregado'] ?></td>
+                      <td><?php echo $da['Cliente']['entregados'] ?></td>
                       <td><?php echo $da['Cliente']['activados'] ?></td>
                       <td><?php echo $da['Cliente']['comerciales'] ?></td>
                       <td><?php echo $da['Cliente']['activados'] - $da['Cliente']['comerciales'] ?></td>
@@ -102,7 +97,6 @@ $meses = array(
                 </tr>
             </tfoot>
         </table>
-
     </div>
 </div>
 
