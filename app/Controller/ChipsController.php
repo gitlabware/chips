@@ -425,6 +425,8 @@ class ChipsController extends AppController {
         }
 
 
+        //debug($array_data);exit;
+        
         if (!empty($array_data['F'])) {
           $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $array_data['F'],'Activado.fecha_act' => $array_data['B'])));
           if (empty($verifica_tel)) {
@@ -1577,7 +1579,9 @@ class ChipsController extends AppController {
       $d_chips['cantidad'] = 0;
       $d_chips['sim'] = 0;
       $d_chips['telefono'] = $activado[0]['activados']['phone_number'];
-      $d_chips['fecha'] = $activado[0]['activados']['fecha_doc'];
+      $d_chips['fecha'] = $activado[0]['activados']['fecha_act'];
+      $d_chips['fecha_entrega_d'] = $activado[0]['activados']['fecha_act'];
+      $d_chips['fecha_entrega_c'] = $activado[0]['activados']['fecha_act'];
       $cliente = $this->Cliente->find('first', array(
         'recursive' => -1,
         'conditions' => array(
