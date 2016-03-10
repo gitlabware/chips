@@ -170,12 +170,14 @@
                   </td>   
                   <td>
                       <?php if ($e['Excel']['tipo'] == 'asignacion'): ?>
-                        <?php echo $this->Html->link("Detalle", array('action' => 'verexcel', $e['Excel']['id']), array('class' => 'button blue-gradient glossy')) ?>
-                        <?php echo $this->Html->link("Asignados", array('action' => 'excel_asignados', $e['Excel']['id']), array('class' => 'button black-gradient glossy')) ?>
+                        <?php echo $this->Html->link('<span class="icon-page-list"></span>', array('action' => 'verexcel', $e['Excel']['id']), array('class' => 'button blue-gradient glossy', 'title' => 'Detalle', 'escape' => FALSE)) ?>
+                        <?php echo $this->Html->link('<span class="icon-ribbon"></span>', array('action' => 'asigna_distrib_exc', $e['Excel']['id']), array('class' => 'button orange-gradient glossy', 'title' => 'Asignar', 'escape' => FALSE)) ?>
+                        <?php echo $this->Html->link('<span class="icon-ribbons"></span>', array('action' => 'excel_asignados', $e['Excel']['id']), array('class' => 'button black-gradient glossy', 'title' => 'Asignados', 'escape' => FALSE)) ?>
                         <a title="Descargar Excel" href="<?php echo $this->Html->url(array('action' => 'genera_excel_3', $e['Excel']['id'])); ?>" class="button green-gradient glossy">
                             <span class="icon-download"></span>
                         </a>
                         <?php echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_as', $e['Excel']['id']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'escape' => false, 'title' => 'Eliminar Excel Chips')) ?>
+
                       <?php elseif ($e['Excel']['tipo'] == 'activacion'): ?>
                         <button type="button" class="button blue-gradient glossy" title="Regularizar Chips Activados" onclick="regularizar_chips(<?php echo $e['Excel']['id']; ?>)"><span class="icon-cycle"></span></button>
                         <a title="Descargar Excel" href="<?php echo $this->Html->url(array('action' => 'genera_excel_3', $e['Excel']['id'])); ?>" class="button green-gradient glossy">
@@ -221,7 +223,7 @@ echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), arr
                       handleData($.parseJSON(data).numero);
                       //alert(numero_chip);
 
-                      //$('#idmodal').load('<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'ajax_precios', $idProducto));                ?>');
+                      //$('#idmodal').load('<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'ajax_precios', $idProducto));                  ?>');
                       //data: return data from server
                       //$("#parte").html(data);
                   },

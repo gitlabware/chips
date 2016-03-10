@@ -7,7 +7,7 @@ App::import('Vendor', 'PHPExcel_IOFactory', array('file' => 'PHPExcel/PHPExcel/I
 class ChipsController extends AppController {
 
   //public $helpers = array('Html', 'Form', 'Session', 'Js');
-  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente', 'Precio', 'Ventaschip','Meta');
+  public $uses = array('Chip', 'Excel', 'Chipstmp', 'User', 'Activado', 'Cliente', 'Precio', 'Ventaschip', 'Meta');
   public $layout = 'viva';
   public $components = array('RequestHandler', 'DataTable', 'Montoliteral');
 
@@ -331,7 +331,7 @@ class ChipsController extends AppController {
           }
         }
         if (!empty($array_data['E'])) {
-          $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $array_data['E'],'Chip.fecha' => $array_data['G'])));
+          $verifica_tel = $this->Chip->find('first', array('conditions' => array('Chip.telefono' => $array_data['E'], 'Chip.fecha' => $array_data['G'])));
           if (empty($verifica_tel)) {
             $this->request->data['Chip']['excel_id'] = $idExcel;
             $this->request->data['Chip']['cantidad'] = $array_data['A'];
@@ -426,9 +426,9 @@ class ChipsController extends AppController {
 
 
         //debug($array_data);exit;
-        
+
         if (!empty($array_data['F'])) {
-          $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $array_data['F'],'Activado.fecha_act' => $array_data['B'])));
+          $verifica_tel = $this->Activado->find('first', array('conditions' => array('Activado.phone_number' => $array_data['F'], 'Activado.fecha_act' => $array_data['B'])));
           if (empty($verifica_tel)) {
 
             $da_acti['ciudad_nro_tel'] = $array_data['A'];
@@ -576,17 +576,20 @@ class ChipsController extends AppController {
   public function asigna_distrib($idUser = null) {
 
     $this->request->data['Dato']['distribuidor_id'] = $idUser;
-    $sql2 = "SELECT fecha_entrega_d FROM chips WHERE distribuidor_id = User.id ORDER BY fecha_entrega_d DESC LIMIT 1";
-    $sql = "SELECT COUNT(*) FROM chips ch,activados ac WHERE ch.telefono = ac.phone_number AND ch.distribuidor_id = User.id AND ch.fecha_entrega_d = ($sql2)";
+
+    //$sql2 = "SELECT fecha_entrega_d FROM chips WHERE distribuidor_id = User.id ORDER BY fecha_entrega_d DESC LIMIT 1";
+    //$sql = "SELECT COUNT(*) FROM chips ch,activados ac WHERE ch.telefono = ac.phone_number AND ch.distribuidor_id = User.id AND ch.fecha_entrega_d = ($sql2)";
+
     $this->User->virtualFields = array(
-      'nombre_completo' => "CONCAT('(',($sql),') ',Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
     );
+
     $distribuidores = $this->User->find('list', array(
       'recursive' => 0,
       'fields' => array('User.id', 'User.nombre_completo', 'Group.name'),
       'conditions' => array('User.group_id' => array(2, 7))
     ));
-    //debug($distribuidores);exit;
+
     if ($this->RequestHandler->responseType() == 'json') {
       /* $editar = '<button class="button orange-gradient compact icon-pencil" type="button" onclick="editarc(' . "',Cliente.id,'" . ')">Editar</button>';
         $elimina = '<button class="button red-gradient compact icon-cross-round" type="button" onclick="eliminarc(' . "',Cliente.id,'" . ')">Eliminar</button>';
@@ -598,7 +601,7 @@ class ChipsController extends AppController {
         'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja'),
         'recursive' => 0,
         'order' => 'Chip.created'
-        , 'conditions' => array('Chip.distribuidor_id' => NULL, 'Chip.cliente_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono) ))')
+        , 'conditions' => array('Chip.distribuidor_id' => NULL, 'Chip.cliente_id' => NULL, '(ISNULL(   (SELECT activados.id FROM activados WHERE activados.phone_number = Chip.telefono AND Chip.fecha <= activados.fecha_doc ORDER BY activados.fecha_doc ASC LIMIT 1) ))')
       );
       $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja');
       $this->DataTable->emptyEleget_usuarios_adminments = 1;
@@ -606,6 +609,42 @@ class ChipsController extends AppController {
       $this->set('_serialize', 'chips');
     }
     $this->set(compact('distribuidores'));
+  }
+
+  public function asigna_distrib_exc($idExcel = null) {
+
+
+    //$sql2 = "SELECT fecha_entrega_d FROM chips WHERE distribuidor_id = User.id ORDER BY fecha_entrega_d DESC LIMIT 1";
+    //$sql = "SELECT COUNT(*) FROM chips ch,activados ac WHERE ch.telefono = ac.phone_number AND ch.distribuidor_id = User.id AND ch.fecha_entrega_d = ($sql2)";
+
+    $this->User->virtualFields = array(
+      'nombre_completo' => "CONCAT(Persona.nombre,' ',Persona.ap_paterno,' ',Persona.ap_materno)"
+    );
+
+    $distribuidores = $this->User->find('list', array(
+      'recursive' => 0,
+      'fields' => array('User.id', 'User.nombre_completo', 'Group.name'),
+      'conditions' => array('User.group_id' => array(2, 7))
+    ));
+    $excel = $this->Excel->find('first',array(
+      'recursive' => -1,
+      'conditions' => array('Excel.id' => $idExcel),
+      'fields' => array('Excel.nombre_original')
+    ));
+    if ($this->RequestHandler->responseType() == 'json') {
+
+      $this->paginate = array(
+        'fields' => array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja'),
+        'recursive' => 0,
+        'order' => 'Chip.created'
+        , 'conditions' => array('Chip.distribuidor_id' => NULL, 'Chip.cliente_id' => NULL, 'Chip.excel_id' => $idExcel)
+      );
+      $this->DataTable->fields = array('Chip.id', 'Chip.cantidad', 'Chip.sim', 'Chip.imsi', 'Chip.telefono', 'Chip.fecha', 'Chip.factura', 'Chip.caja');
+      $this->DataTable->emptyEleget_usuarios_adminments = 1;
+      $this->set('chips', $this->DataTable->getResponse());
+      $this->set('_serialize', 'chips');
+    }
+    $this->set(compact('distribuidores','excel'));
   }
 
   public function registra_asignado() {
@@ -676,7 +715,7 @@ class ChipsController extends AppController {
     $this->set(compact('entregados'));
   }
 
-  public function detalle_entrega($idExcel = null,$fecha = null, $idDistribuidor = null) {
+  public function detalle_entrega($idExcel = null, $fecha = null, $idDistribuidor = null) {
     $distribuidor = $this->User->findByid($idDistribuidor, null, null, 0);
     $entregados = $this->Chip->find('all', array(
       'recursive' => -1,
@@ -887,7 +926,7 @@ class ChipsController extends AppController {
     }
   }
 
-  public function excel($idExcel = null,$fecha_entrega = null, $idDistribuidor = null) {
+  public function excel($idExcel = null, $fecha_entrega = null, $idDistribuidor = null) {
     $sql = "SELECT CONCAT(personas.nombre,' ',personas.ap_paterno) FROM personas WHERE personas.id = Distribuidor.persona_id";
     $sql2 = "SELECT lugares.nombre FROM lugares WHERE lugares.id = Distribuidor.lugare_id";
     $this->Chip->virtualFields = array(
@@ -1418,13 +1457,13 @@ class ChipsController extends AppController {
 
     $dia_actual = date('Y-m-d');
     $dia_20 = date('Y-m-d', strtotime($dia_actual . ' -20 day'));
-    
+
 
     $sql3 = "(IF(EXISTS(SELECT id FROM activados ac WHERE ac.phone_number = Chip.telefono),1,0))";
     $this->Chip->virtualFields = array(
       'activado' => "CONCAT($sql3)"
     );
-    
+
 
     $condiciones = array();
     $condiciones['DATE_ADD(Chip.fecha, INTERVAL 60 DAY) >='] = $dia_20;
@@ -1545,7 +1584,7 @@ class ChipsController extends AppController {
   }
 
   public function get_estado_chips_exc($idExcel = null) {
-    $sql = "(SELECT COUNT(chips.id) cantidad_total, COUNT(chips.distribuidor_id) distribuidor_total, COUNT(chips.cliente_id) asignados_total, COUNT(activados.id) activados_total FROM chips LEFT JOIN activados ON (activados.phone_number = chips.telefono) WHERE chips.excel_id = $idExcel)";
+    $sql = "(SELECT COUNT(chips.id) cantidad_total, COUNT(chips.distribuidor_id) distribuidor_total, COUNT(chips.cliente_id) asignados_total, COUNT(activados.id) activados_total FROM chips LEFT JOIN activados ON (activados.id = chips.activado_id) WHERE chips.excel_id = $idExcel)";
     $chips = $this->Chip->query($sql);
     if (!empty($chips)) {
       return 'D: ' . $chips[0][0]['distribuidor_total'] . ' SD: ' . $chips[0][0]['asignados_total'] . '| AC: ' . $chips[0][0]['activados_total'] . ' | T:' . $chips[0][0]['cantidad_total'];
