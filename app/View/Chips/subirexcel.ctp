@@ -1,5 +1,5 @@
 <script>
-  var idExcel_c = 0;
+    var idExcel_c = 0;
 </script>
 <section role="main" id="main">
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
@@ -47,24 +47,24 @@
         </div>
 
         <script>
-          $("#formAsig").on("submit", function (e) {
+            $("#formAsig").on("submit", function (e) {
 
-              $("#btAsig").replaceWith("<span class='loader big working'></span> Trabajando ;)");
-          });
+                $("#btAsig").replaceWith("<span class='loader big working'></span> Trabajando ;)");
+            });
 
-          function openModal()
-          {
-              //console.log('hizo click');
-              $.modal({
-                  content: '<div id="idmodal"></div>',
-                  title: 'Formato del Archivo',
-                  content: '<?php echo $this->Html->image('iconos/asignados.png'); ?>',
-                          center: true,
-                  width: 850,
-                  height: 450,
-              });
-          }
-          ;
+            function openModal()
+            {
+                //console.log('hizo click');
+                $.modal({
+                    content: '<div id="idmodal"></div>',
+                    title: 'Formato del Archivo',
+                    content: '<?php echo $this->Html->image('iconos/asignados.png'); ?>',
+                            center: true,
+                    width: 850,
+                    height: 450,
+                });
+            }
+            ;
 
         </script>
 
@@ -106,36 +106,36 @@
         </div>
 
         <script>
-          $("#formActi").on("submit", function (e) {
+            $("#formActi").on("submit", function (e) {
 
-              $("#btActi").replaceWith("<span class='loader big working'></span> Trabajando ;)");
-          });
+                $("#btActi").replaceWith("<span class='loader big working'></span> Trabajando ;)");
+            });
 
-          $(document).ready(function () {
-              $("#btMuestraFormAsignaciones").click(function () {
-                  $("#muestraFormAsignaciones").show('slow');
-                  $("#muestraFormActivaciones").hide('slow');
-              });
+            $(document).ready(function () {
+                $("#btMuestraFormAsignaciones").click(function () {
+                    $("#muestraFormAsignaciones").show('slow');
+                    $("#muestraFormActivaciones").hide('slow');
+                });
 
-              $("#btMuestraFormActivaciones").click(function () {
-                  $("#muestraFormActivaciones").show('slow');
-                  $("#muestraFormAsignaciones").hide('slow');
-              });
+                $("#btMuestraFormActivaciones").click(function () {
+                    $("#muestraFormActivaciones").show('slow');
+                    $("#muestraFormAsignaciones").hide('slow');
+                });
 
-          });
+            });
 
-          function openModal2()
-          {
-              //console.log('hizo click');
-              $.modal({
-                  title: 'Formato del Archivo',
-                  content: '<?php echo $this->Html->image('iconos/activados.png'); ?>',
-                  center: true,
-                  width: 1190,
-                  height: 450,
-              });
-          }
-          ;
+            function openModal2()
+            {
+                //console.log('hizo click');
+                $.modal({
+                    title: 'Formato del Archivo',
+                    content: '<?php echo $this->Html->image('iconos/formato_activados.png'); ?>',
+                    center: true,
+                    width: 1190,
+                    height: 450,
+                });
+            }
+            ;
         </script>
         <p>&nbsp;</p>
         <table class="table responsive-table" id="sorting-advanced">
@@ -153,41 +153,45 @@
 
             <tbody>
                 <?php foreach ($excels as $e): ?>
-                  <?php if ($e['Excel']['total_registros'] > 0 && $e['Excel']['total_registros'] > $e['Excel']['puntero']): ?>
-                <script>
-                  idExcel_c = <?php echo $e['Excel']['id']; ?>;
-                </script>
-              <?php endif; ?>
-              <tr>                      
-                  <td><?php echo $e['Excel']['id']; ?></td>                        
-                  <td><?php echo $e['Excel']['nombre_original']; ?></td>                        
-                  <td><?php echo $e['Excel']['created']; ?></td>
-                  <td><?php echo $e['Excel']['tipo']; ?></td>       
-                  <td>
-                      <?php if ($e['Excel']['tipo'] == 'asignacion'): ?>
-                        <?php echo $this->requestAction(array('action' => 'get_estado_chips_exc', $e['Excel']['id'])); ?>
-                      <?php endif; ?>
-                  </td>   
-                  <td>
-                      <?php if ($e['Excel']['tipo'] == 'asignacion'): ?>
-                        <?php echo $this->Html->link('<span class="icon-page-list"></span>', array('action' => 'verexcel', $e['Excel']['id']), array('class' => 'button blue-gradient glossy', 'title' => 'Detalle', 'escape' => FALSE)) ?>
-                        <?php echo $this->Html->link('<span class="icon-ribbon"></span>', array('action' => 'asigna_distrib_exc', $e['Excel']['id']), array('class' => 'button orange-gradient glossy', 'title' => 'Asignar', 'escape' => FALSE)) ?>
-                        <?php echo $this->Html->link('<span class="icon-ribbons"></span>', array('action' => 'excel_asignados', $e['Excel']['id']), array('class' => 'button black-gradient glossy', 'title' => 'Asignados', 'escape' => FALSE)) ?>
-                        <a title="Descargar Excel" href="<?php echo $this->Html->url(array('action' => 'genera_excel_3', $e['Excel']['id'])); ?>" class="button green-gradient glossy">
-                            <span class="icon-download"></span>
-                        </a>
-                        <?php echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_as', $e['Excel']['id']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'escape' => false, 'title' => 'Eliminar Excel Chips')) ?>
+                    <?php if ($e['Excel']['total_registros'] > 0 && $e['Excel']['total_registros'] > $e['Excel']['puntero']): ?>
+                    <script>
+                        idExcel_c = <?php echo $e['Excel']['id']; ?>;
+                    </script>
+                <?php endif; ?>
+                <tr>                      
+                    <td><?php echo $e['Excel']['id']; ?></td>                        
+                    <td><?php echo $e['Excel']['nombre_original']; ?></td>                        
+                    <td><?php echo $e['Excel']['created']; ?></td>
+                    <td><?php echo $e['Excel']['tipo']; ?></td>       
+                    <td>
+                        <?php if ($e['Excel']['tipo'] == 'asignacion'): ?>
+                            <?php echo $this->requestAction(array('action' => 'get_estado_chips_exc', $e['Excel']['id'])); ?>
+                        <?php endif; ?>
+                    </td>   
+                    <td>
+                        <?php if ($e['Excel']['tipo'] == 'asignacion'): ?>
+                            <?php echo $this->Html->link('<span class="icon-page-list"></span>', array('action' => 'verexcel', $e['Excel']['id']), array('class' => 'button blue-gradient glossy', 'title' => 'Detalle', 'escape' => FALSE)) ?>
+                            <?php echo $this->Html->link('<span class="icon-ribbon"></span>', array('action' => 'asigna_distrib_exc', $e['Excel']['id']), array('class' => 'button orange-gradient glossy', 'title' => 'Asignar', 'escape' => FALSE)) ?>
+                            <?php echo $this->Html->link('<span class="icon-ribbons"></span>', array('action' => 'excel_asignados', $e['Excel']['id']), array('class' => 'button black-gradient glossy', 'title' => 'Asignados', 'escape' => FALSE)) ?>
+                            <a title="Descargar Excel" href="<?php echo $this->Html->url(array('action' => 'genera_excel_3', $e['Excel']['id'])); ?>" class="button green-gradient glossy">
+                                <span class="icon-download"></span>
+                            </a>
+                            <?php echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_as', $e['Excel']['id']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'escape' => false, 'title' => 'Eliminar Excel Chips')) ?>
 
-                      <?php elseif ($e['Excel']['tipo'] == 'activacion'): ?>
-                        <button type="button" class="button blue-gradient glossy" title="Regularizar Chips Activados" onclick="regularizar_chips(<?php echo $e['Excel']['id']; ?>)"><span class="icon-cycle"></span></button>
-                        <a title="Descargar Excel" href="<?php echo $this->Html->url(array('action' => 'genera_excel_3', $e['Excel']['id'])); ?>" class="button green-gradient glossy">
-                            <span class="icon-download"></span>
-                        </a>
-                        <?php echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_ac', $e['Excel']['id']), array('class' => 'button orange-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'title' => 'Eliminar Excel Activacion', 'escape' => FALSE)) ?>
-                        <?php echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_as', $e['Excel']['id']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'escape' => false, 'title' => 'Eliminar Excel Chips')) ?>
-                      <?php endif; ?>
-                  </td>                       
-              </tr>  
+                        <?php elseif ($e['Excel']['tipo'] == 'activacion'): ?>
+                                                <!--<button type="button" class="button blue-gradient glossy" title="Regularizar Chips Activados" onclick="regularizar_chips(<?php echo $e['Excel']['id']; ?>)"><span class="icon-cycle"></span></button>-->
+                                                <!--<a title="Descargar Excel" href="<?php //echo $this->Html->url(array('action' => 'genera_excel_3', $e['Excel']['id']));    ?>" class="button green-gradient glossy">
+                                                    <span class="icon-download"></span>
+                                                </a>-->
+                            <a href="javascript:" class="button red-gradient glossy" title="Eliminar Excel Activacion" onclick="if (confirm('Esta seguro de eliminar el excel??')) {
+                                                eliminar_act(<?php echo $e['Excel']['id'] ?>, <?php echo $e[0]['total_ac'] ?>);
+                                            }"><span class="icon-trash"></span></a>
+
+                            <?php //echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_ac', $e['Excel']['id'],$e[0]['total_ac']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'title' => 'Eliminar Excel Activacion', 'escape' => FALSE)) ?>
+                            <?php //echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_as', $e['Excel']['id']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'escape' => false, 'title' => 'Eliminar Excel Chips')) ?>
+                        <?php endif; ?>
+                    </td>                       
+                </tr>  
 
             <?php endforeach; ?>
             </tbody>
@@ -202,296 +206,415 @@ echo $this->Html->css(array('styles/progress-slider.css?v=1'), array('block' => 
 echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), array('block' => 'js_add'))
 ?>
 <script>
+    function envia_sol_reg(idExcel) {
+        //var postData = $('#form_precio').serializeArray();
+        var formURL = '<?php echo $this->Html->url(array('action' => 'regulariza_chips_act')); ?>/' + idExcel;
+        var numero_chip = 0;
+        $.ajax(
+                {
+                    url: formURL,
+                    type: "POST",
+                    //data: postData,
+                    /*beforeSend:function (XMLHttpRequest) {
+                     alert("antes de enviar");
+                     },
+                     complete:function (XMLHttpRequest, textStatus) {
+                     alert('despues de enviar');
+                     },*/
+                    success: function (data, textStatus, jqXHR)
+                    {
+                        handleData($.parseJSON(data).numero);
+                        //alert(numero_chip);
 
-  function envia_sol_reg(idExcel) {
-      //var postData = $('#form_precio').serializeArray();
-      var formURL = '<?php echo $this->Html->url(array('action' => 'regulariza_chips_act')); ?>/' + idExcel;
-      var numero_chip = 0;
-      $.ajax(
-              {
-                  url: formURL,
-                  type: "POST",
-                  //data: postData,
-                  /*beforeSend:function (XMLHttpRequest) {
-                   alert("antes de enviar");
-                   },
-                   complete:function (XMLHttpRequest, textStatus) {
-                   alert('despues de enviar');
-                   },*/
-                  success: function (data, textStatus, jqXHR)
-                  {
-                      handleData($.parseJSON(data).numero);
-                      //alert(numero_chip);
-
-                      //$('#idmodal').load('<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'ajax_precios', $idProducto));                  ?>');
-                      //data: return data from server
-                      //$("#parte").html(data);
-                  },
-                  error: function (jqXHR, textStatus, errorThrown)
-                  {
-                      //if fails   
-                      alert("error");
-                  }
-              });
-      //alert(numero_chip);
-      //return numero_chip;
-  }
-
-
-
-  function carga_reg_chips(idExcel)
-  {
-      var timeout;
-
-      $.modal({
-          contentAlign: 'center',
-          width: 240,
-          title: 'Loading',
-          content: '<div style="line-height: 25px; padding: 0 0 10px"><span id="modal-status">Iniciando Carga de registros...</span><br><span id="modal-progress">0%</span></div>',
-          buttons: {},
-          scrolling: false,
-          actions: {
-              'Cancel': {
-                  color: 'red',
-                  click: function (win) {
-                      win.closeModal();
-                  }
-              }
-          },
-          onOpen: function ()
-          {
-              // Progress bar
-              var progress = $('#modal-progress').progress(100, {
-                  size: 200,
-                  style: 'large',
-                  barClasses: ['anthracite-gradient', 'glossy'],
-                  stripes: true,
-                  darkStripes: false,
-                  showValue: false
-              }),
-                      // Loading state
-                      loaded = 0,
-                      // Window
-                      win = $(this),
-                      // Status text
-                      status = $('#modal-status'),
-                      // Function to simulate loading
-
-                      //total_c = envia_sol_reg(idExcel),
-                      simulateLoading = function ()
-                      {
-
-                          var formURL = '<?php echo $this->Html->url(array('action' => 'registra_reg_chips')); ?>/' + idExcel;
-                          var numero_chip = 0;
-                          $.ajax(
-                                  {
-                                      url: formURL,
-                                      type: "POST",
-                                      //data: postData,
-                                      /*beforeSend:function (XMLHttpRequest) {
-                                       alert("antes de enviar");
-                                       },
-                                       complete:function (XMLHttpRequest, textStatus) {
-                                       alert('despues de enviar');
-                                       },*/
-                                      success: function (data, textStatus, jqXHR)
-                                      {
-                                          //alert('ssss');
-                                          var numero_chip = $.parseJSON(data).numero;
-                                          var total_c = $.parseJSON(data).total;
-                                          //alert(numero_chip + ' ---- ' + total_c);
-                                          if (total_c != 0) {
-                                              var n_chip = numero_chip;
-
-                                              loaded = parseInt((n_chip / total_c) * 100);
-                                              //++loaded;
-                                              //alert(loaded);
-                                              progress.setProgressValue(loaded + '%', true);
-                                              if (loaded === 100)
-                                              {
-                                                  progress.hideProgressStripes().changeProgressBarColor('green-gradient');
-                                                  status.text('Listo!');
-                                                  /*win.getModalContentBlock().message('Content loaded!', {
-                                                   classes: ['green-gradient', 'align-center'],
-                                                   arrow: 'bottom'
-                                                   });*/
-                                                  setTimeout(function () {
-                                                      win.closeModal();
-                                                      window.location.href = window.location.pathname;
-                                                  }, 1500);
-                                              }
-                                              else
-                                              {
-                                                  if (n_chip === 1) {
-                                                      status.text('Creando registros de chip...');
-                                                      progress.changeProgressBarColor('blue-gradient');
-                                                  } else {
-                                                      status.text('Creado registro (' + n_chip + '/' + total_c + ')...');
-                                                  }
-
-                                                  timeout = setTimeout(simulateLoading, 10);
-                                              }
-                                          } else {
-                                              progress.hideProgressStripes().changeProgressBarColor('green-gradient');
-                                              status.text('Listo!');
-                                              /*win.getModalContentBlock().message('Content loaded!', {
-                                               classes: ['green-gradient', 'align-center'],
-                                               arrow: 'bottom'
-                                               });*/
-                                              setTimeout(function () {
-                                                  win.closeModal();
-                                              }, 1500);
-                                          }
-                                      },
-                                      error: function (jqXHR, textStatus, errorThrown)
-                                      {
-                                          //if fails   
-                                          alert("error");
-                                      }
-                                  });
+                        //$('#idmodal').load('<?php //echo $this->Html->url(array('controller' => 'Productosprecios', 'action' => 'ajax_precios', $idProducto));                     ?>');
+                        //data: return data from server
+                        //$("#parte").html(data);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown)
+                    {
+                        //if fails   
+                        alert("error");
+                    }
+                });
+        //alert(numero_chip);
+        //return numero_chip;
+    }
 
 
 
-                      };
+    function carga_reg_chips(idExcel)
+    {
+        var timeout;
 
-              // Start
-              timeout = setTimeout(simulateLoading, 400);
-          },
-          onClose: function ()
-          {
-              // Stop simulated loading if needed
-              clearTimeout(timeout);
-          }
-      });
-  }
+        $.modal({
+            contentAlign: 'center',
+            width: 240,
+            title: 'Loading',
+            content: '<div style="line-height: 25px; padding: 0 0 10px"><span id="modal-status">Iniciando Carga de registros...</span><br><span id="modal-progress">0%</span></div>',
+            buttons: {},
+            scrolling: false,
+            actions: {
+                'Cancel': {
+                    color: 'red',
+                    click: function (win) {
+                        win.closeModal();
+                    }
+                }
+            },
+            onOpen: function ()
+            {
+                // Progress bar
+                var progress = $('#modal-progress').progress(100, {
+                    size: 200,
+                    style: 'large',
+                    barClasses: ['anthracite-gradient', 'glossy'],
+                    stripes: true,
+                    darkStripes: false,
+                    showValue: false
+                }),
+                        // Loading state
+                        loaded = 0,
+                        // Window
+                        win = $(this),
+                        // Status text
+                        status = $('#modal-status'),
+                        // Function to simulate loading
 
+                        //total_c = envia_sol_reg(idExcel),
+                        simulateLoading = function ()
+                        {
 
-  function regularizar_chips(idExcel)
-  {
-      var timeout;
+                            var formURL = '<?php echo $this->Html->url(array('action' => 'registra_reg_chips')); ?>/' + idExcel;
+                            var numero_chip = 0;
+                            $.ajax(
+                                    {
+                                        url: formURL,
+                                        type: "POST",
+                                        //data: postData,
+                                        /*beforeSend:function (XMLHttpRequest) {
+                                         alert("antes de enviar");
+                                         },
+                                         complete:function (XMLHttpRequest, textStatus) {
+                                         alert('despues de enviar');
+                                         },*/
+                                        success: function (data, textStatus, jqXHR)
+                                        {
+                                            //alert('ssss');
+                                            var numero_chip = $.parseJSON(data).numero;
+                                            var total_c = $.parseJSON(data).total;
+                                            //alert(numero_chip + ' ---- ' + total_c);
+                                            if (total_c != 0) {
+                                                var n_chip = numero_chip;
 
-      $.modal({
-          contentAlign: 'center',
-          width: 240,
-          title: 'Loading',
-          content: '<div style="line-height: 25px; padding: 0 0 10px"><span id="modal-status">Iniciando regularizacion...</span><br><span id="modal-progress">0%</span></div>',
-          buttons: {},
-          scrolling: false,
-          actions: {
-              'Cancel': {
-                  color: 'red',
-                  click: function (win) {
-                      win.closeModal();
-                  }
-              }
-          },
-          onOpen: function ()
-          {
-              // Progress bar
-              var progress = $('#modal-progress').progress(100, {
-                  size: 200,
-                  style: 'large',
-                  barClasses: ['anthracite-gradient', 'glossy'],
-                  stripes: true,
-                  darkStripes: false,
-                  showValue: false
-              }),
-                      // Loading state
-                      loaded = 0,
-                      // Window
-                      win = $(this),
-                      // Status text
-                      status = $('#modal-status'),
-                      // Function to simulate loading
+                                                loaded = parseInt((n_chip / total_c) * 100);
+                                                //++loaded;
+                                                //alert(loaded);
+                                                progress.setProgressValue(loaded + '%', true);
+                                                if (loaded === 100)
+                                                {
+                                                    progress.hideProgressStripes().changeProgressBarColor('green-gradient');
+                                                    status.text('Listo!');
+                                                    /*win.getModalContentBlock().message('Content loaded!', {
+                                                     classes: ['green-gradient', 'align-center'],
+                                                     arrow: 'bottom'
+                                                     });*/
+                                                    setTimeout(function () {
+                                                        win.closeModal();
+                                                        window.location.href = window.location.pathname;
+                                                    }, 1500);
+                                                }
+                                                else
+                                                {
+                                                    if (n_chip === 1) {
+                                                        status.text('Creando registros de chip...');
+                                                        progress.changeProgressBarColor('blue-gradient');
+                                                    } else {
+                                                        status.text('Creado registro (' + n_chip + '/' + total_c + ')...');
+                                                    }
 
-                      //total_c = envia_sol_reg(idExcel),
-                      simulateLoading = function ()
-                      {
-
-                          var formURL = '<?php echo $this->Html->url(array('action' => 'regulariza_chips_act')); ?>/' + idExcel;
-                          var numero_chip = 0;
-                          $.ajax(
-                                  {
-                                      url: formURL,
-                                      type: "POST",
-                                      //data: postData,
-                                      /*beforeSend:function (XMLHttpRequest) {
-                                       alert("antes de enviar");
-                                       },
-                                       complete:function (XMLHttpRequest, textStatus) {
-                                       alert('despues de enviar');
-                                       },*/
-                                      success: function (data, textStatus, jqXHR)
-                                      {
-
-                                          var numero_chip = $.parseJSON(data).numero;
-                                          var total_c = $.parseJSON(data).total;
-
-                                          if (total_c != 0) {
-                                              var n_chip = total_c - numero_chip;
-                                              //alert(n_chip + ' ---- ' + total_c);
-                                              loaded = parseInt((n_chip / total_c) * 100);
-                                              //++loaded;
-                                              //alert(loaded);
-                                              progress.setProgressValue(loaded + '%', true);
-                                              if (loaded === 100)
-                                              {
-                                                  progress.hideProgressStripes().changeProgressBarColor('green-gradient');
-                                                  status.text('Listo!');
-                                                  /*win.getModalContentBlock().message('Content loaded!', {
-                                                   classes: ['green-gradient', 'align-center'],
-                                                   arrow: 'bottom'
-                                                   });*/
-
-                                                  setTimeout(function () {
-                                                      win.closeModal();
-
-                                                  }, 1500);
-                                              }
-                                              else
-                                              {
-                                                  if (n_chip === 1) {
-                                                      status.text('Creando registros de chip...');
-                                                      progress.changeProgressBarColor('blue-gradient');
-                                                  } else {
-                                                      status.text('Creado registro (' + n_chip + '/' + total_c + ')...');
-                                                  }
-
-                                                  timeout = setTimeout(simulateLoading, 200);
-                                              }
-                                          } else {
-                                              progress.hideProgressStripes().changeProgressBarColor('green-gradient');
-                                              status.text('Listo!');
-                                              /*win.getModalContentBlock().message('Content loaded!', {
-                                               classes: ['green-gradient', 'align-center'],
-                                               arrow: 'bottom'
-                                               });*/
-                                              setTimeout(function () {
-                                                  win.closeModal();
-
-                                              }, 1500);
-                                          }
-                                      },
-                                      error: function (jqXHR, textStatus, errorThrown)
-                                      {
-                                          //if fails   
-                                          alert("error");
-                                      }
-                                  });
+                                                    timeout = setTimeout(simulateLoading, 10);
+                                                }
+                                            } else {
+                                                progress.hideProgressStripes().changeProgressBarColor('green-gradient');
+                                                status.text('Listo!');
+                                                /*win.getModalContentBlock().message('Content loaded!', {
+                                                 classes: ['green-gradient', 'align-center'],
+                                                 arrow: 'bottom'
+                                                 });*/
+                                                setTimeout(function () {
+                                                    win.closeModal();
+                                                }, 1500);
+                                            }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown)
+                                        {
+                                            //if fails   
+                                            alert("error");
+                                        }
+                                    });
 
 
 
-                      };
+                        };
 
-              // Start
-              timeout = setTimeout(simulateLoading, 4000);
-          },
-          onClose: function ()
-          {
-              // Stop simulated loading if needed
-              clearTimeout(timeout);
-          }
-      });
-  }
-  ;
+                // Start
+                timeout = setTimeout(simulateLoading, 400);
+            },
+            onClose: function ()
+            {
+                // Stop simulated loading if needed
+                clearTimeout(timeout);
+            }
+        });
+    }
+
+
+    function regularizar_chips(idExcel)
+    {
+        var timeout;
+
+        $.modal({
+            contentAlign: 'center',
+            width: 240,
+            title: 'Loading',
+            content: '<div style="line-height: 25px; padding: 0 0 10px"><span id="modal-status">Iniciando regularizacion...</span><br><span id="modal-progress">0%</span></div>',
+            buttons: {},
+            scrolling: false,
+            actions: {
+                'Cancel': {
+                    color: 'red',
+                    click: function (win) {
+                        win.closeModal();
+                    }
+                }
+            },
+            onOpen: function ()
+            {
+                // Progress bar
+                var progress = $('#modal-progress').progress(100, {
+                    size: 200,
+                    style: 'large',
+                    barClasses: ['anthracite-gradient', 'glossy'],
+                    stripes: true,
+                    darkStripes: false,
+                    showValue: false
+                }),
+                        // Loading state
+                        loaded = 0,
+                        // Window
+                        win = $(this),
+                        // Status text
+                        status = $('#modal-status'),
+                        // Function to simulate loading
+
+                        //total_c = envia_sol_reg(idExcel),
+                        simulateLoading = function ()
+                        {
+
+                            var formURL = '<?php echo $this->Html->url(array('action' => 'regulariza_chips_act')); ?>/' + idExcel;
+                            var numero_chip = 0;
+                            $.ajax(
+                                    {
+                                        url: formURL,
+                                        type: "POST",
+                                        //data: postData,
+                                        /*beforeSend:function (XMLHttpRequest) {
+                                         alert("antes de enviar");
+                                         },
+                                         complete:function (XMLHttpRequest, textStatus) {
+                                         alert('despues de enviar');
+                                         },*/
+                                        success: function (data, textStatus, jqXHR)
+                                        {
+
+                                            var numero_chip = $.parseJSON(data).numero;
+                                            var total_c = $.parseJSON(data).total;
+
+                                            if (total_c != 0) {
+                                                var n_chip = total_c - numero_chip;
+                                                //alert(n_chip + ' ---- ' + total_c);
+                                                loaded = parseInt((n_chip / total_c) * 100);
+                                                //++loaded;
+                                                //alert(loaded);
+                                                progress.setProgressValue(loaded + '%', true);
+                                                if (loaded === 100)
+                                                {
+                                                    progress.hideProgressStripes().changeProgressBarColor('green-gradient');
+                                                    status.text('Listo!');
+                                                    /*win.getModalContentBlock().message('Content loaded!', {
+                                                     classes: ['green-gradient', 'align-center'],
+                                                     arrow: 'bottom'
+                                                     });*/
+
+                                                    setTimeout(function () {
+                                                        win.closeModal();
+
+                                                    }, 1500);
+                                                }
+                                                else
+                                                {
+                                                    if (n_chip === 1) {
+                                                        status.text('Creando registros de chip...');
+                                                        progress.changeProgressBarColor('blue-gradient');
+                                                    } else {
+                                                        status.text('Creado registro (' + n_chip + '/' + total_c + ')...');
+                                                    }
+
+                                                    timeout = setTimeout(simulateLoading, 200);
+                                                }
+                                            } else {
+                                                progress.hideProgressStripes().changeProgressBarColor('green-gradient');
+                                                status.text('Listo!');
+                                                /*win.getModalContentBlock().message('Content loaded!', {
+                                                 classes: ['green-gradient', 'align-center'],
+                                                 arrow: 'bottom'
+                                                 });*/
+                                                setTimeout(function () {
+                                                    win.closeModal();
+
+                                                }, 1500);
+                                            }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown)
+                                        {
+                                            //if fails   
+                                            alert("error");
+                                        }
+                                    });
+                        };
+
+                // Start
+                timeout = setTimeout(simulateLoading, 4000);
+            },
+            onClose: function ()
+            {
+                // Stop simulated loading if needed
+                clearTimeout(timeout);
+            }
+        });
+    }
+
+    function eliminar_act(idExcel, total_reg1)
+    {
+        var timeout;
+
+        $.modal({
+            contentAlign: 'center',
+            width: 240,
+            title: 'Loading',
+            content: '<div style="line-height: 25px; padding: 0 0 10px"><span id="modal-status">Iniciando Eliminacion...</span><br><span id="modal-progress">0%</span></div>',
+            buttons: {},
+            scrolling: false,
+            actions: {
+                'Cancel': {
+                    color: 'red',
+                    click: function (win) {
+                        win.closeModal();
+                    }
+                }
+            },
+            onOpen: function ()
+            {
+                // Progress bar
+                var progress = $('#modal-progress').progress(100, {
+                    size: 200,
+                    style: 'large',
+                    barClasses: ['anthracite-gradient', 'glossy'],
+                    stripes: true,
+                    darkStripes: false,
+                    showValue: false
+                }),
+                        // Loading state
+                        loaded = 0,
+                        // Window
+                        win = $(this),
+                        // Status text
+                        status = $('#modal-status'),
+                        // Function to simulate loading
+
+                        //total_c = envia_sol_reg(idExcel),
+                        simulateLoading = function ()
+                        {
+
+                            var formURL = '<?php echo $this->Html->url(array('action' => 'eliminar_ac')); ?>/' + idExcel;
+                            var numero_chip = 0;
+                            $.ajax(
+                                    {
+                                        url: formURL,
+                                        type: "POST",
+                                        //data: postData,
+                                        /*beforeSend:function (XMLHttpRequest) {
+                                         alert("antes de enviar");
+                                         },
+                                         complete:function (XMLHttpRequest, textStatus) {
+                                         alert('despues de enviar');
+                                         },*/
+                                        success: function (data, textStatus, jqXHR)
+                                        {
+
+                                            var numero_chip = $.parseJSON(data).numero;
+                                            //var total_c = $.parseJSON(data).total;
+
+                                            if (total_reg1 != 0) {
+                                                var n_chip = total_reg1 - numero_chip;
+                                                //alert(n_chip + ' ---- ' + total_c);
+                                                loaded = parseInt((n_chip / total_reg1) * 100);
+                                                //++loaded;
+                                                //alert(loaded);
+                                                progress.setProgressValue(loaded + '%', true);
+                                                if (loaded === 100)
+                                                {
+                                                    progress.hideProgressStripes().changeProgressBarColor('green-gradient');
+                                                    status.text('Listo!');
+                                                    /*win.getModalContentBlock().message('Content loaded!', {
+                                                     classes: ['green-gradient', 'align-center'],
+                                                     arrow: 'bottom'
+                                                     });*/
+
+                                                    setTimeout(function () {
+                                                        win.closeModal();
+
+                                                    }, 1500);
+                                                }
+                                                else
+                                                {
+                                                    if (n_chip === 1) {
+                                                        status.text('Eliminando registros de activacion...');
+                                                        progress.changeProgressBarColor('blue-gradient');
+                                                    } else {
+                                                        status.text('Eliminando registro (' + n_chip + '/' + total_reg1 + ')...');
+                                                    }
+                                                    timeout = setTimeout(simulateLoading, 200);
+                                                }
+                                            } else {
+                                                progress.hideProgressStripes().changeProgressBarColor('green-gradient');
+                                                status.text('Listo!');
+                                                /*win.getModalContentBlock().message('Content loaded!', {
+                                                 classes: ['green-gradient', 'align-center'],
+                                                 arrow: 'bottom'
+                                                 });*/
+                                                setTimeout(function () {
+                                                    win.closeModal();
+
+                                                }, 1500);
+                                            }
+                                        },
+                                        error: function (jqXHR, textStatus, errorThrown)
+                                        {
+                                            //if fails   
+                                            alert("error");
+                                        }
+                                    });
+                        };
+
+                // Start
+                timeout = setTimeout(simulateLoading, 4000);
+            },
+            onClose: function ()
+            {
+                // Stop simulated loading if needed
+                clearTimeout(timeout);
+            }
+        });
+    }
 </script>
