@@ -57,7 +57,11 @@
                     </tr>
                     <tr>
                         <th scope="row">Fecha Activacion</th>
-                        <td><?php echo $activacion['Activado']['fecha_act']?></td>
+                        <td><?php echo $chip['Activado']['fecha_act']?></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Fecha Documentacion</th>
+                        <td><?php echo $chip['Activado']['fecha_doc']?></td>
                     </tr>
                 </tbody>
             </table>

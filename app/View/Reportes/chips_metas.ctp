@@ -1,17 +1,17 @@
 <?php
 $meses = array(
-  1 => 'Enero',
-  2 => 'Febrero',
-  3 => 'Marzo',
-  4 => 'Abril',
-  5 => 'Mayo',
-  6 => 'Junio',
-  7 => 'Julio',
-  8 => 'Agosto',
-  9 => 'Sepetiembre',
-  10 => 'Octubre',
-  11 => 'Noviembre',
-  12 => 'Disciembre'
+    1 => 'Enero',
+    2 => 'Febrero',
+    3 => 'Marzo',
+    4 => 'Abril',
+    5 => 'Mayo',
+    6 => 'Junio',
+    7 => 'Julio',
+    8 => 'Agosto',
+    9 => 'Sepetiembre',
+    10 => 'Octubre',
+    11 => 'Noviembre',
+    12 => 'Disciembre'
 );
 ?>
 <link rel="stylesheet" href="<?php echo $this->webroot; ?>js/libs/glDatePicker/developr.fixed.css?v=1">
@@ -42,7 +42,7 @@ $meses = array(
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">&nbsp;</label>
                     <?php if (!empty($this->request->data['Dato']['fecha_fin'])): ?>
-                      <?php echo $this->Html->link("Excel", array('controller' => 'Reportes', 'action' => 'gen_exc_chips_metas', $this->request->data['Dato']['fecha_fin']),array('class' => 'button blue-gradient full-width')) ?>
+                        <?php echo $this->Html->link("Excel", array('controller' => 'Reportes', 'action' => 'gen_exc_chips_metas', $this->request->data['Dato']['fecha_fin']), array('class' => 'button blue-gradient full-width')) ?>
                     <?php endif; ?>
                 </p>
             </div>
@@ -74,21 +74,25 @@ $meses = array(
                 $to_comercial = 0;
                 ?>
                 <?php foreach ($metas as $me): ?>
-                  <?php
-                  $to_ventas = $to_ventas + $me['Meta']['ventas'];
-                  $to_metas = $to_metas + $me['Meta']['meta'];
-                  $to_comercial = $to_comercial + $me['Meta']['comercial'];
-                  ?>
-                  <tr>
-                      <td><?php echo $me['Meta']['inspector'] ?></td>
-                      <td><?php echo $me['Ruta']['cod_ruta'] . '-' . $me['Ruta']['nombre'] ?></td>
-                      <td><?php echo $me['Meta']['ventas'] ?></td>
-                      <td><?php echo $me['Meta']['meta'] ?></td>
-                      <td><?php echo round(($me['Meta']['ventas'] / $me['Meta']['meta']) * 100, 2) . ' %' ?></td>
-                      <td><?php echo $me['Meta']['meta'] - $me['Meta']['ventas'] ?></td>
-                      <td><?php echo $me['Meta']['comercial'] ?></td>
-                      <td><?php echo $me['Meta']['ventas'] - $me['Meta']['comercial'] ?></td>
-                  </tr>
+                    <?php
+                    $to_ventas = $to_ventas + $me['Meta']['ventas'];
+                    $to_metas = $to_metas + $me['Meta']['meta'];
+                    $to_comercial = $to_comercial + $me['Meta']['comercial'];
+                    ?>
+                    <tr>
+                        <td><?php echo $me['Meta']['inspector'] ?></td>
+                        <td><?php echo $me['Ruta']['cod_ruta'] . '-' . $me['Ruta']['nombre'] ?></td>
+                        <td><?php echo $me['Meta']['ventas'] ?></td>
+                        <td><?php echo $me['Meta']['meta'] ?></td>
+                        <?php if (!empty($me['Meta']['meta'])): ?>
+                            <td><?php echo round(($me['Meta']['ventas'] / $me['Meta']['meta']) * 100, 2) . ' %' ?></td>
+                        <?php else:?>
+                            <td><?php echo '0 %' ?></td>
+                        <?php endif; ?>
+                        <td><?php echo $me['Meta']['meta'] - $me['Meta']['ventas'] ?></td>
+                        <td><?php echo $me['Meta']['comercial'] ?></td>
+                        <td><?php echo $me['Meta']['ventas'] - $me['Meta']['comercial'] ?></td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
             <tfoot>
@@ -100,9 +104,9 @@ $meses = array(
                     <td>
                         <?php
                         if ($to_metas != 0) {
-                          echo round(($to_ventas / $to_metas) * 100, 2) . ' %';
+                            echo round(($to_ventas / $to_metas) * 100, 2) . ' %';
                         } else {
-                          echo '0 %';
+                            echo '0 %';
                         }
                         ?>
                     </td>

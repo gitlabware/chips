@@ -31,9 +31,7 @@ class ChipsController extends AppController {
     }
 
     public function subirexcel() {
-
-
-
+        
         $sql1 = "SELECT Excel.*, (SELECT COUNT(activados.id) FROM activados WHERE activados.excel_id = Excel.id) AS total_ac FROM `chips`.`excels` AS `Excel` WHERE `tipo` IN ('asignacion', 'activacion') ORDER BY `Excel`.`id` DESC LIMIT 30";
 
         //$sql1 = "SELECT Excel.*, COUNT(chips.id) AS nnn FROM `chips`.`excels` AS `Excel`, chips WHERE `tipo` IN ('asignacion', 'activacion') AND chips.excel_id = Excel.id  ORDER BY `Excel`.`id` DESC LIMIT 30";
@@ -1212,7 +1210,7 @@ class ChipsController extends AppController {
         $prueba->setActiveSheetIndex(0)->setCellValue("H1", "COD.MERC");
         $prueba->setActiveSheetIndex(0)->setCellValue("I1", "DIST.");
         $prueba->setActiveSheetIndex(0)->setCellValue("J1", "CIUDAD");
-        $prueba->setActiveSheetIndex(0)->setCellValue("K1", "ACTIVACION");
+        $prueba->setActiveSheetIndex(0)->setCellValue("K1", "DOCUMENTACION");
         $prueba->setActiveSheetIndex(0)->setCellValue("L1", "C.DEALER");
         $prueba->setActiveSheetIndex(0)->setCellValue("M1", "C.SUBDEALER");
         $prueba->setActiveSheetIndex(0)->setCellValue("N1", "SUBDEALER");
@@ -1224,16 +1222,17 @@ class ChipsController extends AppController {
         $this->Chip->virtualFields = array(
             'nom_distribuidor' => "CONCAT(($sql))",
             'ciudad_dist' => "CONCAT(($sql2))",
-            'fecha_activacion' => "(SELECT activados.fecha_act FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
-            'ac_cod_dealer' => "(SELECT activados.dealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
-            'ac_cod_subdealer' => "(SELECT activados.subdealer_code FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)",
-            'ac_subdealer' => "(SELECT activados.subdealer FROM activados WHERE activados.phone_number = Chip.telefono LIMIT 1)"
+            'fecha_activacion' => "(Activado.fecha_act)",
+            'fecha_documentacion' => "(Activado.fecha_doc)",
+            'ac_cod_dealer' => "(Activado.dealer_code)",
+            'ac_cod_subdealer' => "(Activado.subdealer_code)",
+            'ac_subdealer' => "(Activado.subdealer)"
         );
         $chips = $this->Chip->find('all', array(
             'recursive' => 0,
             'conditions' => array('Chip.excel_id' => $idExcel),
             'fields' => array('Chip.cantidad', 'Chip.sim', 'Chip.telefono', "DATE_FORMAT(Chip.fecha,'%m/%d/%Y') as fecha_f", "DATE_FORMAT(Chip.fecha_entrega_d,'%m/%d/%Y') as fecha_entrega_d_f",
-                'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado', 'Chip.fecha_activacion', 'Chip.ac_cod_dealer', 'Chip.ac_cod_subdealer', 'Chip.ac_subdealer')
+                'Distribuidor.persona_id', 'Chip.nom_distribuidor', 'Distribuidor.lugare_id', 'Chip.ciudad_dist', 'Cliente.cod_dealer', 'Cliente.nombre', 'Cliente.cod_mercado', 'Chip.fecha_activacion', 'Chip.fecha_documentacion', 'Chip.ac_cod_dealer', 'Chip.ac_cod_subdealer', 'Chip.ac_subdealer')
         ));
         //debug($chips);exit;
         $cont = 1;
@@ -1251,7 +1250,7 @@ class ChipsController extends AppController {
             $prueba->setActiveSheetIndex(0)->setCellValue("H" . $cont, $ch['Cliente']['cod_mercado']);
             $prueba->setActiveSheetIndex(0)->setCellValue("I" . $cont, $ch['Chip']['nom_distribuidor']);
             $prueba->setActiveSheetIndex(0)->setCellValue("J" . $cont, $ch['Chip']['ciudad_dist']);
-            $prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['fecha_activacion']);
+            $prueba->setActiveSheetIndex(0)->setCellValue("K" . $cont, $ch['Chip']['fecha_documentacion']);
             $prueba->setActiveSheetIndex(0)->setCellValue("L" . $cont, $ch['Chip']['ac_cod_dealer']);
             $prueba->setActiveSheetIndex(0)->setCellValue("M" . $cont, $ch['Chip']['ac_cod_subdealer']);
             $prueba->setActiveSheetIndex(0)->setCellValue("N" . $cont, $ch['Chip']['ac_subdealer']);
@@ -1341,17 +1340,18 @@ class ChipsController extends AppController {
 
         $chip = $this->Chip->find('first', array(
             'recursive' => 0,
-            'conditions' => array('Chip.id' => $idChip)
+            'conditions' => array('Chip.id' => $idChip),
+            
         ));
 
-        $activacion = $this->Activado->find('first', array(
+        /*$activacion = $this->Activado->find('first', array(
             'recursive' => -1,
             'conditions' => array('Activado.phone_number' => $chip['Chip']['telefono'])
             , 'fields' => array('Activado.fecha_act')
-        ));
+        ));*/
         //debug($activacion);exit;
 
-        $this->set(compact('chip', 'activacion'));
+        $this->set(compact('chip'));
     }
 
     public function excel_asignados($idExcel = null) {

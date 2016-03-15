@@ -6,7 +6,6 @@
     </hgroup>
     <div class="with-padding">
         <?php echo $this->Form->create(NULL, array('url' => array('controller' => 'Reportes', 'action' => 'reporte_chips_clientes'))); ?>
-
         <div class="columns ocultar_impresion">
             <div class="three-columns">
                 <p class="block-label button-height">

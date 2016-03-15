@@ -144,14 +144,17 @@ class Rutascontroller extends AppController {
     $this->layout = 'ajax';
     $sql1 = "(SELECT COUNT(activados.id) FROM activados WHERE YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
     $sql2 = "(SELECT COUNT(activados.id) FROM activados WHERE YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = Ruta.cod_ruta AND activados.comercial LIKE 'SI' GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
+    
     $this->Meta->virtualFields = array(
       'ventas' => "($sql1)",
       'comercial' => "$sql2"
     );
+    
     $metas = $this->Meta->find('all', array(
       'recursive' => 0,
       'conditions' => array('Meta.anyo' => $ano, 'Meta.mes' => $mes)
     ));
+    
     //$sql_p = "(SELECT COUNT(activados.id) FROM activados WHERE YEAR(activados.fecha_act) = $ano AND MONTH(activados.fecha_act) = $mes AND LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1) = 3502 GROUP BY LEFT(activados.canal_n,LOCATE('-',activados.canal_n) - 1))";
     //debug($this->Meta->query($sql_p));exit;
     $this->set(compact('metas', 'ano', 'mes'));

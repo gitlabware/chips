@@ -48,7 +48,7 @@
                     <th>Codigo</th>
                     <th>Nombre</th>
                     <th>Zona</th>
-                    <th>Estado</th>
+                    <th>Distribuidor</th>
                     <th>Dealer</th>
                     <th>Activados</th>
                     <th>No Activados</th>
