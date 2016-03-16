@@ -1725,5 +1725,18 @@ class ChipsController extends AppController {
         ));
         $this->set(compact('distribuidores', 'chips', 'distribuidor'));
     }
+    
+    public function get_chips_cli_v_ent($idCliente = null){
+        return $this->Chip->find('count',array(
+            'recursive' => -1,
+            'conditions' => array('Chip.cliente_id' => $idCliente,'YEAR(Chip.fecha_entrega_c)' => date('Y'),'MONTH(Chip.fecha_entrega_c)' => date('m'))
+        ));
+    }
+    public function get_chips_cli_v_ven($idCliente = null){
+        return $this->Chip->find('count',array(
+            'recursive' => -1,
+            'conditions' => array('Chip.cliente_id' => $idCliente,'YEAR(Chip.fecha_entrega_c)' => date('Y'),'MONTH(Chip.fecha_entrega_c)' => date('m'),'Chip.activado_id !=' => NULL)
+        ));
+    }
 
 }

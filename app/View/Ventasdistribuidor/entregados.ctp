@@ -2,28 +2,26 @@
 
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
 
-    <hgroup id="main-title" class="thin">
-        <h1>Ultimas Entregas Chip</h1>
-    </hgroup>
-    <div class="with-padding">                   
+    <div class="with-padding">       
+        <h4 class="green underline">Ultimas Entregas Chip</h4>
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
                 <tr>
-                    <th class="hide-on-mobile">Fecha</th>
-                    <th>Cliente</th>
-                    <th>Codigo CLiente</th>
-                    <th>Nro Chips</th>
-                    <th>Monto total</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                    <th style="min-width: 70px;">Fecha</th>
+                    <th>Cod.Cli</th>
+                    <th style="min-width: 250px;">Cliente</th>
+                    <th>#Chips</th>
+                    <th>Monto.total</th>
+                    <th style="min-width: 80px;">Estado</th>
+                    <th style="min-width: 70px;">Acciones</th>
                 </tr>
             </thead>          
             <tbody>
                 <?php foreach ($entregados as $ent): ?>
                   <tr>
-                      <td class="hide-on-mobile"><?php echo $ent['Chip']['fecha_entrega_d'] ?></td>
-                      <td><?php echo $ent['Cliente']['nombre'] ?></td>
+                      <td><?php echo $ent['Chip']['fecha_entrega_c'] ?></td>
                       <td><?php echo $ent['Cliente']['num_registro'] ?></td>
+                      <td><?php echo $ent['Cliente']['nombre'] ?></td>
                       <td><?php echo $ent[0]['num_chips'] ?></td>
                       <td>
                           <?php
@@ -42,8 +40,8 @@
                           <?php endif; ?>
                       </td>
                       <td>
-                          <?php echo $this->Html->link('Detalle', array('action' => 'detalle_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Cliente']['id'])); ?>
-                          <a href="javascript:" class="" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'cancela_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Cliente']['id'])); ?>');">Cancelar</a>
+                          <?php echo $this->Html->link('', array('action' => 'detalle_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Cliente']['id']),array('class' => 'button blue-gradient icon-list','title' => 'Detalle de chips entregados')); ?>
+                          <a href="javascript:" class="button red-gradient icon-forbidden" title="Cancelar Asignacion" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'cancela_entrega', $ent['Chip']['fecha_entrega_c'], $ent['Cliente']['id'])); ?>');"></a>
                       </td>
                   </tr>
                 <?php endforeach; ?>

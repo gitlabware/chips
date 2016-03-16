@@ -2,10 +2,8 @@
 
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
 
-    <hgroup id="main-title" class="thin">
-        <h1>Entregas a <?php echo $cliente['Cliente']['nombre'] ?> de <?php echo $fecha; ?></h1>
-    </hgroup>
     <div class="with-padding"> 
+        <h4 class="green underline">Entregas a <?php echo $cliente['Cliente']['nombre'] ?> de <?php echo $fecha; ?></h4>
         <?php echo $this->Form->create('Ventasdistribuidor', array('url' => array('controller' => 'Ventasdistribuidor', 'action' => 'cancela_asignado'))); ?>
         <div class="columns">
             <div class="four-columns">
@@ -53,7 +51,7 @@
                       <td><?php echo $ent['Chip']['imsi'] ?></td>
                       <td><?php echo $ent['Chip']['telefono'] ?></td>
                       <td>
-                          <a href="javascript:" class="" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'cancela_entrega_id', $ent['Chip']['id'])); ?>');">Cancelar</a>
+                          <a href="javascript:"  class="button red-gradient icon-forbidden" title="Cancelar Asignacion" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'cancela_entrega_id', $ent['Chip']['id'])); ?>');"></a>
                       </td>
                   </tr>
                 <?php endforeach; ?>

@@ -86,7 +86,7 @@ $meses = array(
                         <td><?php echo $me['Meta']['meta'] ?></td>
                         <?php if (!empty($me['Meta']['meta'])): ?>
                             <td><?php echo round(($me['Meta']['ventas'] / $me['Meta']['meta']) * 100, 2) . ' %' ?></td>
-                        <?php else:?>
+                        <?php else: ?>
                             <td><?php echo '0 %' ?></td>
                         <?php endif; ?>
                         <td><?php echo $me['Meta']['meta'] - $me['Meta']['ventas'] ?></td>

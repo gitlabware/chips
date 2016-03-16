@@ -10,7 +10,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-        <title>SISTEMA-SASEZ</title>
+        <title>SISTEMA-VIVA</title>
         <meta name="description" content="Viva">
         <meta name="author" content="LabWare">
 
@@ -84,16 +84,16 @@
 
     <body class="clearfix with-menu with-shortcuts">
         <script>
-          var urljsontabla = '';
-          var datos_tabla2 = null;
-          var datos_tabla1 = null;
+            var urljsontabla = '';
+            var datos_tabla2 = null;
+            var datos_tabla1 = null;
         </script>
         <!-- Prompt IE 6 users to install Chrome Frame -->
         <!--[if lt IE 7]><p class="message red-gradient simpler">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
         <!-- Title bar -->
         <header role="banner" id="title-bar">
-            <h2>SISTEMA DE INVENTARIOS</h2>
+            <h2>SISTEMA DE VIVA</h2>
         </header>
 
         <!-- Button to open/hide menu -->
@@ -134,50 +134,54 @@
         <script src="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.min.js"></script>
 
         <script>
-          // Call template init (optional, but faster if called manually)
-          $.template.init();
+            // Call template init (optional, but faster if called manually)
+            $.template.init();
 
-          // Table sort - DataTables
-          var table = $('#sorting-advanced');
-          if (datos_tabla1 == null) {
-              datos_tabla1 = {
-                  "oLanguage": {
-                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
-                  },
-                  'sPaginationType': 'full_numbers',
-                  'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
-                  'fnInitComplete': function (oSettings)
-                  {
-                      // Style length select
-                      table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
-                      tableStyled = true;
-                  }
-              };
-          }
-          table.dataTable(datos_tabla1);
+            // Table sort - DataTables
+            var table = $('#sorting-advanced');
+            if (datos_tabla1 == null) {
+                datos_tabla1 = {
+                    "sScrollX": "100%",
+                    "bScrollCollapse": true,
+                    /*"oLanguage": {
+                     "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                     },*/
+                    'sPaginationType': 'full_numbers',
+                    'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
+                    'fnInitComplete': function (oSettings)
+                    {
+                        // Style length select
+                        table.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+                        tableStyled = true;
+                    }
+                };
+            }
+            table.dataTable(datos_tabla1);
 
-          var table2 = $('#tabla-json');
-          //console.log(datos_tabla2);
-          if (datos_tabla2 == null) {
-              datos_tabla2 = {
-                  "oLanguage": {
-                      "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
-                  },
-                  'sPaginationType': 'full_numbers',
-                  'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
-                  'bProcessing': true,
-                  'sAjaxSource': urljsontabla,
-                  'sServerMethod': 'POST',
-                  "order": [],
-                  'fnInitComplete': function (oSettings)
-                  {
-                      // Style length select
-                      table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
-                      tableStyled = true;
-                  }
-              };
-          }
-          table2.dataTable(datos_tabla2);
+            var table2 = $('#tabla-json');
+            //console.log(datos_tabla2);
+            if (datos_tabla2 == null) {
+                datos_tabla2 = {
+                    "sScrollX": "100%",
+                    "bScrollCollapse": true,
+                    "oLanguage": {
+                        "sUrl": "<?php echo $this->webroot; ?>js/libs/DataTables/Spanish.json"
+                    },
+                    'sPaginationType': 'full_numbers',
+                    'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
+                    'bProcessing': true,
+                    'sAjaxSource': urljsontabla,
+                    'sServerMethod': 'POST',
+                    "order": [],
+                    'fnInitComplete': function (oSettings)
+                    {
+                        // Style length select
+                        table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+                        tableStyled = true;
+                    }
+                };
+            }
+            table2.dataTable(datos_tabla2);
         </script>
         <?php echo $this->Session->flash(); ?>
         <div style="text-align: center; color:gray;">

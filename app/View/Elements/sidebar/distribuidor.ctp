@@ -15,14 +15,14 @@
 
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
-            <li><a href="<?php echo $this->Html->url(array('controller' => 'ventasdistribuidor', 'action' => 'clientes')) ?>" title="INICIO"><span class="icon-gear"></span></span></a></li>
+            <li><a href="<?php echo $this->Html->url(array('controller' => 'ventasdistribuidor', 'action' => 'mismetas')) ?>" title="INICIO"><span class="icon-gear"></span></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'editar', $this->Session->read('Auth.User.id'))) ?>" title="Mis Datos"><span class="icon-user"></span></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'users', 'action' => 'salir')) ?>" title="Salir"><span class="icon-extract"></span></a></li>     
         </ul>
         <section class="navigable">
             <ul class="big-menu">
                 <?php $id = $this->Session->read("Auth.User.id") ?>
-                <li class="with-right-arrow">
+                <!--<li class="with-right-arrow">
                     <span>Reportes</span>
                     <ul class="big-menu">
                         <li>
@@ -36,7 +36,6 @@
                 <li class="with-right-arrow">
                     <span>Clientes</span>
                     <ul class="big-menu">
-                         <!--<li><a href="<?php //echo $this->Html->url(array('action'=>'clientes'));  ?>">Clientes</a></li>-->
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'clientes')); ?>">Listado de Clientes</a></li>
                         <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'cliente')); ?>">Nuevo Cliente</a></li>                                                                        
 
@@ -57,7 +56,10 @@
                 <li>
                     <a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'minieventos')); ?>">Listado de Minieventos</a>
                 </li>
-                <li><a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'premios')); ?>">Premios</a></li>
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Impulsadores', 'action' => 'premios')); ?>">Premios</a></li>-->
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'mismetas')); ?>">Metas</a></li>
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'clientes')); ?>">Clientes</a></li>
+                <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'entregados')); ?>">Chips entregados</a></li>
             </ul>
         </section>
     </div>

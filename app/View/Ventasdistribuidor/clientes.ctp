@@ -12,12 +12,12 @@
 
             <thead>
                 <tr>
-                    <th style="width: 8%;">num de registro</th>
+                    <th style="width: 30px;">#reg</th>
                     <th >nombre</th>
-                    <th style="width: 30%;" class="hide-on-mobile">direccion</th>  
+                    <th class="hide-on-mobile">direccion</th>  
                     <th class="hide-on-mobile">celular</th>
                     <th class="hide-on-mobile">zona</th>
-                    <th >Acciones</th>
+                    <th style="width: 20px;">Accion</th>
                 </tr>
             </thead>          
             <tbody>
