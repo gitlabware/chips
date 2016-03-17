@@ -19,7 +19,7 @@
             <li><a href="<?php echo $this->Html->url(array('controller' => 'Almacenes', 'action' => 'principal')) ?>" title="Estadisticas"><span class="icon-line-graph"></span></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'editar', $idUsuario)) ?>" title="Mis Datos"><span class="icon-user"></span></span></a></li>
             <?php
-            $num_chips_v = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_venciendo'));
+            // $num_chips_v = $this->requestAction(array('controller' => 'Chips', 'action' => 'get_num_venciendo'));
             ?>
             <?php /*if (empty($num_chips_v)): ?>
               <li><a href="<?php echo $this->Html->url(array('controller' => 'productos', 'action' => 'index')) ?>" title="Listado de Productos"><span class="icon-clipboard"></span></a></li>

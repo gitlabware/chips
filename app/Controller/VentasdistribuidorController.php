@@ -1400,8 +1400,7 @@ class VentasdistribuidorController extends AppController {
         $this->redirect($this->referer());
     }
 
-    public function detalle_entrega($idCliente = null, $idExcel = null) {
-        //debug($idExcel);die;
+    public function detalle_entrega($idCliente = null, $idExcel = null) {        
         $cliente = $this->Cliente->findByid($idCliente, null, null, -1);
         $entregados = $this->Chip->find('all', array(
             'recursive' => -1,
