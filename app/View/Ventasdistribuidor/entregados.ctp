@@ -3,7 +3,7 @@
     <noscript class="message black-gradient simpler">Your browser does not support JavaScript! Some features won't work as expected...</noscript>
 
     <div class="with-padding">       
-        <h4 class="green underline">Ultimas Entregas Chip</h4>
+        <h4 class="green underline">Ultimas Entregas Chip</h4>     
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
                 <tr>
@@ -40,7 +40,7 @@
                           <?php endif; ?>
                       </td>
                       <td>
-                          <?php echo $this->Html->link('', array('action' => 'detalle_entrega', $ent['Chip']['fecha_entrega_d'], $ent['Cliente']['id']),array('class' => 'button blue-gradient icon-list','title' => 'Detalle de chips entregados')); ?>
+                          <?php echo $this->Html->link('', array('action' => 'detalle_entrega', $ent['Cliente']['id'], $ent['Chip']['excel_id']),array('class' => 'button blue-gradient icon-list','title' => 'Detalle de chips entregados')); ?>
                           <a href="javascript:" class="button red-gradient icon-forbidden" title="Cancelar Asignacion" onclick="cancelar('<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'cancela_entrega', $ent['Chip']['fecha_entrega_c'], $ent['Cliente']['id'])); ?>');"></a>
                       </td>
                   </tr>

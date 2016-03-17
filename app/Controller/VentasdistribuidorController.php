@@ -1372,7 +1372,7 @@ class VentasdistribuidorController extends AppController {
 
     public function entregados() {
         $entregados = $this->Chip->find('all', array(
-            'fields' => array('Chip.fecha_entrega_c', 'Cliente.nombre', 'Cliente.id', 'Cliente.num_registro', 'COUNT(*) as num_chips', 'Chip.pagado', 'Chip.precio_d')
+            'fields' => array('Chip.fecha_entrega_c', 'Cliente.nombre', 'Cliente.id', 'Cliente.num_registro', 'COUNT(*) as num_chips', 'Chip.pagado', 'Chip.precio_d', 'Chip.excel_id')
             , 'conditions' => array('Chip.distribuidor_id' => $this->Session->read('Auth.User.id'), 'Chip.cliente_id !=' => NULL, 'Chip.fecha_entrega_c !=' => NULL)
             , 'group' => array('Chip.fecha_entrega_c', 'cliente_id')
             , 'order' => 'fecha_entrega_d DESC'
@@ -1400,11 +1400,12 @@ class VentasdistribuidorController extends AppController {
         $this->redirect($this->referer());
     }
 
-    public function detalle_entrega($fecha = null, $idCliente = null) {
+    public function detalle_entrega($idCliente = null, $idExcel = null) {
+        //debug($idExcel);die;
         $cliente = $this->Cliente->findByid($idCliente, null, null, -1);
         $entregados = $this->Chip->find('all', array(
             'recursive' => -1,
-            'conditions' => array('Chip.fecha_entrega_c' => $fecha, 'Chip.cliente_id' => $idCliente)
+            'conditions' => array('Chip.excel_id' => $idExcel, 'Chip.cliente_id' => $idCliente)
         ));
         $this->set(compact('entregados', 'fecha', 'cliente'));
     }
