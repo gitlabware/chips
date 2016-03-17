@@ -16,7 +16,7 @@
         <!-- By default, this section is made for 4 icons, see the doc to learn how to change this, in "basic markup explained" -->
         <ul id="access" class="children-tooltip">
             <li><a href="<?php echo $this->Html->url(array('controller' => 'ventasdistribuidor', 'action' => 'mismetas')) ?>" title="INICIO"><span class="icon-gear"></span></span></a></li>
-            <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'editar', $this->Session->read('Auth.User.id'))) ?>" title="Mis Datos"><span class="icon-user"></span></span></a></li>
+            <li><a href="<?php echo $this->Html->url(array('controller' => 'Users', 'action' => 'edit_distribuidor', $this->Session->read('Auth.User.id'))) ?>" title="Mis Datos"><span class="icon-user"></span></span></a></li>
             <li><a href="<?php echo $this->Html->url(array('controller' => 'users', 'action' => 'salir')) ?>" title="Salir"><span class="icon-extract"></span></a></li>     
         </ul>
         <section class="navigable">

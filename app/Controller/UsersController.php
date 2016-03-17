@@ -443,5 +443,28 @@ class UsersController extends AppController {
     $this->Session->setFlash("Se registro correctamente!!", 'msgbueno');
     $this->redirect($this->referer());
   }
+  
+  public function edit_distribuidor(){
+      $this->layout = 'vivadistribuidor';
+      
+      if(!empty($this->request->data)){
+          
+          if(!empty($this->request->data['User']['password2'])){
+              $this->request->data['User']['password'] = $this->request->data['User']['password2'];
+          }
+          $this->User->create();
+          $this->User->save($this->request->data['User']);
+          
+          $this->Persona->create();
+          $this->Persona->save($this->request->data['Persona']);
+          
+          $this->Session->setFlash("Se ha registrado correctamente los datos del usuario!!",'msgbueno');
+          $this->redirect(array('controller' => 'Ventasdistribuidor','action' => 'mismetas'));
+      }
+      
+      $idUser = $this->Session->read('Auth.User.id');
+      $this->User->id = $idUser;
+      $this->request->data = $this->User->read();
+  }
 
 }
