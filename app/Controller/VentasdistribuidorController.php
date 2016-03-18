@@ -1270,7 +1270,14 @@ class VentasdistribuidorController extends AppController {
     }
 
     public function chips($idCliente = null) {
-        $cliente = $this->Cliente->find('first', array('recursive' => -1, 'fields' => array('Cliente.nombre', 'Cliente.direccion'), 'conditions' => array('Cliente.id' => $idCliente)));
+        $cliente = $this->Cliente->find('first', array(
+            'recursive' => -1, 
+            'fields' => array(
+                'Cliente.nombre', 
+                'Cliente.direccion',
+                'Cliente.id'
+                ), 
+            'conditions' => array('Cliente.id' => $idCliente)));
 
         if ($this->RequestHandler->responseType() == 'json') {
             $this->paginate = array(

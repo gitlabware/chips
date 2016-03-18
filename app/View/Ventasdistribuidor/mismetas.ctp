@@ -17,7 +17,6 @@ $meses = array(
 
 
 
-
 <section role="main" id="main">
     <hgroup id="main-title" class="thin">
         <h1>METAS CHIP'S</h1>
@@ -26,7 +25,7 @@ $meses = array(
         <table class="table">
             <thead>
                 <tr>
-                    <th colspan="4" style="text-align: center;"><?php echo $ano . ' - ' . $meses[$mes] ?></th>
+                    <th colspan="4" style="text-align: center;"><?php echo $ano . ' - ' . $meses[(int)$mes] ?></th>
                 </tr>
                 <tr>
                     <th>Mercado</th>

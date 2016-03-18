@@ -1,3 +1,19 @@
+<?php
+$meses = array(
+    1 => 'Enero',
+    2 => 'Febrero',
+    3 => 'Marzo',
+    4 => 'Abril',
+    5 => 'Mayo',
+    6 => 'Junio',
+    7 => 'Julio',
+    8 => 'Agosto',
+    9 => 'Sepetiembre',
+    10 => 'Octubre',
+    11 => 'Noviembre',
+    12 => 'Disciembre'
+);
+?>
 <script>
     var idExcel_c = 0;
 </script>
@@ -7,23 +23,36 @@
     </hgroup>
     <div class="with-padding">
         <div id="muestraFormAsignaciones">
-            <?php echo $this->Form->create('Chips', array('action' => 'guardaexcel', 'id' => 'formAsig', 'enctype' => 'multipart/form-data')); ?>
+            <?php echo $this->Form->create('Comisione', array('action' => 'guardaexcel', 'id' => 'formAsig', 'enctype' => 'multipart/form-data')); ?>
             <!--        <form method="post" action="" class="columns" onsubmit="return false">                               -->
             <!--<div class="new-row-desktop four-columns six-columns-tablet twelve-columns-mobile">-->
             <div class="new-row twelve-columns">                
                 <!--                <h3 class="thin underline">&nbsp;</h3>                                          -->
-                <fieldset class="fieldset fields-list">
-                    <legend class="legend black-gradient">Formulario Subida Excel Asignaciones</legend>
-                    <div class="field-block button-height"					
-                        <label for="login" class="label"><b>Seleccionar Excel :</b></label>
-                        <?php //echo $this->Form->text('Persona.nombre', array('class' => 'span12', 'required')); ?>
-                        <!--<input type="text" name="login" id="login" value="" class="input">-->
-                        <span class="input file">
-                            <span class="file-text"></span>
-                            <span class="button compact black-gradient">Seleccione</span>
-                            <input type="file" name="data[Excel][excel]" id="special-input-1" class="file withClearFunctions" required />
-                        </span>
-                    </div>                                                                 
+                <fieldset class="fieldset">
+
+                    <div class="columns">
+                        <div class="four-columns">
+                            <p class="button-height">
+                                <span class="input file full-width">
+                                    <span class="file-text"></span>
+                                    <span class="button compact black-gradient">Seleccione</span>
+                                    <input type="file" name="data[Excel][excel]" id="special-input-1" class="file withClearFunctions" required />
+                                </span>
+                            </p>
+                        </div>
+                        <div class="four-columns">
+                            <p class="block-label button-height">
+                                <?php echo $this->Form->year('Dato.gestion', date('Y') - 2, date('Y') + 2, array('class' => 'select full-width', 'value' => date('Y'), 'required', 'empty' => 'Seleccione la gestion'));
+                                ?>
+                            </p>
+                        </div>
+                        <div class="four-columns">
+                            <p class="block-label button-height">
+                                <?php echo $this->Form->select('Dato.mes', $meses, array('class' => 'select full-width', 'required', 'value' => date('m'), 'empty' => 'Seleccione mes')); ?>
+                            </p>
+                        </div>
+                    </div>
+
 
                     <div class="field-block button-height">
                         <button type="submit" id="btAsig" class="button glossy mid-margin-right">
@@ -108,18 +137,21 @@
             </thead>
             <tbody>
                 <?php foreach ($excels as $e): ?>
+                    <?php
+                    $gestion = unserialize($e['Excel']['detalles']);
+                    ?>
                     <?php if ($e['Excel']['total_registros'] > 0 && $e['Excel']['total_registros'] > $e['Excel']['puntero']): ?>
                     <script>
                         idExcel_c = <?php echo $e['Excel']['id']; ?>;
                     </script>
                 <?php endif; ?>
-                <tr>                      
-                    <td><?php echo $e['Excel']['gestion']; ?></td>                        
+                <tr>                
+                    <td><?php echo $meses[(int) $gestion['mes']] . '-' . $gestion['gestion']; ?></td>                        
                     <td><?php echo $e['Excel']['created']; ?></td>                        
                     <td><?php echo $e['Excel']['nombre_original']; ?></td>
                     <td>
-                        
-                    </td>                       
+                        <?php echo $this->Html->link('Ver',array('action' => 'vercomisiones',$e['Excel']['id'])); ?>
+                    </td>                  
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -131,9 +163,11 @@
 <!-- End sidebar/drop-down menu -->
 <?php
 echo $this->Html->css(array('styles/progress-slider.css?v=1'), array('block' => 'css'));
-echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), array('block' => 'js_add'))
+echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel2'), array('block' => 'js_add'))
 ?>
 <script>
+
+
     function carga_reg_com(idExcel)
     {
         var timeout;
@@ -217,10 +251,10 @@ echo $this->Html->script(array('developr.progress-slider', 'inicargaexcel'), arr
                                                 else
                                                 {
                                                     if (n_chip === 1) {
-                                                        status.text('Creando registros de chip...');
+                                                        status.text('Creando registros de comisiones...');
                                                         progress.changeProgressBarColor('blue-gradient');
                                                     } else {
-                                                        status.text('Creado registro (' + n_chip + '/' + total_c + ')...');
+                                                        status.text('Creando registro (' + n_chip + '/' + total_c + ')...');
                                                     }
 
                                                     timeout = setTimeout(simulateLoading, 10);
