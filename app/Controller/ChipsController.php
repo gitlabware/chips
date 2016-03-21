@@ -31,9 +31,8 @@ class ChipsController extends AppController {
     }
 
     public function subirexcel() {
-        
-        $sql1 = "SELECT Excel.*, (SELECT COUNT(activados.id) FROM activados WHERE activados.excel_id = Excel.id) AS total_ac FROM `chips`.`excels` AS `Excel` WHERE `tipo` IN ('asignacion', 'activacion') ORDER BY `Excel`.`id` DESC LIMIT 30";
-
+  
+        $sql1 = "SELECT Excel.*, (SELECT COUNT(activados.id) FROM activados WHERE activados.excel_id = Excel.id) AS total_ac FROM excels AS Excel WHERE Excel.tipo IN ('asignacion', 'activacion') ORDER BY Excel.id DESC LIMIT 30";
         //$sql1 = "SELECT Excel.*, COUNT(chips.id) AS nnn FROM `chips`.`excels` AS `Excel`, chips WHERE `tipo` IN ('asignacion', 'activacion') AND chips.excel_id = Excel.id  ORDER BY `Excel`.`id` DESC LIMIT 30";
         /* $excels = $this->Excel->find('all', array(
           'order' => array('Excel.id DESC'),

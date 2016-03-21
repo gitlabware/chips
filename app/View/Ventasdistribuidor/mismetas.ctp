@@ -31,7 +31,7 @@ $meses = array(
                     <th>Mercado</th>
                     <th>Meta</th>
                     <th>Ventas</th>
-                    <th>Cumplimiento</th>
+                    <th>Cumpl.</th>
                 </tr>
             </thead>
             <tbody>
@@ -43,7 +43,7 @@ $meses = array(
                         <td><?php echo $me['Meta']['ventas']; ?></td>
                         <td><?php 
                         if(!empty($me['Meta']['meta'])){
-                            echo (($me['Meta']['ventas']/$me['Meta']['meta'])*100).' %';
+                            echo round((($me['Meta']['ventas']/$me['Meta']['meta'])*100),2).' %';
                         }else{
                             echo '0 %';
                         }

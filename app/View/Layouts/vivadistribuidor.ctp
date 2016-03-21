@@ -134,7 +134,11 @@
         <script src="<?php echo $this->webroot; ?>js/libs/DataTables/jquery.dataTables.min.js"></script>
 
         <script>
-            // Call template init (optional, but faster if called manually)
+
+
+            
+
+
             $.template.init();
 
             // Table sort - DataTables
@@ -182,6 +186,31 @@
                 };
             }
             table2.dataTable(datos_tabla2);
+
+            function cargarmodal(url, titulo, alto) {
+                if (alto === undefined) {
+                    alto = 400;
+                }
+
+                $.modal({
+                    content: '<div id="idmodal"></div>',
+                    title: titulo,
+                    width: 600,
+                    height: alto,
+                    actions: {
+                        'Cerrar': {
+                            color: 'red',
+                            click: function (win) {
+                                win.closeModal();
+                            }
+                        }
+                    },
+                    buttonsLowPadding: true
+                });
+                $('#idmodal').load(url);
+                //cierra_modal();
+
+            }
         </script>
         <?php echo $this->Session->flash(); ?>
         <div style="text-align: center; color:gray;">

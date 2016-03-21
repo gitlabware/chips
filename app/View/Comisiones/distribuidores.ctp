@@ -19,146 +19,22 @@ $meses = array(
 </script>
 <section role="main" id="main">
     <hgroup id="main-title" class="thin">
-        <h1>Comisiones</h1>
+        <h1>Comisiones de <?php echo $meses[(int) $gestion['mes']] . ' - ' . $gestion['gestion']; ?></h1>
     </hgroup>
     <div class="with-padding">
-        <div id="muestraFormAsignaciones">
-            <?php echo $this->Form->create('Comisione', array('action' => 'guardaexcel', 'id' => 'formAsig', 'enctype' => 'multipart/form-data')); ?>
-            <!--        <form method="post" action="" class="columns" onsubmit="return false">                               -->
-            <!--<div class="new-row-desktop four-columns six-columns-tablet twelve-columns-mobile">-->
-            <div class="new-row twelve-columns">                
-                <!--                <h3 class="thin underline">&nbsp;</h3>                                          -->
-                <fieldset class="fieldset">
-
-                    <div class="columns">
-                        <div class="four-columns">
-                            <p class="button-height">
-                                <span class="input file full-width">
-                                    <span class="file-text"></span>
-                                    <span class="button compact black-gradient">Seleccione</span>
-                                    <input type="file" name="data[Excel][excel]" id="special-input-1" class="file withClearFunctions" required />
-                                </span>
-                            </p>
-                        </div>
-                        <div class="four-columns">
-                            <p class="block-label button-height">
-                                <?php echo $this->Form->year('Dato.gestion', date('Y') - 2, date('Y') + 2, array('class' => 'select full-width', 'value' => date('Y'), 'required', 'empty' => 'Seleccione la gestion'));
-                                ?>
-                            </p>
-                        </div>
-                        <div class="four-columns">
-                            <p class="block-label button-height">
-                                <?php echo $this->Form->select('Dato.mes', $meses, array('class' => 'select full-width', 'required', 'value' => date('m'), 'empty' => 'Seleccione mes')); ?>
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <div class="field-block button-height">
-                        <button type="submit" id="btAsig" class="button glossy mid-margin-right">
-                            <span class="button-icon black-gradient"><span class="icon-save"></span></span>
-                            Guardar Excel
-                        </button>
-                        &nbsp;
-                        <button type="button" class="button glossy mid-margin-right" id="btMuestraFAsignaciones" onclick="openModal()"> 
-                            <span class="button-icon"><span class="icon-search"></span></span>
-                            Ver Formato
-                        </button>
-                        <a href="<?= $this->webroot; ?>formatos/primero.xlsx" class="button"><span class="button-icon"><span class="icon-download"></span></span> Formato</a>
-                    </div>                                        
-                </fieldset>
-            </div>
-            </form>
-        </div>
-
-        <script>
-            $("#formAsig").on("submit", function (e) {
-
-                $("#btAsig").replaceWith("<span class='loader big working'></span> Trabajando ;)");
-            });
-
-            function openModal()
-            {
-                //console.log('hizo click');
-                $.modal({
-                    content: '<div id="idmodal"></div>',
-                    title: 'Formato del Archivo',
-                    content: '<?php echo $this->Html->image('iconos/asignados.png'); ?>',
-                            center: true,
-                    width: 850,
-                    height: 450,
-                });
-            }
-            ;
-
-        </script>
-
-        <script>
-            $("#formActi").on("submit", function (e) {
-
-                $("#btActi").replaceWith("<span class='loader big working'></span> Trabajando ;)");
-            });
-
-            $(document).ready(function () {
-                $("#btMuestraFormAsignaciones").click(function () {
-                    $("#muestraFormAsignaciones").show('slow');
-                    $("#muestraFormActivaciones").hide('slow');
-                });
-
-                $("#btMuestraFormActivaciones").click(function () {
-                    $("#muestraFormActivaciones").show('slow');
-                    $("#muestraFormAsignaciones").hide('slow');
-                });
-
-            });
-
-            function openModal2()
-            {
-                //console.log('hizo click');
-                $.modal({
-                    title: 'Formato del Archivo',
-                    content: '<?php echo $this->Html->image('iconos/formato_activados.png'); ?>',
-                    center: true,
-                    width: 1190,
-                    height: 450,
-                });
-            }
-            ;
-        </script>
-        <p>&nbsp;</p>
         <table class="table responsive-table" id="sorting-advanced">
             <thead>
                 <tr>
-                    <th scope="col" class="align-center">Gestion</th>
-                    <th scope="col" class="align-center">Fecha</th>
-                    <th scope="col" class="align-center">Nombre</th>
-                    <th scope="col" class="align-center">Registrados</th>
-                    <th scope="col" class="align-center">Reconocidos</th>
+                    <th scope="col" class="align-center">Distribuidor</th>
                     <th scope="col" class="align-center">Acciones</th> 
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($excels as $e): ?>
-                    <?php
-                    $gestion = unserialize($e['Excel']['detalles']);
-                    ?>
-                    <?php if ($e['Excel']['total_registros'] > 0 && $e['Excel']['total_registros'] > $e['Excel']['puntero']): ?>
-                    <script>
-                        idExcel_c = <?php echo $e['Excel']['id']; ?>;
-                    </script>
-                <?php endif; ?>
-                <tr>                
-                    <td><?php echo $meses[(int) $gestion['mes']] . '-' . $gestion['gestion']; ?></td>                        
-                    <td><?php echo $e['Excel']['created']; ?></td>                        
-                    <td><?php echo $e['Excel']['nombre_original']; ?></td>
-                    <td><?php echo $e['Excel']['registrados']; ?></td>
-                    <td><?php echo $e['Excel']['reconocidos']; ?></td>
+                <?php foreach ($distribuidores as $di): ?>
+                <tr>
+                    <td><?php echo $di['User']['nombre_completo']; ?></td>
                     <td>
-                        <?php echo $this->Html->link('Ver', array('action' => 'vercomisiones', $e['Excel']['id']), array('class' => 'button green-gradient glossy', 'escape' => false)); ?>
-                        <?php echo $this->Html->link('<span class="icon-users"></span>', array('action' => 'distribuidores', $e['Excel']['id']), array('class' => 'button blue-gradient glossy', 'escape' => false, 'title' => 'Distribuidores')) ?>
-                        
-                        <?php echo $this->Html->link('<span class="icon-inbox"></span>', array('action' => 'genera_excel_2', $e['Excel']['id']), array('class' => 'button blue-gradient glossy', 'escape' => false, 'title' => 'Excel de Comisiones')) ?>
-                        <?php echo $this->Html->link('<span class="icon-trash"></span>', array('action' => 'eliminar_excel', $e['Excel']['id']), array('class' => 'button red-gradient glossy', 'confirm' => 'Esta seguro de eliminar el excel??', 'escape' => false, 'title' => 'Eliminar Excel')) ?>
+                        <?php echo $this->Html->link('<span class="icon-down-fat"></span>', array('action' => 'genera_excel_1', $excel['Excel']['id'],$di['User']['id']), array('class' => 'button blue-gradient glossy', 'escape' => false, 'title' => 'Descargar Excel Comisiones')) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

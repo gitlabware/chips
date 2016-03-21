@@ -17,7 +17,7 @@
                     <th class="hide-on-mobile">direccion</th>  
                     <th class="hide-on-mobile">celular</th>
                     <th class="hide-on-mobile">zona</th>
-                    <th style="width: 20px;">Accion</th>
+                    <th style="width: 100px;">Accion</th>
                 </tr>
             </thead>          
             <tbody>
@@ -28,40 +28,46 @@
 </section>	
 
 <script>
-  function asignar(idcliente) {
-      location = '<?php echo $this->Html->url(array('action' => 'chips')); ?>/' + idcliente;
-  }
-  function venta(idcliente) {
-      location = '<?php echo $this->Html->url(array('action' => 'formulario')); ?>/' + idcliente;
-  }
-  function editar(idcliente) {
-      location = '<?php echo $this->Html->url(array('action' => 'cliente')); ?>/' + idcliente;
-  }
+    function asignar(idcliente) {
+        location = '<?php echo $this->Html->url(array('action' => 'chips')); ?>/' + idcliente;
+    }
+    function comision(idcliente) {
+        location = '<?php echo $this->Html->url(array('controller' => 'Comisiones', 'action' => 'distribuidor')); ?>/' + idcliente;
+    }
+    function venta(idcliente) {
+        location = '<?php echo $this->Html->url(array('action' => 'formulario')); ?>/' + idcliente;
+    }
+    function editar(idcliente) {
+        location = '<?php echo $this->Html->url(array('action' => 'cliente')); ?>/' + idcliente;
+    }
 </script>
 <script>
-  urljsontabla = '<?php echo $this->Html->url(array('action' => 'clientes.json')); ?>';
-  datos_tabla2 = {};
-  datos_tabla2 = {
-      /*"oLanguage": {
-          "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
-      },*/
-      'sPaginationType': 'full_numbers',
-      'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
-      'bProcessing': true,
-      'sAjaxSource': urljsontabla,
-      'sServerMethod': 'POST',
-      "order": [],
-      'fnInitComplete': function (oSettings)
-      {
-          // Style length select
-          table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
-          tableStyled = true;
-      }, "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-          $('td:eq(2)', nRow).addClass('hide-on-mobile');
-          $('td:eq(3)', nRow).addClass('hide-on-mobile');
-          $('td:eq(4)', nRow).addClass('hide-on-mobile');
-      }
-  };
+    urljsontabla = '<?php echo $this->Html->url(array('action' => 'clientes.json')); ?>';
+    datos_tabla2 = {};
+    datos_tabla2 = {
+        /*"oLanguage": {
+         "sUrl": "https://cdn.datatables.net/plug-ins/1.10.7/i18n/Spanish.json"
+         },*/
+
+        "sScrollX": "100%",
+        "bScrollCollapse": true,
+        'sPaginationType': 'full_numbers',
+        'sDom': '<"dataTables_header"lfr>t<"dataTables_footer"ip>',
+        'bProcessing': true,
+        'sAjaxSource': urljsontabla,
+        'sServerMethod': 'POST',
+        "order": [],
+        'fnInitComplete': function (oSettings)
+        {
+            // Style length select
+            table2.closest('.dataTables_wrapper').find('.dataTables_length select').addClass('select blue-gradient glossy').styleSelect();
+            tableStyled = true;
+        }, "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            $('td:eq(2)', nRow).addClass('hide-on-mobile');
+            $('td:eq(3)', nRow).addClass('hide-on-mobile');
+            $('td:eq(4)', nRow).addClass('hide-on-mobile');
+        }
+    };
 </script>
 <!-- Sidebar/drop-down menu -->
 <?php echo $this->element('sidebar/distribuidor'); ?>

@@ -22,13 +22,13 @@
             <div class="four-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Rang. Inicial</label>
-                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'full-width input')); ?>
+                    <?php echo $this->Form->text('Dato.rango_ini', array('class' => 'full-width input','type' => 'number')); ?>
                 </p>
             </div>
             <div class="four-columns">
                 <p class="block-label button-height">
                     <label for="block-label-1" class="label">Cantidad</label>
-                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'full-width input')); ?>
+                    <?php echo $this->Form->text('Dato.cantidad', array('class' => 'full-width input','type' => 'number')); ?>
                 </p>
             </div>
             <div class="four-columns">

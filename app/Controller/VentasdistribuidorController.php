@@ -1241,13 +1241,14 @@ class VentasdistribuidorController extends AppController {
     public function clientes() {
 
         if ($this->RequestHandler->responseType() == 'json') {
-            $asignar = '<button class="button blue-gradient icon-star" type="button" onclick="asignar(' . "',Cliente.id,'" . ')"></button>';
+            $asignar = '<button class="button blue-gradient icon-star" title="Asignacion de chips" type="button" onclick="asignar(' . "',Cliente.id,'" . ')"></button>';
+            $comision = '<button class="button orange-gradient icon-star" title="Comision" type="button" onclick="comision(' . "',Cliente.id,'" . ')"></button>';
             //$asignar = '<button class="button blue-gradient compact icon-list" type="button" onclick="asignar(' . "',Cliente.id,'" . ')">Asignar</button>';
             //$venta = '<button class="button green-gradient compact icon-list" type="button" onclick="venta(' . "',Cliente.id,'" . ')">Venta</button>';
             //$editar = '<button class="button orange-gradient compact icon-list" type="button" onclick="editar(' . "',Cliente.id,'" . ')">Editar</button>';
             //$editar2 = "',IF((Cliente.estado = 1),CONCAT('$editar'),''),'";
             //$acciones = "$asignar $venta $editar2";
-            $acciones = "$asignar";
+            $acciones = "$asignar $comision";
             $rutas_usuario = $this->Rutasusuario->find('list', array(
                 'conditions' => array('Rutasusuario.user_id' => $this->Session->read('Auth.User.id')),
                 'fields' => array('Rutasusuario.ruta_id')
@@ -1299,9 +1300,13 @@ class VentasdistribuidorController extends AppController {
         if (!empty($datos['rango_ini']) && !empty($datos['cantidad'])) {
             $chips = $this->Chip->find('all', array(
                 'recursive' => -1,
-                'order' => 'Chip.id', 'limit' => $datos['cantidad'], 'fields' => array('Chip.id'),
+                'order' => 'Chip.id ASC', 
+                'limit' => $datos['cantidad'], 
+                'fields' => array('Chip.id'),
                 'conditions' => array('Chip.id >=' => $datos['rango_ini'], 'Chip.cliente_id' => NULL, 'Chip.distribuidor_id' => $this->Session->read('Auth.User.id'))
             ));
+            /*debug($chips);
+            exit;*/
             foreach ($chips as $ch) {
                 $this->Chip->id = $ch['Chip']['id'];
                 $dato['Chip']['cliente_id'] = $datos['cliente_id'];
@@ -1411,7 +1416,9 @@ class VentasdistribuidorController extends AppController {
         $cliente = $this->Cliente->findByid($idCliente, null, null, -1);
         $entregados = $this->Chip->find('all', array(
             'recursive' => -1,
-            'conditions' => array('Chip.excel_id' => $idExcel, 'Chip.cliente_id' => $idCliente)
+            'conditions' => array(
+                //'Chip.excel_id' => $idExcel, 
+                'Chip.cliente_id' => $idCliente)
         ));
         $this->set(compact('entregados', 'fecha', 'cliente'));
     }

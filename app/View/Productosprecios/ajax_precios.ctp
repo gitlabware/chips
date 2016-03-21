@@ -1,7 +1,6 @@
 <div class="with-padding">
     <?php echo $this->Form->create('Productosprecio', array('action' => 'registra_precio', 'id' => 'form_precio')); ?>
     <div class="columns">
-
         <div class="new-row four-columns">
             <p class="block-label button-height">
                 <label for="block-label-1" class="label">Escala <small>(requerido)</small></label> 

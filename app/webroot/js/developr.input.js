@@ -42,6 +42,7 @@
 	 */
 	$.fn.styleCheckable = function(options)
 	{
+            
 		// Settings
 		var globalSettings = $.extend({}, $.fn.styleCheckable.defaults, options);
 
@@ -80,7 +81,7 @@
 									'<span class="check-knob"></span>'+
 								'</span>');
 			}
-
+                        
 			// Prevent the element from being focusable by keyboard
 			this.tabIndex = -1;
 
@@ -103,8 +104,8 @@
 				$.template.enableDOMWatch();
 			}
 		});
+                
 	};
-
 	/*
 	 * Options for styled switches, checkboxes and radios
 	 */
@@ -1968,7 +1969,9 @@
 		if (replaced.is(':checkbox') || !replaced.prop('checked'))
 		{
 			replaced.prop('checked', !replaced.prop('checked')).trigger('change');
+                        
 		}
+                
 	});
 
 	// Drag switches
@@ -2120,6 +2123,7 @@
 			}
 		}
 		doc.on(touchEvent ? 'touchend' : 'mouseup', endDrag);
+                
 	});
 
 	// Radios and checkboxes changes
