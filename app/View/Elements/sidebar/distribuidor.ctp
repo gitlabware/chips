@@ -60,7 +60,6 @@
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'mismetas')); ?>">Metas</a></li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'clientes')); ?>">Clientes</a></li>
                 <li><a href="<?php echo $this->Html->url(array('controller' => 'Ventasdistribuidor', 'action' => 'entregados')); ?>">Chips entregados</a></li>
-                <li><a href="<?php echo $this->Html->url(array('controller' => 'Comisiones', 'action' => 'distribuidor')); ?>">Chips entregados</a></li>
             </ul>
         </section>
     </div>
